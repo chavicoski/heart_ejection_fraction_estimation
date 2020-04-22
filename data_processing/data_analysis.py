@@ -1,6 +1,7 @@
 import sys
 import os
 import pandas as pd
+import numpy as np
 from pydicom import dcmread
 from matplotlib import pyplot as plt
 from tqdm import tqdm
@@ -35,8 +36,9 @@ Info:
 - The folders with more or less than 30 slices will be ignored.
 '''
 ignored_slices = []
-slices_count = {"train": [], "dev": [], "test": []}
-spacing_count = {"train": [], "dev": [], "test": []}
+pixels_stats = {"train": [], "dev": [], "test": []}   # Tuples of pixels values (avg, max, min)
+slices_count = {"train": [], "dev": [], "test": []}   # Number of slices per patient
+spacing_count = {"train": [], "dev": [], "test": []}  # Tuples with spaces in each dimension (h, w, depth)
 data_splits = [("train", train_data_path), ("dev", dev_data_path), ("test", test_data_path)]
 shapes_count = {}  # To store the different shapes in the data -> key: shape tuple string, value: number of adquisitions
 
@@ -64,6 +66,12 @@ for split_name, data_path in data_splits:
                         # Store slices shape
                         img_shape = pixel_array.shape
                         shapes_count[str(img_shape)] = shapes_count.get(str(img_shape), 0) + 1  
+
+                    # Get pixel values stats
+                    pix_avg = np.mean(pixel_array)
+                    pix_max = np.max(pixel_array)
+                    pix_min = np.min(pixel_array)
+                    pixels_stats[split_name].append((pix_avg, pix_max, pix_min))
 
                 n_valid_slices += 1
 
@@ -110,7 +118,7 @@ for shape, count in sorted(shapes_count.items(), key=lambda x: x[1], reverse=Tru
 '''
 Spacing stats
 '''
-print("\nPixel spacing:")
+print("\nPixels spacings:")
 for split, counts in spacing_count.items():
     x_avg, y_avg, z_avg = 0, 0, 0
     x_max, y_max, z_max = -1, -1, -1
@@ -161,4 +169,51 @@ plt.xlabel("Distance")
 plt.ylabel("Count")
 plt.title(f"Count of depth spacings")
 plt.savefig(f"plots/spacings_z.png")
+plt.clf()  # Reset figure for next plot
+
+'''
+Pixels stats
+'''
+print("\nPixels values:")
+for split, pix_stats in pixels_stats.items():
+    aux_avg = 0
+    aux_max = -1
+    aux_min = 999999
+    total = 0
+    for pix_avg, pix_max, pix_min in pix_stats:
+        if pix_max > aux_max: aux_max = pix_max 
+        if pix_min < aux_min: aux_min = pix_min 
+
+        aux_avg += pix_avg
+        total += 1
+
+    print(f"\t{split} split:")
+    print(f"\t\taverage_pixel={aux_avg/total} - max_pixel={aux_max} - min_pixel={aux_min}")
+
+pix_avgs = [stat[0] for split, pix_stats in pixels_stats.items() for stat in pix_stats]
+pix_maxs = [stat[1] for split, pix_stats in pixels_stats.items() for stat in pix_stats]
+pix_mins = [stat[2] for split, pix_stats in pixels_stats.items() for stat in pix_stats]
+
+# Pixels averages (by slice and timestep) histogram
+plt.hist(pix_avgs, bins=30)
+plt.xlabel("Pixel value")
+plt.ylabel("Count")
+plt.title(f"Count of average pixel value for every dicom image")
+plt.savefig(f"plots/pixels_averages.png")
+plt.clf()  # Reset figure for next plot
+
+# Pixels maximums histogram
+plt.hist(pix_maxs, bins=30)
+plt.xlabel("Pixel value")
+plt.ylabel("Count")
+plt.title(f"Count of maximum pixel values for every dicom image")
+plt.savefig(f"plots/pixels_maxspng")
+plt.clf()  # Reset figure for next plot
+
+# Pixels minimums histogram
+plt.hist(pix_mins, bins=30)
+plt.xlabel("Pixel value")
+plt.ylabel("Count")
+plt.title(f"Count of minimum pixel values for every dicom image")
+plt.savefig(f"plots/pixels_mins.png")
 plt.clf()  # Reset figure for next plot
