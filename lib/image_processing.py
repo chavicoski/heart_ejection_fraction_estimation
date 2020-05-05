@@ -2,6 +2,7 @@ import numpy as np
 from skimage import exposure
 from skimage.filters import threshold_otsu
 from skimage.morphology import binary_erosion, disk
+import cv2
 
 
 ############################
@@ -51,7 +52,7 @@ def segment_multiple(patient_images):
     segmented_images = np.zeros((num_images, height, width))
 
     for i in range(num_images):
-        seg_image = thresh_segmentation(patient_images[i])
+        seg_image = threshold_segmentation(patient_images[i])
         if seg_image.sum() > seg_image.size * 0.5:
             seg_image = 1 - seg_image
         segmented_images[i] = seg_image
@@ -70,14 +71,14 @@ def roi_mean_yx(patient_image):
     neighborhood = disk(2)
 
     for i, seg_image in enumerate(seg_images):
-    # Perform erosion to get rid of wrongly segmented small parts
-    seg_images_eroded = binary_erosion(seg_image, neighborhood) 
+        # Perform erosion to get rid of wrongly segmented small parts
+        seg_images_eroded = binary_erosion(seg_image, neighborhood) 
 
-    # Filter out background of slice, after erosion [background=0, foreground=1]
-    y_coord, x_coord = seg_images_eroded.nonzero()
+        # Filter out background of slice, after erosion [background=0, foreground=1]
+        y_coord, x_coord = seg_images_eroded.nonzero()
 
-    # Save mean coordinates of foreground 
-    y_all[i], x_all[i] = np.mean(y_coord), np.mean(x_coord)
+        # Save mean coordinates of foreground 
+        y_all[i], x_all[i] = np.mean(y_coord), np.mean(x_coord)
 
     # Return mean of mean foregrounds - this gives an estimate of ROI coords.
     mean_y = int(np.mean(y_all))
@@ -98,7 +99,7 @@ def histogram_normalize_4d(images, clip_limit=0.03):
     norm_images_4d = np.empty(images.shape)
     for i in range(slices):
         for j in range(timesteps):
-            norm_imgs_4d[i,j] = exposure.equalize_adapthist(images[i,j].astype(np.uint16), clip_limit=clip_limit)
+            norm_images_4d[i,j] = exposure.equalize_adapthist(images[i,j].astype(np.uint16), clip_limit=clip_limit)
 
     return norm_images_4d
 
@@ -117,7 +118,7 @@ def rescale_patient_slices(patient_slices, x_dist, y_dist):
 
     # Resize for each slice and time step all the images of the patient
     for s in range(num_slices):
-        for t in range(timestep):
+        for t in range(timesteps):
             scaled_images[s,t] = cv2.resize(src=patient_slices[s,t], dsize=None, fx=x_dist, fy=y_dist)
 
     return scaled_images
@@ -153,8 +154,8 @@ def crop_roi(image, dim_y, dim_x, coord_y, coord_x):
 
     # Fill out new image from top left corner
     # Leave pixels outside range as 0's (black)
-    crop_image[0:range_y, 0:range_x] = img[dy_up:dy_down, dx_left:dx_right]
-    return crop_img
+    crop_image[0:range_y, 0:range_x] = image[dy_up:dy_down, dx_left:dx_right]
+    return crop_image
 
 
 def crop_heart(patient_slices, target_height=200, target_width=200):
@@ -199,9 +200,48 @@ def preprocess_pipeline1(patient_slices, pix_spacings, target_size=(200, 200)):
     return crop_images
 
 
+################
+# IO FUNCTIONS #
+################
+
+def print_patient_slices(patient_slices):
+    '''
+    Given a numpy array of shape (n_slices, timesteps, height, with) with the
+    data of a patient, this function creates and stores the plots for all the
+    slices and timesteps including a gift animation per slice.
+    '''
+    pass  # TODO
+
+
 ##################
 # TEST FUNCTIONS #
 ##################
 
 if __name__ == "__main__":
+    import sys
+    import os
+    from pydicom import dcmread
     print("### PREPROCESS FUNCTIONS TESTS ###")
+
+    test_patient_path = "../cardiac_dataset/train/train/48/study"
+    patient_slices = []
+    pix_spacings = None
+    for sax_folder in os.listdir(test_patient_path):
+        if sax_folder.startswith("sax_"):
+            sax_images = []
+            sax_path = os.path.join(test_patient_path, sax_folder)
+            for dicom_name in os.listdir(sax_path):
+                dicom_data = dcmread(os.path.join(sax_path, dicom_name))
+                image_array = dicom_data.pixel_array
+                sax_images.append(image_array)
+                if pix_spacings == None:
+                    pix_spacings = dicom_data.PixelSpacing
+            patient_slices.append(sax_images)
+
+    patient_slices = np.array(patient_slices)
+    print(patient_slices.shape)
+    preproc_patient = preprocess_pipeline1(patient_slices, pix_spacings)
+    print(type(preproc_patient))
+    print(preproc_patient.shape)
+
+    
