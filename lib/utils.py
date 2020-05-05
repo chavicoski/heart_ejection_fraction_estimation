@@ -3,44 +3,16 @@ from time import time
 import torch
 from matplotlib import pyplot as plt
 
-
-'''
-Metric function to compute "intersection over union".
-Params:
-    logits -> Tensor output of the net. Shape: (batch_size, 1, h, w)
-    target -> Target mask tensor of 0's anb 1's. Shape: (batch_size, 1, h, w)
-    threshold -> threshold value to count logits as 1 or 0
-'''
-def iou_metric(logits, target, threshold=0.5):
-    # To avoid dividing by 0
-    epsilon = 1e-6
-
-    # Remove channel dimension. From (batch, channel, h, w) to (batch, h, w)
-    logits = logits.squeeze(1)
-    target = target.squeeze(1)
-
-    # Cast to byte type for computation of intersection and union
-    logits = (logits > threshold).byte() # Also use threshold to conver to 0 or 1
-    target = target.byte()
-
-    intersection = (logits & target).float().sum((1,2))
-    union = (logits | target).float().sum((1,2))
-
-    iou = (intersection + epsilon) / (union + epsilon)
-    
-    return iou
-
-
-'''
-Training loop function
-Params:
-    train_loader -> pytorch DataLoader for training data
-    net -> pytorch model
-    criterion -> pytorch loss function
-    optimizer -> pytorch optimizer
-    device -> pytorch computing device
-'''
 def train(train_loader, net, criterion, optimizer, device, pin_memory):
+    '''
+    Training loop function
+    Params:
+        train_loader -> pytorch DataLoader for training data
+        net -> pytorch model
+        criterion -> pytorch loss function
+        optimizer -> pytorch optimizer
+        device -> pytorch computing device
+    '''
     # Set the net in train mode
     net.train()
 
@@ -93,15 +65,15 @@ def train(train_loader, net, criterion, optimizer, device, pin_memory):
     return current_loss, current_iou
 
 
-'''
-Test function. Computes loss and accuracy for development set.
-Params:
-    test_loader -> pytorch DataLoader for testing data
-    net -> pytorch model
-    criterion -> pytorch loss function
-    device -> pytorch computing device
-'''
 def test(test_loader, net, criterion, device, pin_memory):
+    '''
+    Test function. Computes loss and accuracy for development set.
+    Params:
+        test_loader -> pytorch DataLoader for testing data
+        net -> pytorch model
+        criterion -> pytorch loss function
+        device -> pytorch computing device
+    '''
     # Set the net in eval mode
     net.eval()
 
@@ -143,6 +115,13 @@ def test(test_loader, net, criterion, device, pin_memory):
 
 
 def plot_results(train_losses, train_ious, test_losses, test_ious, loss_title="Loss", iou_title="Intersection Over Union", save_as=""):
+    '''
+    Given the list of stats for each epoch during training, this 
+    function shows and saves(if told) the plots of the stats
+    Params:
+        save_as -> name of the plot file without extension. If it
+                   is not specified the function don't save the plot
+    '''
     fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(20,10))
     ax[0].plot(train_losses, "r", label="train")
     ax[0].plot(test_losses, "g", label="test")
