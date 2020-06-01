@@ -1,16 +1,21 @@
 import sys
 import os
-from pydicom import dcmread
 import glob
-from matplotlib import pyplot as plt
 from tqdm import tqdm
 import multiprocessing as mp
 import numpy as np
+from matplotlib import pyplot as plt
 from array2gif import write_gif
+from pydicom import dcmread
 
 if len(sys.argv) < 2:
     print(f"usage: {sys.argv[0]} <CASE_FOLDER_PATH> [<N_PROCESSES>]")
     sys.exit()
+
+'''
+Given a path to a case folder, this script creates a folder in /plots/images/ with the png's for
+all the images of the case and creates the gif animations for each sax slice
+'''
 
 case_path = sys.argv[1] 
 case_id = case_path.split("/")[-1]
@@ -20,6 +25,9 @@ else:
     n_proc = mp.cpu_count()
 
 def save_dicom_plot(dicom_f, return_data=False):
+    '''
+    Auxiliary function to save the dicom images
+    '''
     dicom_data = dcmread(dicom_f) 
     pixel_array = dicom_data.pixel_array
     plt.imshow(pixel_array, cmap=plt.cm.bone)
