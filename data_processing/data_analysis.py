@@ -36,11 +36,13 @@ Info:
 - The folders with more or less than 30 slices will be ignored.
 '''
 ignored_slices = []
-pixels_stats = {"train": [], "dev": [], "test": []}   # Tuples of pixels values (avg, max, min)
-slices_count = {"train": [], "dev": [], "test": []}   # Number of slices per patient
-spacing_count = {"train": [], "dev": [], "test": []}  # Tuples with spaces in each dimension (h, w, depth)
-data_splits = [("train", train_data_path), ("dev", dev_data_path), ("test", test_data_path)]
-shapes_count = {}  # To store the different shapes in the data -> key: shape tuple string, value: number of adquisitions
+pixels_stats   = {"train": [], "dev": [], "test": []}  # Tuples of pixels values (avg, max, min)
+slices_count   = {"train": [], "dev": [], "test": []}  # Number of slices per patient
+spacing_count  = {"train": [], "dev": [], "test": []}  # Tuples with spaces in each dimension (h, w, depth)
+shapes_count   = {"train": {}, "dev": {}, "test": {}}  # To store the different shapes in the data -> key: shape tuple string, value: number of adquisitions
+systole_count  = {"train": [], "dev": [], "test": []}  # List with float values for systole labels
+diastole_count = {"train": [], "dev": [], "test": []}  # List with float values for diastole labels
+data_splits    = [("train", train_data_path), ("dev", dev_data_path), ("test", test_data_path)]
 
 for split_name, data_path in data_splits:
     for patient in tqdm(os.listdir(data_path), desc=f"{split_name + ' split':<13}"):
@@ -65,7 +67,7 @@ for split_name, data_path in data_splits:
                         spacing_count[split_name].append((x_dist, y_dist, z_dist))
                         # Store slices shape
                         img_shape = pixel_array.shape
-                        shapes_count[str(img_shape)] = shapes_count.get(str(img_shape), 0) + 1  
+                        shapes_count[split_name][str(img_shape)] = shapes_count[split_name].get(str(img_shape), 0) + 1  
 
                     # Get pixel values stats
                     pix_avg = np.mean(pixel_array)
@@ -82,6 +84,19 @@ for split_name, data_path in data_splits:
             slices_count[split_name].append(n_valid_slices)
         else:
             print(f"There are no valid slices for patient {patient} of {split_name} split!")
+
+# Get stats from labels
+for split_name, df in [("train", train_df), ("dev", dev_df), ("test", test_df)]:
+    if split_name != "test":
+        for idx, row in df.iterrows():
+            systole_count[split_name].append(row["Systole"]) 
+            diastole_count[split_name].append(row["Diastole"]) 
+    else:  # Test dataframe has diferent format
+        for idx, row in df.iterrows():
+            if row["Id"].endswith("Systole"):
+                systole_count[split_name].append(row["Volume"]) 
+            elif row["Id"].endswith("Diastole"):
+                diastole_count[split_name].append(row["Volume"]) 
 
 
 ##############
@@ -112,8 +127,10 @@ for sax_dir, n_dicom_files in ignored_slices:
 Shapes stats
 '''
 print("\nShapes:")
-for shape, count in sorted(shapes_count.items(), key=lambda x: x[1], reverse=True):
-    print(f"\t{shape}: {count:>4}")
+for split, shapes in shapes_count.items():
+    print(f"{split} split:")
+    for shape, count in sorted(shapes.items(), key=lambda x: x[1], reverse=True):
+        print(f"\t{shape}: {count:>4}")
 
 '''
 Spacing stats
@@ -216,4 +233,28 @@ plt.xlabel("Pixel value")
 plt.ylabel("Count")
 plt.title(f"Count of minimum pixel values for every dicom image")
 plt.savefig(f"plots/pixels_mins.png")
+plt.clf()  # Reset figure for next plot
+
+'''
+Labels stats
+'''
+total_systole_values = []
+total_diastole_values = []
+print("\nLabels values:")
+for split in systole_count.keys():
+    print(f"{split} split:")
+    systole_values = systole_count[split]
+    diastole_values = diastole_count[split]
+    total_systole_values += systole_values
+    total_diastole_values += diastole_values
+    print(f"\tSystole : average={sum(systole_values)/len(systole_values):.1f} - max={max(systole_values):.1f} - min={min(systole_values):.1f}")
+    print(f"\tDiastole: average={sum(diastole_values)/len(diastole_values):.1f} - max={max(diastole_values):.1f} - min={min(diastole_values):.1f}")
+
+# Histogram versions of labels stats
+plt.hist([total_systole_values, total_diastole_values], bins=60, label=["Systole", "Diastole"])
+plt.legend(loc="upper right")
+plt.xlabel("Volume")
+plt.ylabel("Count")
+plt.title(f"Count of systole and diastole values for all the dataset")
+plt.savefig(f"plots/labels_count.png")
 plt.clf()  # Reset figure for next plot
