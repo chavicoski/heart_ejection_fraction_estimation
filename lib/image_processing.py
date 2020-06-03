@@ -6,6 +6,7 @@ from skimage.filters import threshold_otsu
 from skimage.morphology import binary_erosion, disk
 import cv2
 import multiprocessing 
+from array2gif import write_gif
 
 
 ############################
@@ -215,6 +216,22 @@ def save_slice(slice_image, path):
     plt.imshow(slice_image, cmap=plt.cm.bone)
     plt.savefig(path)
             
+
+def gif_preprocessing(slice_images):
+    '''
+    This function preprocesses the original images of a slice with 1 color 
+    channel in order to have 3 channels and the values in the range [0,255]
+    to be able to use the library that creates the gif animation
+    '''
+    timesteps, h, w = slice_images.shape
+    norm_slice = (slice_images*255.0) / slice_images.max()  # To range [0,255]
+    processed_slice = []  # List with an image for each timestep
+    for t in range(timesteps):
+        selected_image = norm_slice[t,:,:]
+        processed_slice.append([selected_image, selected_image, selected_image])  # 3 channels
+    return np.array(processed_slice).astype(np.uint8)
+
+
 def save_patient_slices(patient_slices, folder_path, n_proc=0):
     '''
     Given a numpy array of shape (n_slices, timesteps, height, with) with the
@@ -232,7 +249,7 @@ def save_patient_slices(patient_slices, folder_path, n_proc=0):
         slice_images = patient_slices[s,:,:,:]
         slice_images_paths = [os.path.join(slice_path, f"{i:03}.png") for i in range(slice_images.shape[0])]
         pool_arguments = zip(slice_images, slice_images_paths)
-        
+        write_gif(gif_preprocessing(slice_images), os.path.join(slice_path, "animation.gif"), fps=30)
         with multiprocessing.Pool(processes=n_proc) as pool:
             pool.starmap(save_slice, pool_arguments)
 
@@ -245,18 +262,18 @@ if __name__ == "__main__":
     import sys
     from time import time
     from pydicom import dcmread
-    print("### PREPROCESS FUNCTIONS TESTS ###")
 
+    print("### PREPROCESS FUNCTIONS TESTS ###")
     split = "train"
-    case_number = 49
+    case_number = 38
     test_patient_path = f"../cardiac_dataset/{split}/{split}/{case_number}/study"
     patient_slices = []
     pix_spacings = None
-    for sax_folder in os.listdir(test_patient_path):
+    for sax_folder in sorted(os.listdir(test_patient_path)):
         if sax_folder.startswith("sax_"):
             sax_images = []
             sax_path = os.path.join(test_patient_path, sax_folder)
-            for dicom_name in os.listdir(sax_path):
+            for dicom_name in sorted(os.listdir(sax_path)):
                 dicom_data = dcmread(os.path.join(sax_path, dicom_name))
                 image_array = dicom_data.pixel_array
                 sax_images.append(image_array)
@@ -276,6 +293,6 @@ if __name__ == "__main__":
     print(f"preproc_patient_slices shape = {preproc_patient.shape}")
     print(f"Time elapsed during processing: {end-start:.2f} seconds")
     start = time()
-    save_patient_slices(preproc_patient, "plots/images/case_{case_number}_preproc")
+    save_patient_slices(preproc_patient, f"plots/images/case_{case_number}_preproc")
     end = time()
     print(f"Time elapsed during preproc plot: {end-start:.2f} seconds")

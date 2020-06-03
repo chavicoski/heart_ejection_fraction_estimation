@@ -55,7 +55,7 @@ for sax_dir in tqdm(glob.glob(os.path.join(case_path, "study/sax_*"))):  # Go th
         time_slices = [pool.apply(save_dicom_plot, args=(dicom_f, True)) for dicom_f in sorted(dicom_files)]
         
         # Create slice gif
-        write_gif(time_slices, f'plots/images/case_{case_id}/{sax_dir.split("/")[-1]}/animation.gif', fps=15)
+        write_gif(time_slices, f'plots/images/case_{case_id}/{sax_dir.split("/")[-1]}/animation.gif', fps=30)
 
     elif n_dicom_files > 30:
         print(f'This case has {n_dicom_files} slices in sax folder {sax_dir.split("/")[-1]}')
