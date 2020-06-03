@@ -1,8 +1,11 @@
+import os
 import numpy as np
+from matplotlib import pyplot as plt
 from skimage import exposure
 from skimage.filters import threshold_otsu
 from skimage.morphology import binary_erosion, disk
 import cv2
+import multiprocessing 
 
 
 ############################
@@ -204,13 +207,34 @@ def preprocess_pipeline1(patient_slices, pix_spacings, target_size=(200, 200)):
 # IO FUNCTIONS #
 ################
 
-def print_patient_slices(patient_slices):
+def save_slice(slice_image, path):
+    '''
+    Auxiliary function that stores the given image (numpy) in the
+    given path (including the name of the output file)
+    '''
+    plt.imshow(slice_image, cmap=plt.cm.bone)
+    plt.savefig(path)
+            
+def save_patient_slices(patient_slices, folder_path, n_proc=0):
     '''
     Given a numpy array of shape (n_slices, timesteps, height, with) with the
     data of a patient, this function creates and stores the plots for all the
-    slices and timesteps including a gift animation per slice.
+    slices and timesteps including a gift animation per slice. This images are
+    stored in 'folder_path' and if it doesn't exist it will be created. 
     '''
-    pass  # TODO
+    os.makedirs(folder_path, exist_ok=True)  # Check or create the save path
+    n_slices, timesteps, h, w = patient_slices.shape
+    if n_proc < 1: 
+        n_proc = multiprocessing.cpu_count()  # Get the number of CPU cores
+    for s in range(n_slices):
+        slice_path = os.path.join(folder_path, f"slice_{s}")
+        os.makedirs(slice_path, exist_ok=True)
+        slice_images = patient_slices[s,:,:,:]
+        slice_images_paths = [os.path.join(slice_path, f"{i:03}.png") for i in range(slice_images.shape[0])]
+        pool_arguments = zip(slice_images, slice_images_paths)
+        
+        with multiprocessing.Pool(processes=n_proc) as pool:
+            pool.starmap(save_slice, pool_arguments)
 
 
 ##################
@@ -219,11 +243,13 @@ def print_patient_slices(patient_slices):
 
 if __name__ == "__main__":
     import sys
-    import os
+    from time import time
     from pydicom import dcmread
     print("### PREPROCESS FUNCTIONS TESTS ###")
 
-    test_patient_path = "../cardiac_dataset/train/train/48/study"
+    split = "train"
+    case_number = 49
+    test_patient_path = f"../cardiac_dataset/{split}/{split}/{case_number}/study"
     patient_slices = []
     pix_spacings = None
     for sax_folder in os.listdir(test_patient_path):
@@ -239,9 +265,17 @@ if __name__ == "__main__":
             patient_slices.append(sax_images)
 
     patient_slices = np.array(patient_slices)
-    print(patient_slices.shape)
-    preproc_patient = preprocess_pipeline1(patient_slices, pix_spacings)
-    print(type(preproc_patient))
-    print(preproc_patient.shape)
-
-    
+    start = time()
+    save_patient_slices(patient_slices, f"plots/images/case_{case_number}")
+    end = time()
+    print(f"orig_patient_slices shape = {patient_slices.shape}")
+    print(f"Time elapsed during orig plot: {end-start:.2f} seconds")
+    start = time()
+    preproc_patient = preprocess_pipeline1(patient_slices, pix_spacings, target_size=(150, 150))
+    end = time()
+    print(f"preproc_patient_slices shape = {preproc_patient.shape}")
+    print(f"Time elapsed during processing: {end-start:.2f} seconds")
+    start = time()
+    save_patient_slices(preproc_patient, "plots/images/case_{case_number}_preproc")
+    end = time()
+    print(f"Time elapsed during preproc plot: {end-start:.2f} seconds")
