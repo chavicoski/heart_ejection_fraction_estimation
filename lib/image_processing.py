@@ -186,7 +186,7 @@ def crop_heart(patient_slices, target_height=200, target_width=200):
 # Preprocess_pipelines #
 ########################
 
-def preprocess_pipeline1(patient_slices, pix_spacings, target_size=(200, 200)):
+def preprocess_pipeline1(patient_slices, pix_spacings, target_size=(150, 150)):
     '''
     Given a raw patient numpy with all the slices data. Returns the preprocessed version
     following this steps:
@@ -254,6 +254,29 @@ def save_patient_slices(patient_slices, folder_path, n_proc=0):
             pool.starmap(save_slice, pool_arguments)
 
 
+def get_patient_slices(case_number, split, data_path="../cardiac_dataset/"):
+    '''
+    Given a patient number and the partition that belongs returns a numpy array
+    with all the images for each slice (shape=(n_slices, timesptes, height, width))
+    and the pixel spacing (used for preprocessing)
+    '''
+    patient_path = os.path.join(data_path, f"{split}/{split}/{case_number}/study")
+    patient_slices = []
+    pix_spacings = None
+    for sax_folder in sorted(os.listdir(patient_path)):
+        if sax_folder.startswith("sax_"):
+            sax_images = []
+            sax_path = os.path.join(patient_path, sax_folder)
+            for dicom_name in sorted(os.listdir(sax_path)):
+                dicom_data = dcmread(os.path.join(sax_path, dicom_name))
+                image_array = dicom_data.pixel_array
+                sax_images.append(image_array)
+                if pix_spacings == None:
+                    pix_spacings = dicom_data.PixelSpacing
+            patient_slices.append(sax_images)
+
+    return np.array(patient_slices), pix_spacings
+
 ##################
 # TEST FUNCTIONS #
 ##################
@@ -264,35 +287,24 @@ if __name__ == "__main__":
     from pydicom import dcmread
 
     print("### PREPROCESS FUNCTIONS TESTS ###")
-    split = "train"
-    case_number = 38
-    test_patient_path = f"../cardiac_dataset/{split}/{split}/{case_number}/study"
-    patient_slices = []
-    pix_spacings = None
-    for sax_folder in sorted(os.listdir(test_patient_path)):
-        if sax_folder.startswith("sax_"):
-            sax_images = []
-            sax_path = os.path.join(test_patient_path, sax_folder)
-            for dicom_name in sorted(os.listdir(sax_path)):
-                dicom_data = dcmread(os.path.join(sax_path, dicom_name))
-                image_array = dicom_data.pixel_array
-                sax_images.append(image_array)
-                if pix_spacings == None:
-                    pix_spacings = dicom_data.PixelSpacing
-            patient_slices.append(sax_images)
 
-    patient_slices = np.array(patient_slices)
+    ########################################
+    # TEST OF THE PREPROCESSING PIPELINE 1 #
+    ########################################
+    split = "train"   # Split of the case to process
+    case_number = 39
+    patient_slices, pix_spacings = get_patient_slices(case_number, split)
     start = time()
-    save_patient_slices(patient_slices, f"plots/images/case_{case_number}")
+    save_patient_slices(patient_slices, f"plots/images/case_{case_number}")  # Store the images of the case
     end = time()
     print(f"orig_patient_slices shape = {patient_slices.shape}")
     print(f"Time elapsed during orig plot: {end-start:.2f} seconds")
     start = time()
-    preproc_patient = preprocess_pipeline1(patient_slices, pix_spacings, target_size=(150, 150))
+    preproc_patient = preprocess_pipeline1(patient_slices, pix_spacings, target_size=(150, 150))  # Do preprocesing
     end = time()
     print(f"preproc_patient_slices shape = {preproc_patient.shape}")
     print(f"Time elapsed during processing: {end-start:.2f} seconds")
     start = time()
-    save_patient_slices(preproc_patient, f"plots/images/case_{case_number}_preproc")
+    save_patient_slices(preproc_patient, f"plots/images/case_{case_number}_preproc")  # Store preprocessed images of the case
     end = time()
     print(f"Time elapsed during preproc plot: {end-start:.2f} seconds")
