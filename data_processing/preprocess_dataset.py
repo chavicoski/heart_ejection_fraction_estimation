@@ -4,10 +4,12 @@ import os
 import pandas as pd
 import torch
 from lib.image_processing import get_patient_slices, preprocess_pipeline1
+from tqdm import tqdm
 
-if sys.argv != 3:
+if len(sys.argv) != 3:
     print("Invalid number of arguments!")
-    print("Usage: {sys.argv[0]} <IN_DATA_PATH> <OUT_DATA_PATH>")
+    print(f"Usage: {sys.argv[0]} <IN_DATA_PATH> <OUT_DATA_PATH>")
+    sys.exit()
 
 out_path = sys.argv[2]
 os.makedirs(out_path, exist_ok=True)  # Create output directory
@@ -43,7 +45,7 @@ splits_labels = [
 for split_name, df, labels_dict in splits_labels:
     if split_name != "test":
         for idx, row in df.iterrows():
-            labels_dict[row["Id"]] = [row["Systole"], row["Diastole"]]
+            labels_dict[int(row["Id"])] = [row["Systole"], row["Diastole"]]
     else:  # Test dataframe has diferent format
         for idx, row in df.iterrows():
             case_id = int(row["Id"].split("_")[0])
@@ -54,6 +56,11 @@ for split_name, df, labels_dict in splits_labels:
             elif row["Id"].endswith("Diastole"):
                 labels_dict[case_id][1] = row["Volume"]
 
+print("Partitions size:")
+print(f"\t-training: {len(train_labels)} cases")
+print(f"\t-validation: {len(dev_labels)} cases")
+print(f"\t-test: {len(test_labels)} cases")
+
 ################################################
 # PREPROCESS EACH SAMPLE AND CREATE A CSV FILE #
 ################################################
@@ -63,5 +70,18 @@ splits_data = [
         ("test", test_data_path, test_labels),
         ]
 for split_name, data_path, labels_dict in splits_data:
-    os.makedirs(os.path.join(out_path, split_name), exist_ok=True) 
+    split_path = os.path.join(out_path, split_name)
+    os.makedirs(split_path, exist_ok=True) 
     split_df = pd.DataFrame(columns=["Id", "X_path", "Systole", "Diastole"]) 
+    df_idx = 0  # Index to insert in the DataFrame
+    for case_id, (systole, diastole) in tqdm(labels_dict.items()):
+        patient_slices, pix_spacings = get_patient_slices(case_id, split_name)  # Get case images
+        if patient_slices is None: continue
+        preproc_patient = preprocess_pipeline1(patient_slices, pix_spacings, target_size=(150, 150))  # Do preprocessing
+        patient_tensor = torch.from_numpy(preproc_patient)  # Create pytorch tensor
+        save_path = os.path.join(split_path, f"{case_id}.pt")
+        torch.save(patient_tensor, save_path)  # Store the pytorch tensor
+        split_df.loc[df_idx] = [case_id, save_path, systole, diastole]  # Store the case info in the dataframe
+        df_idx += 1
+    
+    split_df.to_csv(os.path.join(out_path, f"{split_name}.csv"), index=False)  # Save the csv of the split

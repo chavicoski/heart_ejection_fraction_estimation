@@ -7,7 +7,7 @@ from skimage.morphology import binary_erosion, disk
 import cv2
 import multiprocessing 
 from array2gif import write_gif
-
+from pydicom import dcmread
 
 ############################
 # Detect movement with FFT #
@@ -263,13 +263,23 @@ def get_patient_slices(case_number, split, data_path="../cardiac_dataset/"):
     patient_path = os.path.join(data_path, f"{split}/{split}/{case_number}/study")
     patient_slices = []
     pix_spacings = None
+    aux_shape = None
     for sax_folder in sorted(os.listdir(patient_path)):
         if sax_folder.startswith("sax_"):
             sax_images = []
             sax_path = os.path.join(patient_path, sax_folder)
-            for dicom_name in sorted(os.listdir(sax_path)):
+            dicom_files = sorted([f_name for f_name in os.listdir(sax_path) if f_name.endswith(".dcm")])
+            if len(dicom_files) != 30:
+                print(f"get_patient_slices(): Error! The number of timesteps is not 30 (case {case_number})")
+                return None, None
+            for dicom_name in dicom_files:
                 dicom_data = dcmread(os.path.join(sax_path, dicom_name))
                 image_array = dicom_data.pixel_array
+                if aux_shape == None:
+                    aux_shape = image_array.shape
+                elif aux_shape != image_array.shape:
+                    print(f"get_patient_slices(): Error! The slices shapes don't match (case {case_number})")
+                    return None, None
                 sax_images.append(image_array)
                 if pix_spacings == None:
                     pix_spacings = dicom_data.PixelSpacing
@@ -284,7 +294,6 @@ def get_patient_slices(case_number, split, data_path="../cardiac_dataset/"):
 if __name__ == "__main__":
     import sys
     from time import time
-    from pydicom import dcmread
 
     print("### PREPROCESS FUNCTIONS TESTS ###")
 
