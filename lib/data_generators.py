@@ -1,42 +1,48 @@
 import torch
 
-class Cells_dataset(torch.utils.data.Dataset):
-    '''
-    Dataset constructor
+class Cardiac_dataset(torch.utils.data.Dataset):
+    def __init__(self, data_df):
+        '''Dataset constructor
+        Params:
+            data_df -> Pandas dataframe with the dataset info
+                *data_df columns:
+                    - Id -> case Id in the dataset
+                    - X_path -> relative path from the workspace folder to the data tensor
+                    - Systole -> float value for Systole label
+                    - Diastole -> float value for Diastole label
+        '''
+        self.df = data_df
 
-    Params:
-        data_df -> Pandas dataframe with the dataset info
-            *data_df columns:
-                - ImageId -> sample id in the dataset
-                - Partition -> 'train' or 'dev'
-                - ImagePath -> path to input tensor
-                - MaskPath -> path to mask output tensor
-
-        partition -> Select the dataset partition of the generator. Can be "train" or "dev"
-    '''
-    def __init__(self, data_df, partition="train"):
-        
-        self.partition = partition
-        # Store the samples from the selected partition
-        self.df = data_df[data_df["Partition"]==partition]
-
-    '''
-    Returns the number of samples in the dataset
-    '''
     def __len__(self):
-        # Returns the number of rows in the dataframe
-        return len(self.df.index)
+        '''Returns the number of samples in the dataset'''
+        return len(self.df.index)  # Number of rows in the DataFrame
 
-    '''
-    Generates a sample of data -> (input_image, output_mask)
-    '''
     def __getitem__(self, index):
+        '''Returns a sample by index from the dataset'''
+        sample_row = self.df.iloc[index]  # Get sample row from DataFrame
+        sample_data = torch.load(sample_row["X_path"])  # Load sample data
+        sample_label = self.norm_labels(sample_row["Systole"], sample_row["Diastole"]) 
+        return {"X": sample_data, "Y": sample_label}
+    
+    def norm_labels(self, systole, diastole, max_val=599):
+        '''Returns the labels normalized between 0 and 1'''
+        assert systole <= max_val and diastole <= max_val
+        return systole/max_val, diastole/max_val
 
-        # Get the dataframe row of the sample
-        sample_row = self.df.iloc[index]
-        # Load the image tensor
-        image_tensor = torch.load(sample_row["ImagePath"])
-        # Load the mask tensor
-        mask_tensor = torch.load(sample_row["MaskPath"])
-       
-        return {"image": image_tensor, "mask": mask_tensor}
+
+if __name__ == "__main__":
+    
+    import pandas as pd
+
+    partition_csv_path = "../preproc1_150x150_dataset/train.csv"
+    print(f"Creating dataset from: {partition_csv_path}")
+    df = pd.read_csv(partition_csv_path)  # Load partition info
+    dataset = Cardiac_dataset(df)  # Create the dataset for the partition
+    samples_to_print = 5
+    print(f"Number of samples: {len(dataset)}")
+    print(f"Going to show {samples_to_print} samples:")
+    for i, sample in enumerate(dataset):
+        if i == samples_to_print: break
+        x, y = sample['X'], sample['Y']
+        print(f"\tX info: shape={x.shape} - mean={x.mean():.3f} - max={x.max()} - min={x.min()}")
+        print(f"\tY info: systole={y[0]:.3f} - diastole={y[1]:.3f}\n")
