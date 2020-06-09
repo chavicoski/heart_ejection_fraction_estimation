@@ -39,7 +39,7 @@ test_df = pd.read_csv(test_csv_path)
 train_labels, dev_labels, test_labels = dict(), dict(), dict()
 splits_labels = [
         ("train", train_df, train_labels), 
-        ("dev", dev_df, dev_labels), 
+        ("validate", dev_df, dev_labels), 
         ("test", test_df, test_labels)
         ]
 for split_name, df, labels_dict in splits_labels:
@@ -66,7 +66,7 @@ print(f"\t-test: {len(test_labels)} cases")
 ################################################
 splits_data = [
         ("train", train_data_path, train_labels),
-        ("dev", dev_data_path, dev_labels),
+        ("validate", dev_data_path, dev_labels),
         ("test", test_data_path, test_labels),
         ]
 for split_name, data_path, labels_dict in splits_data:
