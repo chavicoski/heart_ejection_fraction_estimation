@@ -16,4 +16,4 @@ class RandomRotation4D:
     def __call__(self, x):
         '''Returns the pytorch tensor "x" with all the images rotated
         with the same angle'''
-        return x
+        return x # TODO

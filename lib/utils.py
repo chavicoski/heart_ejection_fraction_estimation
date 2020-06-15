@@ -18,7 +18,7 @@ def train(train_loader, net, criterion, optimizer, device, pin_memory):
 
     # Initialize stats
     running_loss = 0.0
-    running_iou = 0.0
+    running_correct = 0.0
     samples_count = 0
     
     # Epoch timer
@@ -45,24 +45,25 @@ def train(train_loader, net, criterion, optimizer, device, pin_memory):
         optimizer.step()
         # Accumulate loss
         running_loss += loss.item()
-        # Compute and Accumulate iou values
-        batch_iou = iou_metric(outputs, target)
-        running_iou += batch_iou.sum().item()
+        # Accumulate accuracy
+        pred = outputs.argmax(dim=1, keepdim=True)
+        correct = pred.eq(target.view_as(pred)).sum().item()
+        running_correct += correct
         # Compute current statistics
         current_loss = running_loss / samples_count 
-        current_iou = running_iou / samples_count
+        current_acc = running_correct / samples_count
         # Compute time per batch (in miliseconds)
         batch_time = (time() - batch_timer) * 1000
         # Print training log
-        stdout.write(f"\rTrain batch {batch_idx+1}/{len(train_loader)} - {batch_time:.1f}ms/batch - loss: {current_loss:.5f} - iou: {current_iou:.5f}")
+        stdout.write(f"\rTrain batch {batch_idx+1}/{len(train_loader)} - {batch_time:.1f}ms/batch - loss: {current_loss:.5f} - acc: {current_acc:.5f}")
 
     # Compute total epoch time (in seconds)
     epoch_time = time() - epoch_timer
     # Final print with the total time of the epoch
-    stdout.write(f"\rTrain batch {batch_idx+1}/{len(train_loader)} - {epoch_time:.1f}s {batch_time:.1f}ms/batch - loss: {current_loss:.5f} - iou: {current_iou:.5f}")
+    stdout.write(f"\rTrain batch {batch_idx+1}/{len(train_loader)} - {epoch_time:.1f}s {batch_time:.1f}ms/batch - loss: {current_loss:.5f} - acc: {current_acc:.5f}")
 
     # return final loss and accuracy
-    return current_loss, current_iou
+    return current_loss, current_acc
 
 
 def test(test_loader, net, criterion, device, pin_memory):
@@ -79,7 +80,7 @@ def test(test_loader, net, criterion, device, pin_memory):
 
     # Initialize stats
     test_loss = 0   
-    iou = 0.0
+    correct = 0
 
     # Test timer
     test_timer = time()
@@ -97,24 +98,23 @@ def test(test_loader, net, criterion, device, pin_memory):
             output = net(data)       
             # Compute loss and accumulate it
             test_loss += criterion(output, target).item()       
-            # Compute samples iou
-            batch_iou = iou_metric(output, target)
-            iou += batch_iou.sum().item()
-
+            # Compute correct predictions and accumulate them
+            pred = output.argmax(dim=1, keepdim=True)
+            correct += pred.eq(target.view_as(pred)).sum().item()
 
     # Compute final loss
     test_loss /= len(test_loader.dataset)   
-    # Compute final iou
-    test_iou = iou / len(test_loader.dataset) 
+    # Compute final accuracy
+    test_acc = correct / len(test_loader.dataset) 
     # Compute time consumed 
     test_time = time() - test_timer
     # Print test log 
-    stdout.write(f'\nTest {test_time:.1f}s: val_loss: {test_loss:.5f} - val_iou: {test_iou:.5f}\n')    
+    stdout.write(f'\nTest {test_time:.1f}s: val_loss: {test_loss:.5f} - val_acc: {test_acc:.5f}\n')    
 
     return test_loss, test_iou
 
 
-def plot_results(train_losses, train_ious, test_losses, test_ious, loss_title="Loss", iou_title="Intersection Over Union", save_as=""):
+def plot_results(train_losses, train_accs, test_losses, test_accs, loss_title="Loss", acc_title="Accuracy", save_as=""):
     '''
     Given the list of stats for each epoch during training, this 
     function shows and saves(if told) the plots of the stats
@@ -127,10 +127,10 @@ def plot_results(train_losses, train_ious, test_losses, test_ious, loss_title="L
     ax[0].plot(test_losses, "g", label="test")
     ax[0].legend()
     ax[0].title.set_text(loss_title)
-    ax[1].plot(train_ious, "r", label="train")
-    ax[1].plot(test_ious, "g", label="test")
+    ax[1].plot(train_accs, "r", label="train")
+    ax[1].plot(test_accs, "g", label="test")
     ax[1].legend()
-    ax[1].title.set_text(iou_title)
+    ax[1].title.set_text(acc_title)
     if save_as is not "": 
         plt.savefig("plots/" + save_as + "_trainres.png")
     plt.show() 
