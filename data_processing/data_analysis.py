@@ -116,7 +116,7 @@ plt.legend(loc="upper right")
 plt.xlabel("N slices")
 plt.ylabel("Count")
 plt.title(f"Count of slices by patient for each partition")
-plt.savefig(f"plots/slices_count.png")
+plt.savefig(f"plots/analysis/slices_count.png")
 plt.clf()  # Reset figure for next plot
 
 print(f"\nIngnored slices ({len(ignored_slices)}):")
@@ -169,7 +169,7 @@ plt.hist(x_dists, bins=30)
 plt.xlabel("Distance")
 plt.ylabel("Count")
 plt.title(f"Count of row spacings")
-plt.savefig(f"plots/spacings_x.png")
+plt.savefig(f"plots/analysis/spacings_x.png")
 plt.clf()  # Reset figure for next plot
 
 # Column spacings histogram
@@ -177,7 +177,7 @@ plt.hist(y_dists, bins=30)
 plt.xlabel("Distance")
 plt.ylabel("Count")
 plt.title(f"Count of column spacings")
-plt.savefig(f"plots/spacings_y.png")
+plt.savefig(f"plots/analysis/spacings_y.png")
 plt.clf()  # Reset figure for next plot
 
 # Depth spacings histogram
@@ -185,7 +185,7 @@ plt.hist(z_dists, bins=30)
 plt.xlabel("Distance")
 plt.ylabel("Count")
 plt.title(f"Count of depth spacings")
-plt.savefig(f"plots/spacings_z.png")
+plt.savefig(f"plots/analysis/spacings_z.png")
 plt.clf()  # Reset figure for next plot
 
 '''
@@ -216,7 +216,7 @@ plt.hist(pix_avgs, bins=30)
 plt.xlabel("Pixel value")
 plt.ylabel("Count")
 plt.title(f"Count of average pixel value for every dicom image")
-plt.savefig(f"plots/pixels_averages.png")
+plt.savefig(f"plots/analysis/pixels_averages.png")
 plt.clf()  # Reset figure for next plot
 
 # Pixels maximums histogram
@@ -224,7 +224,7 @@ plt.hist(pix_maxs, bins=30)
 plt.xlabel("Pixel value")
 plt.ylabel("Count")
 plt.title(f"Count of maximum pixel values for every dicom image")
-plt.savefig(f"plots/pixels_maxspng")
+plt.savefig(f"plots/analysis/pixels_maxspng")
 plt.clf()  # Reset figure for next plot
 
 # Pixels minimums histogram
@@ -232,7 +232,7 @@ plt.hist(pix_mins, bins=30)
 plt.xlabel("Pixel value")
 plt.ylabel("Count")
 plt.title(f"Count of minimum pixel values for every dicom image")
-plt.savefig(f"plots/pixels_mins.png")
+plt.savefig(f"plots/analysis/pixels_mins.png")
 plt.clf()  # Reset figure for next plot
 
 '''
@@ -256,5 +256,5 @@ plt.legend(loc="upper right")
 plt.xlabel("Volume")
 plt.ylabel("Count")
 plt.title(f"Count of systole and diastole values for all the dataset")
-plt.savefig(f"plots/labels_count.png")
+plt.savefig(f"plots/analysis/labels_count.png")
 plt.clf()  # Reset figure for next plot

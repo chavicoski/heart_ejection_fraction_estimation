@@ -13,10 +13,13 @@ class Time_as_depth_model(nn.Module):
     outputs a single value to make regresion with the systole or diastole value.
     '''
     def __init__(self, in_channels=30):
-        super(Time_as_depth_model, self).__init_()
+        super(Time_as_depth_model, self).__init__()
         # Define the model architecture
         self.conv_block = nn.Sequential(
-                nn.Conv2d(in_channels, 64, kernel_size=3, padding=0),
+                nn.Conv2d(in_channels, 32, kernel_size=3, padding=0),
+                nn.MaxPool2d(2),
+                nn.ReLU(inplace=True),
+                nn.Conv2d(32, 64, kernel_size=3, padding=0),
                 nn.MaxPool2d(2),
                 nn.ReLU(inplace=True),
                 nn.Conv2d(64, 128, kernel_size=3, padding=0),
@@ -31,16 +34,15 @@ class Time_as_depth_model(nn.Module):
                 )
         self.flatten = Flatten()
         self.dense_block = nn.Sequential(
-                nn.Linear(73, 1024),
+                nn.Linear(2048, 1024),
                 nn.ReLU(inplace=True),
-                nn.Linear(1024, 1024),
+                nn.Linear(1024, 512),
                 nn.ReLU(inplace=True),
-                nn.Linear(1024, 1)
+                nn.Linear(512, 1)
                 )
 
-        def forward(self, x):
-            x = self.conv_block(x)
-            x = self.flatten(x)
-            x = self.dense_block(x)
-            return x
-
+    def forward(self, x):
+        x = self.conv_block(x)
+        x = self.flatten(x)
+        x = self.dense_block(x)
+        return x

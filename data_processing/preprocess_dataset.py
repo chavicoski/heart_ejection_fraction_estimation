@@ -78,7 +78,7 @@ for split_name, data_path, labels_dict in splits_data:
         patient_slices, pix_spacings = get_patient_slices(case_id, split_name)  # Get case images
         if patient_slices is None: continue
         preproc_patient = preprocess_pipeline1(patient_slices, pix_spacings, target_size=(150, 150))  # Do preprocessing
-        patient_tensor = torch.from_numpy(preproc_patient)  # Create pytorch tensor
+        patient_tensor = torch.from_numpy(preproc_patient).float()  # Create pytorch tensor
         save_path = os.path.join(split_path, f"{case_id}.pt")
         torch.save(patient_tensor, save_path)  # Store the pytorch tensor
         split_df.loc[df_idx] = [case_id, save_path, systole, diastole]  # Store the case info in the dataframe
