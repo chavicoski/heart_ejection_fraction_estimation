@@ -224,7 +224,7 @@ def plot_results_regresor(train_losses, test_losses, title="Loss", save_as=""):
     plt.plot(train_losses, "r", label="train")
     plt.plot(test_losses, "g", label="test")
     plt.legend()
-    plt.title.set_text(loss_title)
+    plt.title(loss_title)
     if save_as is not "": 
         plt.savefig("plots/train_results/" + save_as + "_trainres.png")
     plt.show() 

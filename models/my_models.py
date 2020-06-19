@@ -16,28 +16,31 @@ class Time_as_depth_model(nn.Module):
         super(Time_as_depth_model, self).__init__()
         # Define the model architecture
         self.conv_block = nn.Sequential(
-                nn.Conv2d(in_channels, 32, kernel_size=3, padding=0),
+                nn.Conv2d(in_channels, 64, kernel_size=3, padding=0),
+                nn.ReLU(),
+                nn.Conv2d(64, 64, kernel_size=3, padding=0),
+                nn.ReLU(),
                 nn.MaxPool2d(2),
-                nn.ReLU(inplace=True),
-                nn.Conv2d(32, 64, kernel_size=3, padding=0),
-                nn.MaxPool2d(2),
-                nn.ReLU(inplace=True),
                 nn.Conv2d(64, 128, kernel_size=3, padding=0),
+                nn.ReLU(),
+                nn.Conv2d(128, 128, kernel_size=3, padding=0),
+                nn.ReLU(),
                 nn.MaxPool2d(2),
-                nn.ReLU(inplace=True),
                 nn.Conv2d(128, 256, kernel_size=3, padding=0),
+                nn.ReLU(),
+                nn.Conv2d(256, 256, kernel_size=3, padding=0),
+                nn.ReLU(),
                 nn.MaxPool2d(2),
-                nn.ReLU(inplace=True),
                 nn.Conv2d(256, 512, kernel_size=3, padding=0),
-                nn.MaxPool2d(2),
-                nn.ReLU(inplace=True)
+                nn.ReLU(),
+                nn.Conv2d(512, 512, kernel_size=3, padding=0),
+                nn.ReLU(),
+                nn.AvgPool2d((11, 11)),
                 )
         self.flatten = Flatten()
         self.dense_block = nn.Sequential(
-                nn.Linear(2048, 1024),
-                nn.ReLU(inplace=True),
-                nn.Linear(1024, 512),
-                nn.ReLU(inplace=True),
+                nn.Linear(512, 512),
+                nn.ReLU(),
                 nn.Linear(512, 1)
                 )
 

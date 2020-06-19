@@ -32,7 +32,7 @@ else:
 # Training parameters #
 #######################
 
-epochs = 50
+epochs = 100
 batch_size = 32
 num_workers = 2   # Processes for loading data in parallel
 multi_gpu = True  # Enables multi-gpu training if it is possible
@@ -44,6 +44,7 @@ opt_name = "Adam"  # Selected optimizer
 learning_rate = 0.01  # Learning rate for the optimizer
 momentum = 0.9  # In case of opt_name="SGD"
 exp_name = f"{target_label}_{model_name}_{opt_name}-{learning_rate}"  # Experiment name
+print(f"Running experiment {exp_name}")
 
 ###################
 # Data generators #
