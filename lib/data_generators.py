@@ -30,7 +30,7 @@ class Cardiac_dataset(torch.utils.data.Dataset):
         '''Returns a sample by index from the dataset'''
         sample_row = self.df.iloc[index]  # Get sample row from DataFrame
         sample_data = torch.load(sample_row["X_path"])  # Load sample data
-        sample_label = torch.tensor([sample_row[self.target_label]])
+        sample_label = torch.tensor([sample_row[self.target_label]]).float()
         return {"X": sample_data, "Y": sample_label}
     
 
@@ -50,4 +50,4 @@ if __name__ == "__main__":
         if i == samples_to_print: break
         x, y = sample['X'], sample['Y']
         print(f"\tX info: shape={x.shape} - mean={x.mean():.3f} - max={x.max()} - min={x.min()} - dtype={x.type()}")
-        print(f"\tY info: {target_label}={y[0]:.3f}\n")
+        print(f"\tY info: {target_label}={y[0]:.3f} - dtype={y.type()}\n")

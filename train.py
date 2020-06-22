@@ -12,16 +12,15 @@ from models.my_models import Time_as_depth_model
 # Check computing device
 if torch.cuda.is_available():
     n_gpus = torch.cuda.device_count()
+    # Select a GPU
+    device_slot = torch.cuda.current_device()
+    device = torch.device(f"cuda:{device_slot}")
     if n_gpus > 1:
         print(f"{n_gpus} GPU's available:")
         for gpu_idx in range(n_gpus):
             print(f"\t-At device cuda:{gpu_idx} -> device model = {torch.cuda.get_device_name(gpu_idx)}")
     else:
         print(f"Cuda available with device {device} -> device model = {torch.cuda.get_device_name(device_slot)}")
-    
-    # Select a GPU
-    device_slot = torch.cuda.current_device()
-    device = torch.device(f"cuda:{device_slot}")
 else:
     n_gpus = 0
     device = torch.device("cpu")
@@ -33,12 +32,12 @@ else:
 #######################
 
 epochs = 100
-batch_size = 32
+batch_size = 64
 num_workers = 2   # Processes for loading data in parallel
 multi_gpu = True  # Enables multi-gpu training if it is possible
 pin_memory = True  # Pin memory for extra speed loading batches in GPU
 tensorboard = True  # Enable tensorboard
-target_label = "Systole"  # Target label to predict
+target_label = "Diastole"  # Target label to predict "Systole" or "Diastole"
 model_name = "TimeAsDepth"  # Model architecture name
 opt_name = "Adam"  # Selected optimizer
 learning_rate = 0.01  # Learning rate for the optimizer
@@ -88,6 +87,7 @@ else:
 best_loss = 99999
 best_epoch = -1
 train_losses, test_losses = [], []
+train_diffs, test_diffs = [], []
 
 # Scheduler for changing the value of the laearning rate
 scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'min', factor=0.1, patience=10, verbose=True)
@@ -116,19 +116,23 @@ for epoch in range(epochs):
     if best_epoch > -1 : stdout.write(f"current best loss = {best_loss:.5f}, at epoch {best_epoch}\n")
     else: stdout.write("\n")
     # Train split
-    train_loss = train_regresor(train_datagen, model, criterion, optimizer, device, pin_memory)
+    train_loss, train_diff = train_regresor(train_datagen, model, criterion, optimizer, device, pin_memory)
     # Development split 
-    test_loss = test_regresor(dev_datagen, model, criterion, device, pin_memory)
+    test_loss, test_diff = test_regresor(dev_datagen, model, criterion, device, pin_memory)
     # Apply the lr scheduler
     scheduler.step(test_loss)
     # Save the results of the epoch
     train_losses.append(train_loss)
     test_losses.append(test_loss)
+    train_diffs.append(train_diff)
+    test_diffs.append(test_diff)
     # Log in tensorboard 
     if tensorboard:
         # Loss
         tboard_writer.add_scalar("Loss/train", train_loss, epoch)
         tboard_writer.add_scalar("Loss/test", test_loss, epoch)
+        tboard_writer.add_scalar("Diff/train", train_diff, epoch)
+        tboard_writer.add_scalar("Diff/test", test_diff, epoch)
 
     # If val_loss improves we store the model
     if test_losses[-1] < best_loss:
@@ -138,6 +142,7 @@ for epoch in range(epochs):
         torch.save(model, model_path)
         # Update best model stats
         best_loss = test_losses[-1]
+        best_diff = test_diffs[-1]
         best_epoch = epoch
 
     # To separate the epochs outputs  
@@ -150,6 +155,7 @@ if tensorboard:
         "optimizer": opt_name,
         "lr": learning_rate},
         {"hparam/loss": best_loss, 
+        "hparam/diff": best_diff, 
         "hparam/best_epoch": best_epoch})
 
 # Close the tensorboard writer
@@ -157,4 +163,5 @@ if tensorboard:
     tboard_writer.close()
 
 # Plot loss and accuracy of training epochs
-plot_results_regresor(train_losses, test_losses, title=f"Loss {target_label}",save_as=exp_name)
+plot_results(train_losses, test_losses, title=f"Loss {target_label}", save_as=exp_name + "_loss")
+plot_results(train_diffs, test_diffs, title=f"Diff {target_label}", save_as=exp_name + "_diff")
