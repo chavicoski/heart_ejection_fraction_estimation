@@ -50,4 +50,4 @@ if __name__ == "__main__":
         if i == samples_to_print: break
         x, y = sample['X'], sample['Y']
         print(f"\tX info: shape={x.shape} - mean={x.mean():.3f} - max={x.max()} - min={x.min()} - dtype={x.type()}")
-        print(f"\tY info: {target_label}={y:.3f}\n")
+        print(f"\tY info: {target_label}={y[0]:.3f}\n")

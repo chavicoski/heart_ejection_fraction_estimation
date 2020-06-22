@@ -16,36 +16,35 @@ class Time_as_depth_model(nn.Module):
         super(Time_as_depth_model, self).__init__()
         # Define the model architecture
         self.conv_block = nn.Sequential(
-                nn.Conv2d(in_channels, 64, kernel_size=3, padding=0),
+                nn.Conv2d(in_channels, 64, kernel_size=5, stride=2, padding=0),
                 nn.ReLU(),
                 nn.Conv2d(64, 64, kernel_size=3, padding=0),
                 nn.ReLU(),
                 nn.MaxPool2d(2),
+                nn.Dropout(0.3),
                 nn.Conv2d(64, 128, kernel_size=3, padding=0),
                 nn.ReLU(),
                 nn.Conv2d(128, 128, kernel_size=3, padding=0),
                 nn.ReLU(),
                 nn.MaxPool2d(2),
+                nn.Dropout(0.3),
                 nn.Conv2d(128, 256, kernel_size=3, padding=0),
                 nn.ReLU(),
                 nn.Conv2d(256, 256, kernel_size=3, padding=0),
                 nn.ReLU(),
-                nn.MaxPool2d(2),
-                nn.Conv2d(256, 512, kernel_size=3, padding=0),
-                nn.ReLU(),
-                nn.Conv2d(512, 512, kernel_size=3, padding=0),
-                nn.ReLU(),
-                nn.AvgPool2d((11, 11)),
+                #nn.AvgPool2d(())
+                nn.Dropout(0.3),
                 )
         self.flatten = Flatten()
         self.dense_block = nn.Sequential(
-                nn.Linear(512, 512),
+                nn.Linear(512, 1024),
                 nn.ReLU(),
-                nn.Linear(512, 1)
+                nn.Linear(1024, 1)
                 )
 
     def forward(self, x):
         x = self.conv_block(x)
+        print(f"Shape pre-flatten: {x.size()}")
         x = self.flatten(x)
         x = self.dense_block(x)
         return x
