@@ -1,3 +1,4 @@
+import sys
 import numpy as np
 import pandas as pd
 import torch
@@ -8,42 +9,57 @@ from torch.utils.tensorboard import SummaryWriter
 from lib.data_generators import Cardiac_dataset
 from lib.utils import *
 from models.my_models import Time_as_depth_model
-
-# Check computing device
-if torch.cuda.is_available():
-    n_gpus = torch.cuda.device_count()
-    # Select a GPU
-    device_slot = torch.cuda.current_device()
-    device = torch.device(f"cuda:{device_slot}")
-    if n_gpus > 1:
-        print(f"{n_gpus} GPU's available:")
-        for gpu_idx in range(n_gpus):
-            print(f"\t-At device cuda:{gpu_idx} -> device model = {torch.cuda.get_device_name(gpu_idx)}")
-    else:
-        print(f"Cuda available with device {device} -> device model = {torch.cuda.get_device_name(device_slot)}")
-else:
-    n_gpus = 0
-    device = torch.device("cpu")
-    print(f"Cuda is not available, using {device} instead")
- 
+import argparse
 
 #######################
 # Training parameters #
 #######################
 
-epochs = 100
-batch_size = 64
-num_workers = 2   # Processes for loading data in parallel
-multi_gpu = True  # Enables multi-gpu training if it is possible
-pin_memory = True  # Pin memory for extra speed loading batches in GPU
-tensorboard = True  # Enable tensorboard
-target_label = "Diastole"  # Target label to predict "Systole" or "Diastole"
-model_name = "TimeAsDepth"  # Model architecture name
-opt_name = "Adam"  # Selected optimizer
-learning_rate = 0.01  # Learning rate for the optimizer
-momentum = 0.9  # In case of opt_name="SGD"
+# Parse script aguments
+arg_parser = argparse.ArgumentParser(description="Runs the training of the deep learning model")
+arg_parser.add_argument("target_label", help="Value to train for", type=str, choices=["Systole", "Diastole"])
+arg_parser.add_argument("-e", "--epochs", help="Number of epochs to train the model", type=int, default=100)
+arg_parser.add_argument("-bs", "--batch_size", help="Samples per training batch", type=int, default=128)
+arg_parser.add_argument("-w", "--workers", help="Number of workers for data loading", type=int, default=2)
+arg_parser.add_argument("--gpu", help="Select the GPU to use by slot id", type=int, metavar="GPU_SLOT", default=0)
+arg_parser.add_argument("--multi_gpu", help="Use all the available GPU's for training", action="store_true", default=False)
+arg_parser.add_argument("--pin_mem", help="To use pinned memory for data loading into GPU", type=bool, default=True)
+arg_parser.add_argument("--tensorboard", help="To enable tensorboard logs", type=bool, default=True)
+arg_parser.add_argument("-m", "--model", help="Select the model to train", type=str, choices=["TimeAsDepth"], default="TimeAsDepth")
+arg_parser.add_argument("-opt", "--optimizer", help="Select the training optimizer", type=str, choices=["Adam", "SGD"], default="Adam")
+arg_parser.add_argument("-lr", "--learning_rate", help="Starting learning rate for the optimizer", type=float, default=0.01)
+args = arg_parser.parse_args()
+
+epochs = args.epochs
+batch_size = args.batch_size
+num_workers = args.workers
+selected_gpu = args.gpu
+multi_gpu = args.multi_gpu
+pin_memory = args.pin_mem
+tensorboard = args.tensorboard
+target_label = args.target_label
+model_name = args.model
+opt_name = args.optimizer
+learning_rate = args.learning_rate
 exp_name = f"{target_label}_{model_name}_{opt_name}-{learning_rate}"  # Experiment name
 print(f"Running experiment {exp_name}")
+
+# Check computing device
+if torch.cuda.is_available():
+    n_gpus = torch.cuda.device_count()
+    # Select a GPU
+    device = torch.device(f"cuda:{selected_gpu}")
+    if n_gpus > 1 and multi_gpu:
+        print("Going to use multi GPU training")
+        print(f"{n_gpus} GPU's available:")
+        for gpu_idx in range(n_gpus):
+            print(f"\t-At device cuda:{gpu_idx} -> device model = {torch.cuda.get_device_name(gpu_idx)}")
+    else:
+        print(f"Going to train with the GPU in the slot {selected_gpu} -> device model: {torch.cuda.get_device_name(selected_gpu)}")
+else:
+    n_gpus = 0
+    device = torch.device("cpu")
+    print(f"Cuda is not available, using {device} instead")
 
 ###################
 # Data generators #
@@ -78,7 +94,7 @@ criterion = nn.MSELoss()
 if opt_name == "Adam":
     optimizer = optim.Adam(model.parameters(), lr=learning_rate)
 elif opt_name == "SGD":
-    optimizer = optim.SGD(model.parameters(), lr=learning_rate, momentum=momentum)
+    optimizer = optim.SGD(model.parameters(), lr=learning_rate, momentum=0.9)
 else:
     print(f"Optimizer {opt_name} not recognized!")
     sys.exit()
