@@ -1,8 +1,10 @@
 import sys
+sys.path.insert(1, '.')  # To access the libraries
 import torch
+from lib.my_transforms import MyAffine
 
 class Cardiac_dataset(torch.utils.data.Dataset):
-    def __init__(self, data_df, target_label, norm_labels=False):
+    def __init__(self, data_df, target_label, norm_labels=False, data_augmentation=False):
         '''Dataset constructor
         Params:
             data_df -> Pandas dataframe with the dataset info
@@ -22,6 +24,10 @@ class Cardiac_dataset(torch.utils.data.Dataset):
             print(f"Wrong target label ({target_label}) passed to the dataset!")
             sys.exit()
 
+        self.da = data_augmentation
+        if self.da:
+            self.transform = MyAffine(angle_range=(-15, 15), translate_range=(0, 0.1))
+
     def __len__(self):
         '''Returns the number of samples in the dataset'''
         return len(self.df.index)  # Number of rows in the DataFrame
@@ -30,6 +36,8 @@ class Cardiac_dataset(torch.utils.data.Dataset):
         '''Returns a sample by index from the dataset'''
         sample_row = self.df.iloc[index]  # Get sample row from DataFrame
         sample_data = torch.load(sample_row["X_path"])  # Load sample data
+        if self.da:
+            sample_data = self.transform(sample_data)  # Apply data augmentation
         sample_label = torch.tensor([sample_row[self.target_label]]).float()
         return {"X": sample_data, "Y": sample_label}
     
@@ -42,7 +50,7 @@ if __name__ == "__main__":
     target_label = "Systole"
     print(f"Creating dataset from: {partition_csv_path}")
     df = pd.read_csv(partition_csv_path)  # Load partition info
-    dataset = Cardiac_dataset(df, target_label)  # Create the dataset for the partition
+    dataset = Cardiac_dataset(df, target_label, data_augmentation=True)  # Create the dataset for the partition
     samples_to_print = 5
     print(f"Number of samples: {len(dataset)}")
     print(f"Going to show {samples_to_print} samples:")

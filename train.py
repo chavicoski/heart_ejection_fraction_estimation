@@ -28,6 +28,7 @@ arg_parser.add_argument("--tensorboard", help="To enable tensorboard logs", type
 arg_parser.add_argument("-m", "--model", help="Select the model to train", type=str, choices=["TimeAsDepth"], default="TimeAsDepth")
 arg_parser.add_argument("-opt", "--optimizer", help="Select the training optimizer", type=str, choices=["Adam", "SGD"], default="Adam")
 arg_parser.add_argument("-lr", "--learning_rate", help="Starting learning rate for the optimizer", type=float, default=0.01)
+arg_parser.add_argument("-da", "--data_augmentation", help="Enable data augmentation", action="store_true", default=False)
 args = arg_parser.parse_args()
 
 epochs = args.epochs
@@ -41,7 +42,10 @@ target_label = args.target_label
 model_name = args.model
 opt_name = args.optimizer
 learning_rate = args.learning_rate
+data_augmentation = args.data_augmentation
 exp_name = f"{target_label}_{model_name}_{opt_name}-{learning_rate}"  # Experiment name
+if data_augmentation:
+    exp_name += "_DA"
 print(f"Running experiment {exp_name}")
 
 # Check computing device
@@ -69,7 +73,7 @@ else:
 train_df = pd.read_csv("../preproc1_150x150_bySlices_dataset/train.csv")
 dev_df = pd.read_csv("../preproc1_150x150_bySlices_dataset/validate.csv")
 # Create train datagen
-train_dataset = Cardiac_dataset(train_df, target_label)
+train_dataset = Cardiac_dataset(train_df, target_label, data_augmentation=data_augmentation)
 train_datagen = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=num_workers, pin_memory=pin_memory)
 # Create develoment datagen
 dev_dataset = Cardiac_dataset(dev_df, target_label)
@@ -168,6 +172,7 @@ if tensorboard:
     tboard_writer.add_hparams(
         {"label": target_label,
         "model": model_name,
+        "DA": data_augmentation,
         "optimizer": opt_name,
         "lr": learning_rate},
         {"hparam/loss": best_loss, 
