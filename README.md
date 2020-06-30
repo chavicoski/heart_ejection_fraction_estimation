@@ -1,2 +1,2 @@
-# heart_ejection_fraction_estimation
+# Heart ejection fraction estimation
 Second Annual Data Science Bowl (Kaggle competition)
