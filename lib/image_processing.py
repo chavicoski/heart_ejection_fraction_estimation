@@ -113,6 +113,8 @@ def histogram_normalize_4d(images, clip_limit=0.03):
 ###################
 
 def rescale_patient_slices(patient_slices, x_dist, y_dist):
+    '''Given a numpy with the slices of a patient and the pixel spacings
+    this function resizes the images to match 1mm for each pixel'''
     num_slices, timesteps, _, _ = patient_slices.shape
 
     # Rescale the first 2d image, in order to find out the resulting dimensions
@@ -123,9 +125,21 @@ def rescale_patient_slices(patient_slices, x_dist, y_dist):
     # Resize for each slice and time step all the images of the patient
     for s in range(num_slices):
         for t in range(timesteps):
-            scaled_images[s,t] = cv2.resize(src=patient_slices[s,t], dsize=None, fx=x_dist, fy=y_dist)
+            scaled_images[s,t] = cv2.resize(src=patient_slices[s,t], dsize=None, fx=x_dist, fy=y_dist, interpolation=cv2.INTER_CUBIC)
 
     return scaled_images
+
+def resize_patient_slices(patient_slices, target_height, target_width):
+    '''Given a numpy with the slices of a patient and the target shape
+    this function resizes the images to the target shape'''
+    num_slices, timesteps, _, _ = patient_slices.shape
+    resized_images = np.zeros((num_slices, timesteps, target_height, target_width))
+    # Resize for each slice and time step all the images of the patient
+    for s in range(num_slices):
+        for t in range(timesteps):
+            resized_images[s,t] = cv2.resize(patient_slices[s,t], dsize=(target_height, target_width), interpolation=cv2.INTER_CUBIC)
+
+    return resized_images
 
 ########
 # CROP #
@@ -185,6 +199,11 @@ def crop_heart(patient_slices, target_height=200, target_width=200):
 ########################
 # Preprocess_pipelines #
 ########################
+
+def preprocess_pipeline0(patient_slices, pix_spacings, target_size=(150, 150)):
+    '''Basic preprocessing to resize the images to the target_size'''
+    resized_images = resize_patient_slices(patient_slices, target_size[0], target_size[1])
+    return rescaled_images
 
 def preprocess_pipeline1(patient_slices, pix_spacings, target_size=(150, 150)):
     '''
@@ -309,7 +328,8 @@ if __name__ == "__main__":
     print(f"orig_patient_slices shape = {patient_slices.shape}")
     print(f"Time elapsed during orig plot: {end-start:.2f} seconds")
     start = time()
-    preproc_patient = preprocess_pipeline1(patient_slices, pix_spacings, target_size=(150, 150))  # Do preprocesing
+    preproc_patient = preprocess_pipeline1(patient_slices, target_size=(150, 150))  # Do preprocesing
+    #preproc_patient = preprocess_pipeline1(patient_slices, pix_spacings, target_size=(150, 150))  # Do preprocesing
     end = time()
     print(f"preproc_patient_slices shape = {preproc_patient.shape}")
     print(f"Time elapsed during processing: {end-start:.2f} seconds")

@@ -5,17 +5,27 @@ import pandas as pd
 import torch
 from lib.image_processing import get_patient_slices, preprocess_pipeline1
 from tqdm import tqdm
+import argparse
 
-if len(sys.argv) != 3:
-    print("Invalid number of arguments!")
-    print(f"Usage: {sys.argv[0]} <IN_DATA_PATH> <OUT_DATA_PATH>")
-    sys.exit()
+arg_parser = argparse.ArgumentParser(description="Takes the origin raw data and makes a first preprocessing and stores the images in pytorch tensors (.pt files)")
 
-out_path = sys.argv[2]
+
+arg_parser.add_argument("in_data", help="Path to the folder with the data to process", type=str)
+arg_parser.add_argument("out_data", help="Path to the new folder to store the processed pytorch tensors", type=str)
+arg_parser.add_argument("-p", "--preprocess", help="Preprocess pipeline to apply (0 = no preprocessing)", choices=[0, 1], type=int, default=1)
+arg_parser.add_argument("-f", "--format", help="How to store the samples: bySlices: (timesteps, H, W) or byPatients: (slices, timesteps, H, W)", choices=["bySlices", "byPatients"], type=str, default="bySlices")
+args = arg_parser.parse_args()
+
+print(f"in_data: {args.in_data} - out_data: {args.out_data} - preproc_pipeline: {args.preprocess}")
+sys.exit()
+
+pipeline_id = args.preprocess # Get preprocess id
+samples_format = args.format  # Get shape format of the samples
+# Prepare output folder
+out_path = args.out_data
 os.makedirs(out_path, exist_ok=True)  # Create output directory
-
 # Root data path
-dataset_path = sys.argv[1]
+dataset_path = args.in_data
 # Partitons paths
 train_path = os.path.join(dataset_path, "train")
 dev_path = os.path.join(dataset_path, "validate")
@@ -77,13 +87,27 @@ for split_name, data_path, labels_dict in splits_data:
     for case_id, (systole, diastole) in tqdm(labels_dict.items()):
         patient_slices, pix_spacings = get_patient_slices(case_id, split_name)  # Get case images
         if patient_slices is None: continue
-        preproc_patient = preprocess_pipeline1(patient_slices, pix_spacings, target_size=(150, 150))  # Do preprocessing
-        # Save each slice image in a file
-        for slice_idx in range(preproc_patient.shape[0]):
-            slice_tensor = torch.from_numpy(preproc_patient[slice_idx]).float()  # Create pytorch tensor
-            save_path = os.path.join(split_path, f"{case_id}_{slice_idx}.pt")
-            torch.save(slice_tensor, save_path)  # Store the pytorch tensor
-            split_df.loc[df_idx] = [case_id, slice_idx, save_path, systole, diastole]  # Store the case info in the dataframe
+
+        # Apply preprocessing pipeline
+        if pipeline_id == 0:
+            preproc_patient = patient_slices  # Do nothing
+        elif pipeline_id == 1:
+            preproc_patient = preprocess_pipeline1(patient_slices, pix_spacings, target_size=(150, 150))  
+        
+        if samples_format == "bySlices":
+            # Save each slice image (timesteps, H, W) in a different tensor
+            for slice_idx in range(preproc_patient.shape[0]):
+                slice_tensor = torch.from_numpy(preproc_patient[slice_idx]).float()  # Create pytorch tensor
+                save_path = os.path.join(split_path, f"{case_id}_{slice_idx}.pt")
+                torch.save(slice_tensor, save_path)  # Store the pytorch tensor
+                split_df.loc[df_idx] = [case_id, slice_idx, save_path, systole, diastole]  # Store the case info in the dataframe
+                df_idx += 1
+        else:  # samples_format = "byPatients"
+            # Save all the slices of a patient (slices, timesteps, H, W) in the same tensor
+            patient_tensor = torch.from_numpy(preproc_patient).float()  # Create pytorch tensor
+            save_path = os.path.join(split_path, f"{case_id}.pt")
+            torch.save(patient_tensor, save_path)  # Store the pytorch tensor
+            split_df.loc[df_idx] = [case_id, save_path, systole, diastole]  # Store the case info in the dataframe
             df_idx += 1
     
     split_df.to_csv(os.path.join(out_path, f"{split_name}.csv"), index=False)  # Save the csv of the split
