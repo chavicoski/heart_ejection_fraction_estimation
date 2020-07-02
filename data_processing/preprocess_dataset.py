@@ -3,7 +3,7 @@ sys.path.insert(1, '.')  # To access the libraries
 import os
 import pandas as pd
 import torch
-from lib.image_processing import get_patient_slices, preprocess_pipeline1
+from lib.image_processing import get_patient_slices, preprocess_pipeline0, preprocess_pipeline1
 from tqdm import tqdm
 import argparse
 
@@ -12,7 +12,7 @@ arg_parser = argparse.ArgumentParser(description="Takes the origin raw data and 
 
 arg_parser.add_argument("in_data", help="Path to the folder with the data to process", type=str)
 arg_parser.add_argument("out_data", help="Path to the new folder to store the processed pytorch tensors", type=str)
-arg_parser.add_argument("-p", "--preprocess", help="Preprocess pipeline to apply (0 = no preprocessing)", choices=[0, 1], type=int, default=1)
+arg_parser.add_argument("-p", "--preprocess", help="Preprocess pipeline to apply", choices=[0, 1], type=int, default=1)
 arg_parser.add_argument("-f", "--format", help="How to store the samples: bySlices: (timesteps, H, W) or byPatients: (slices, timesteps, H, W)", choices=["bySlices", "byPatients"], type=str, default="bySlices")
 args = arg_parser.parse_args()
 
@@ -90,7 +90,7 @@ for split_name, data_path, labels_dict in splits_data:
 
         # Apply preprocessing pipeline
         if pipeline_id == 0:
-            preproc_patient = patient_slices  # Do nothing
+            preproc_patient = preprocess_pipeline0(patient_slices, target_size=(150, 150))  
         elif pipeline_id == 1:
             preproc_patient = preprocess_pipeline1(patient_slices, pix_spacings, target_size=(150, 150))  
         

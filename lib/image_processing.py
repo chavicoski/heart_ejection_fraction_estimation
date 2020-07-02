@@ -200,10 +200,10 @@ def crop_heart(patient_slices, target_height=200, target_width=200):
 # Preprocess_pipelines #
 ########################
 
-def preprocess_pipeline0(patient_slices, pix_spacings, target_size=(150, 150)):
+def preprocess_pipeline0(patient_slices, target_size=(150, 150)):
     '''Basic preprocessing to resize the images to the target_size'''
     resized_images = resize_patient_slices(patient_slices, target_size[0], target_size[1])
-    return rescaled_images
+    return resized_images
 
 def preprocess_pipeline1(patient_slices, pix_spacings, target_size=(150, 150)):
     '''
@@ -328,8 +328,8 @@ if __name__ == "__main__":
     print(f"orig_patient_slices shape = {patient_slices.shape}")
     print(f"Time elapsed during orig plot: {end-start:.2f} seconds")
     start = time()
-    preproc_patient = preprocess_pipeline1(patient_slices, target_size=(150, 150))  # Do preprocesing
-    #preproc_patient = preprocess_pipeline1(patient_slices, pix_spacings, target_size=(150, 150))  # Do preprocesing
+    #preproc_patient = preprocess_pipeline0(patient_slices, target_size=(150, 150))  # Do preprocesing
+    preproc_patient = preprocess_pipeline1(patient_slices, pix_spacings, target_size=(150, 150))  # Do preprocesing
     end = time()
     print(f"preproc_patient_slices shape = {preproc_patient.shape}")
     print(f"Time elapsed during processing: {end-start:.2f} seconds")
