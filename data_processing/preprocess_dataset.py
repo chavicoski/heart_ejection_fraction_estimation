@@ -16,9 +16,6 @@ arg_parser.add_argument("-p", "--preprocess", help="Preprocess pipeline to apply
 arg_parser.add_argument("-f", "--format", help="How to store the samples: bySlices: (timesteps, H, W) or byPatients: (slices, timesteps, H, W)", choices=["bySlices", "byPatients"], type=str, default="bySlices")
 args = arg_parser.parse_args()
 
-print(f"in_data: {args.in_data} - out_data: {args.out_data} - preproc_pipeline: {args.preprocess}")
-sys.exit()
-
 pipeline_id = args.preprocess # Get preprocess id
 samples_format = args.format  # Get shape format of the samples
 # Prepare output folder
