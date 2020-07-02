@@ -1,1 +1,1 @@
-__all__ = ["my_models"]
+__all__ = ["WideResNet", "TimeAsDepth", "utils"]
