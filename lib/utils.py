@@ -1,7 +1,17 @@
+import os
 from sys import stdout
 from time import time
 import torch
 from matplotlib import pyplot as plt
+
+def get_dataset_name(path):
+    """Given a path to a folder this function returns tha name of this folder"""
+    parts = os.path.split(path)
+    if parts[-1] is not '':  # To fix the case ending with '/'
+        return parts[-1]
+    else:
+        return os.path.basename(parts[-2])
+
 
 def train_regresor(train_loader, net, criterion, optimizer, device, pin_memory):
     '''

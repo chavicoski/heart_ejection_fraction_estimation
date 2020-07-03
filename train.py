@@ -1,3 +1,4 @@
+import os
 import sys
 import argparse
 import numpy as np
@@ -26,13 +27,17 @@ arg_parser.add_argument("--gpu", help="Select the GPU to use by slot id", type=i
 arg_parser.add_argument("--multi_gpu", help="Use all the available GPU's for training", action="store_true", default=False)
 arg_parser.add_argument("--pin_mem", help="To use pinned memory for data loading into GPU", type=bool, default=True)
 arg_parser.add_argument("--tensorboard", help="To enable tensorboard logs", type=bool, default=True)
-arg_parser.add_argument("-m", "--model", help="Select the model to train", type=str, default="TimeAsDepth")
+arg_parser.add_argument("-m", "--model", help="Select the model to train", type=str, default="TimeAsDepth_0")
 arg_parser.add_argument("-opt", "--optimizer", help="Select the training optimizer", type=str, choices=["Adam", "SGD"], default="Adam")
 arg_parser.add_argument("-lr", "--learning_rate", help="Starting learning rate for the optimizer", type=float, default=0.01)
 arg_parser.add_argument("-da", "--data_augmentation", help="Enable data augmentation", action="store_true", default=False)
+arg_parser.add_argument("-dp", "--data_path", help="Path to the preprocessed dataset folder", type=str, default="../preproc1_150x150_bySlices_dataset/")
+arg_parser.add_argument("-fr", "--freeze_ratio", help="Percentaje (range [0...1]) of epochs to freeze the model from the begining", type=float, default=0.3)
 args = arg_parser.parse_args()
 
+data_path = args.data_path
 epochs = args.epochs
+freeze_ratio = args.freeze_ratio
 batch_size = args.batch_size
 num_workers = args.workers
 selected_gpu = args.gpu
@@ -71,8 +76,8 @@ else:
 ###################
 
 # Load dataset info
-train_df = pd.read_csv("../preproc1_150x150_bySlices_dataset/train.csv")
-dev_df = pd.read_csv("../preproc1_150x150_bySlices_dataset/validate.csv")
+train_df = pd.read_csv(os.path.join(data_path, "train.csv"))
+dev_df = pd.read_csv(os.path.join(data_path, "validate.csv"))
 # Create train datagen
 train_dataset = Cardiac_dataset(train_df, target_label, data_augmentation=data_augmentation)
 train_datagen = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=num_workers, pin_memory=pin_memory)
@@ -85,10 +90,13 @@ dev_datagen = DataLoader(dev_dataset, batch_size=batch_size, shuffle=True, num_w
 ########################
 
 # Build the model
+is_pretrained = False  # To unfreeze the weights
 if model_name == "TimeAsDepth_0":
     model = TimeAsDepth_0()
 elif model_name == "WideResNet50_0":
     model = WideResNet50_0()
+    is_pretrained = True
+    model.set_freeze(True)  # Freeze pretrained weights
 else:
     print(f"The model name provided ({model_name}) is not valid")
 # Print model architecture
@@ -130,6 +138,9 @@ if multi_gpu and n_gpus > 1 :
 # Move the model to the computing devices
 model = model.to(device)
 
+# Compute freezed epochs
+freezed_epochs = int(freeze_ratio * epochs)
+
 # Print training header
 print("\n############################\n"\
       +f"# TRAIN PHASE: {epochs:>4} epochs #\n"\
@@ -141,6 +152,14 @@ for epoch in range(epochs):
     stdout.write(f"Epoch {epoch}: ") 
     if best_epoch > -1 : stdout.write(f"current best loss = {best_loss:.5f}, at epoch {best_epoch}\n")
     else: stdout.write("\n")
+
+    if is_pretrained and epoch == freezed_epochs:
+        print("Going to unfreeze the pretrained weights")
+        if multi_gpu and n_gpus > 1 :
+            model.module.set_freeze(False)
+        else:
+            model.set_freeze(False)
+
     # Train split
     train_loss, train_diff = train_regresor(train_datagen, model, criterion, optimizer, device, pin_memory)
     # Development split 
@@ -176,14 +195,15 @@ for epoch in range(epochs):
 
 if tensorboard:
     tboard_writer.add_hparams(
-        {"label": target_label,
-        "model": model_name,
-        "DA": data_augmentation,
-        "optimizer": opt_name,
-        "lr": learning_rate},
-        {"hparam/loss": best_loss, 
-        "hparam/diff": best_diff, 
-        "hparam/best_epoch": best_epoch})
+            {"dataset": get_dataset_name(data_path),
+            "label": target_label,
+            "model": model_name,
+            "DA": data_augmentation,
+            "optimizer": opt_name,
+            "lr": learning_rate},
+            {"hparam/loss": best_loss, 
+            "hparam/diff": best_diff, 
+            "hparam/best_epoch": best_epoch})
 
 # Close the tensorboard writer
 if tensorboard:
