@@ -45,8 +45,10 @@ if __name__ == "__main__":
     from matplotlib import pyplot as plt
 
     tensor = torch.load("../preproc1_150x150_bySlices_dataset/train/109_4.pt")
+    print(f"orig stats: max: {tensor.max()} - min: {tensor.min()} - mean: {tensor.mean()}")
     transform = MyAffine(angle_range=(-15, 15))
     rot_tensor = transform(tensor)
+    print(f"transform stats: max: {rot_tensor.max()} - min: {rot_tensor.min()} - mean: {rot_tensor.mean()}")
     for i in range(30):
         plt.imshow(tensor[i,:,:], cmap=plt.cm.bone)
         plt.savefig(f"test_transform/orig_{i}.png")

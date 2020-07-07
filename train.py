@@ -36,6 +36,7 @@ arg_parser.add_argument("-fr", "--freeze_ratio", help="Percentaje (range [0...1]
 args = arg_parser.parse_args()
 
 data_path = args.data_path
+dataset_name = get_dataset_name(data_path)
 epochs = args.epochs
 freeze_ratio = args.freeze_ratio
 batch_size = args.batch_size
@@ -49,7 +50,7 @@ model_name = args.model
 opt_name = args.optimizer
 learning_rate = args.learning_rate
 data_augmentation = args.data_augmentation
-exp_name = f"{target_label}_{model_name}_{opt_name}-{learning_rate}"  # Experiment name
+exp_name = f"{dataset_name}_{target_label}_{model_name}_{opt_name}-{learning_rate}"  # Experiment name
 if data_augmentation:
     exp_name += "_DA"
 print(f"Running experiment {exp_name}")
@@ -118,7 +119,8 @@ else:
     sys.exit()
 
 # Initialization of the variables to store the results
-best_loss = 99999
+best_loss = 99999999
+best_diff = 99999999
 best_epoch = -1
 train_losses, test_losses = [], []
 train_diffs, test_diffs = [], []
@@ -195,7 +197,7 @@ for epoch in range(epochs):
 
 if tensorboard:
     tboard_writer.add_hparams(
-            {"dataset": get_dataset_name(data_path),
+            {"dataset": dataset_name,
             "label": target_label,
             "model": model_name,
             "DA": data_augmentation,

@@ -203,6 +203,7 @@ def crop_heart(patient_slices, target_height=200, target_width=200):
 def preprocess_pipeline0(patient_slices, target_size=(150, 150)):
     '''Basic preprocessing to resize the images to the target_size'''
     resized_images = resize_patient_slices(patient_slices, target_size[0], target_size[1])
+    resized_images = resized_images / resized_images.max()  # Normalize [0...1]
     return resized_images
 
 def preprocess_pipeline1(patient_slices, pix_spacings, target_size=(150, 150)):
