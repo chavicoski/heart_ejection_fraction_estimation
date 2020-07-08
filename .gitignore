@@ -1,3 +1,9 @@
 outputs
 __pycache__
 preproc_out.txt
+lib/__init__.pyc
+models/checkpoints/
+plots/train_results/
+runs_old/
+test_transform/
+test_transform_old/
