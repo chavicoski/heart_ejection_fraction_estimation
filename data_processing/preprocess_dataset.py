@@ -14,10 +14,13 @@ arg_parser.add_argument("in_data", help="Path to the folder with the data to pro
 arg_parser.add_argument("out_data", help="Path to the new folder to store the processed pytorch tensors", type=str)
 arg_parser.add_argument("-p", "--preprocess", help="Preprocess pipeline to apply", choices=[0, 1], type=int, default=1)
 arg_parser.add_argument("-f", "--format", help="How to store the samples: bySlices: (timesteps, H, W) or byPatients: (slices, timesteps, H, W)", choices=["bySlices", "byPatients"], type=str, default="bySlices")
+arg_parser.add_argument("-th", "--target_height", help="Height of the processed images", type=int, default=150)
+arg_parser.add_argument("-tw", "--target_width", help="Width of the processed images", type=int, default=150)
 args = arg_parser.parse_args()
 
 pipeline_id = args.preprocess # Get preprocess id
 samples_format = args.format  # Get shape format of the samples
+target_size = (args.target_height, args.target_width)
 # Prepare output folder
 out_path = args.out_data
 os.makedirs(out_path, exist_ok=True)  # Create output directory
@@ -87,9 +90,9 @@ for split_name, data_path, labels_dict in splits_data:
 
         # Apply preprocessing pipeline
         if pipeline_id == 0:
-            preproc_patient = preprocess_pipeline0(patient_slices, target_size=(150, 150))  
+            preproc_patient = preprocess_pipeline0(patient_slices, target_size=target_size)  
         elif pipeline_id == 1:
-            preproc_patient = preprocess_pipeline1(patient_slices, pix_spacings, target_size=(150, 150))  
+            preproc_patient = preprocess_pipeline1(patient_slices, pix_spacings, target_size=target_size)  
         
         if samples_format == "bySlices":
             # Save each slice image (timesteps, H, W) in a different tensor

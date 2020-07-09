@@ -317,11 +317,12 @@ if __name__ == "__main__":
 
     print("### PREPROCESS FUNCTIONS TESTS ###")
 
-    ########################################
-    # TEST OF THE PREPROCESSING PIPELINE 1 #
-    ########################################
+    ######################################
+    # TEST OF THE PREPROCESSING PIPELINE #
+    ######################################
     split = "train"   # Split of the case to process
     case_number = 39
+    target_size = (100, 100)
     patient_slices, pix_spacings = get_patient_slices(case_number, split)
     start = time()
     save_patient_slices(patient_slices, f"plots/images/case_{case_number}")  # Store the images of the case
@@ -329,8 +330,8 @@ if __name__ == "__main__":
     print(f"orig_patient_slices shape = {patient_slices.shape}")
     print(f"Time elapsed during orig plot: {end-start:.2f} seconds")
     start = time()
-    #preproc_patient = preprocess_pipeline0(patient_slices, target_size=(150, 150))  # Do preprocesing
-    preproc_patient = preprocess_pipeline1(patient_slices, pix_spacings, target_size=(150, 150))  # Do preprocesing
+    #preproc_patient = preprocess_pipeline0(patient_slices, target_size=target_size)  # Do preprocesing
+    preproc_patient = preprocess_pipeline1(patient_slices, pix_spacings, target_size=target_size) # Do preprocesing
     end = time()
     print(f"preproc_patient_slices shape = {preproc_patient.shape}")
     print(f"Time elapsed during processing: {end-start:.2f} seconds")
