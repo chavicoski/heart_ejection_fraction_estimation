@@ -15,7 +15,7 @@ from pydicom import dcmread
 
 def fourier_time_transform_slice(image_3d):
     '''Returns (width, height) matrix
-    3D array -> 2D array
+    3D array -> 2D array (compresses time dimension)
     [slice, height, width] -> [height, width]
     Apply Fourier transform to 3d data (time,height,width) to get 2d data (height, width)
     '''
@@ -26,13 +26,12 @@ def fourier_time_transform_slice(image_3d):
 
 def fourier_time_transform(patient_slices):
     '''
-    4D array -> 3D array (compresses time dimension)
-    [slice, time, height, width] -> [slice, height, width]
+    list of 3D numpy arrays -> list of 2D numpy arrays (compresses time dimension)
     Apply Fourier transform for analyzing movement over time.
     '''
     # Apply FFT to each slice to see movement over time
-    ftt_image = np.array([fourier_time_transform_slice(patient_slice) for patient_slice in patient_slices])
-    return ftt_image
+    ftt_images = [fourier_time_transform_slice(patient_slice) for patient_slice in patient_slices]
+    return ftt_images
 
 
 ############################## 
@@ -49,29 +48,27 @@ def threshold_segmentation(patient_image):
     return binary_slice
 
 def segment_multiple(patient_images):
-    """Returns list with segmented binary slices
+    """Returns a list with the segmented binary slices
     Apply the function thresh_segmentation() to every slice image of the patient
     """
-    num_images, height, width = patient_images.shape
-    segmented_images = np.zeros((num_images, height, width))
-
-    for i in range(num_images):
-        seg_image = threshold_segmentation(patient_images[i])
+    segmented_images = []
+    for aux_image in patient_images:
+        seg_image = threshold_segmentation(aux_image)
         if seg_image.sum() > seg_image.size * 0.5:
             seg_image = 1 - seg_image
-        segmented_images[i] = seg_image
+        segmented_images.append(seg_image)
 
     return segmented_images
 
-def roi_mean_yx(patient_image):
+def roi_mean_yx(patient_images):
     """Returns mean(y) and mean(x) [double]
     Mean coordinates in segmented patients slices. To identify the ROI
     This function performs erosion to get a better result.
     Original: See https://nbviewer.jupyter.org/github/kmader/Quantitative-Big-Imaging-2019/blob/master/Lectures/06-ShapeAnalysis.ipynb
     """
-    seg_images = segment_multiple(patient_image)
-    num_images = seg_images.shape[0]
-    y_all, x_all = np.zeros(num_images), np.zeros(num_images)
+    seg_images = segment_multiple(patient_images)
+    num_images = len(seg_images)
+    y_all, x_all = [], []
     neighborhood = disk(2)
 
     for i, seg_image in enumerate(seg_images):
@@ -81,12 +78,14 @@ def roi_mean_yx(patient_image):
         # Filter out background of slice, after erosion [background=0, foreground=1]
         y_coord, x_coord = seg_images_eroded.nonzero()
 
-        # Save mean coordinates of foreground 
-        y_all[i], x_all[i] = np.mean(y_coord), np.mean(x_coord)
+        if len(y_coord) > 0 and len(x_coord) > 0:
+            # Save mean coordinates of foreground 
+            y_all.append(np.mean(y_coord))
+            x_all.append(np.mean(x_coord))
 
     # Return mean of mean foregrounds - this gives an estimate of ROI coords.
-    mean_y = int(np.mean(y_all))
-    mean_x = int(np.mean(x_all))
+    mean_y = int(np.mean(np.array(y_all)))
+    mean_x = int(np.mean(np.array(x_all)))
     return mean_y, mean_x
 
 
@@ -94,50 +93,53 @@ def roi_mean_yx(patient_image):
 # IMAGE NORMALIZATION #
 #######################
 
-def histogram_normalize_4d(images, clip_limit=0.03):
+def histogram_normalize(patient_slices, clip_limit=0.03):
     '''
-    Apply image normalization with adaptive equalization (check source)
+    Apply image normalization with adaptive equalization (check source) to a list of
+    numpy arrays with the slices data from a patient
     Source: https://scikit-image.org/docs/dev/auto_examples/color_exposure/plot_equalize.html
     '''
-    slices, timesteps, _, _ = images.shape
-    norm_images_4d = np.empty(images.shape)
-    for i in range(slices):
-        for j in range(timesteps):
-            norm_images_4d[i,j] = exposure.equalize_adapthist(images[i,j].astype(np.uint16), clip_limit=clip_limit)
+    norm_images = []
+    for aux_slice in patient_slices:
+        timesteps = aux_slice.shape[0]
+        aux_norm_images = []
+        for t in range(timesteps):
+            aux_norm_images.append(exposure.equalize_adapthist(aux_slice[t].astype(np.uint16), clip_limit=clip_limit))
+        norm_images.append(np.array(aux_norm_images))
 
-    return norm_images_4d
+    return norm_images
 
 
 ###################
 # IMAGE RESCALING #
 ###################
 
-def rescale_patient_slices(patient_slices, x_dist, y_dist):
-    '''Given a numpy with the slices of a patient and the pixel spacings
-    this function resizes the images to match 1mm for each pixel'''
-    num_slices, timesteps, _, _ = patient_slices.shape
-
-    # Rescale the first 2d image, in order to find out the resulting dimensions
-    aux_image = cv2.resize(src=patient_slices[0, 0], dsize=None, fx=x_dist, fy=y_dist)
-    target_height, target_width = aux_image.shape
-    scaled_images = np.zeros((num_slices, timesteps, target_height, target_width))
-
-    # Resize for each slice and time step all the images of the patient
-    for s in range(num_slices):
+def rescale_patient_slices(patient_slices, pix_spacings):
+    '''Given a list of numpys with the slices of a patient and the pixel spacings
+    for each slice, this function resizes the images to match 1mm for each pixel'''
+    scaled_slices = []  # To store the rescaled numpys
+    for s in range(len(patient_slices)):
+        aux_slice = patient_slices[s]
+        x_dist, y_dist = pix_spacings[s]
+        timesteps = aux_slice.shape[0]
+        assert timesteps == 30
+        aux_slices = []
         for t in range(timesteps):
-            scaled_images[s,t] = cv2.resize(src=patient_slices[s,t], dsize=None, fx=x_dist, fy=y_dist, interpolation=cv2.INTER_CUBIC)
+            aux_slices.append(cv2.resize(src=aux_slice[t], dsize=None, fx=x_dist, fy=y_dist, interpolation=cv2.INTER_CUBIC))
+        scaled_slices.append(np.array(aux_slices))
 
-    return scaled_images
+    return scaled_slices
 
 def resize_patient_slices(patient_slices, target_height, target_width):
-    '''Given a numpy with the slices of a patient and the target shape
-    this function resizes the images to the target shape'''
-    num_slices, timesteps, _, _ = patient_slices.shape
+    '''Given a list of numpys with the slices of a patient and the target shape
+    this function resizes the images to the target shape.
+    Returns: One numpy array of shape (num_slices, timesteps, target_height, target_width)'''
+    num_slices = len(patient_slices)
+    timesteps = patient_slices[0].shape[0]
     resized_images = np.zeros((num_slices, timesteps, target_height, target_width))
-    # Resize for each slice and time step all the images of the patient
     for s in range(num_slices):
         for t in range(timesteps):
-            resized_images[s,t] = cv2.resize(patient_slices[s,t], dsize=(target_height, target_width), interpolation=cv2.INTER_CUBIC)
+            resized_images[s,t] = cv2.resize(patient_slices[s][t], dsize=(target_height, target_width), interpolation=cv2.INTER_CUBIC)
 
     return resized_images
 
@@ -176,7 +178,7 @@ def crop_roi(image, dim_y, dim_x, coord_y, coord_x):
     return crop_image
 
 
-def crop_heart(patient_slices, target_height=200, target_width=200):
+def crop_heart(patient_slices, target_height=150, target_width=150):
     '''
     Finds the heart and crops it. With the crop size provided (target_height, target_width).
     '''
@@ -185,13 +187,14 @@ def crop_heart(patient_slices, target_height=200, target_width=200):
     roi_y, roi_x = roi_mean_yx(fft_images)
 
     # Create new 4d image array to store the crop
-    num_slices, timesteps, _, _ = patient_slices.shape
+    num_slices = len(patient_slices)
+    timesteps = patient_slices[0].shape[0]
     heart_crop_slices = np.zeros((num_slices, timesteps, target_height, target_width))
 
     # Crop every slice image
     for s in range(num_slices):
         for t in range(timesteps):
-            heart_crop_slices[s, t] = crop_roi(patient_slices[s, t], target_height, target_width, roi_y, roi_x)
+            heart_crop_slices[s, t] = crop_roi(patient_slices[s][t], target_height, target_width, roi_y, roi_x)
 
     return heart_crop_slices
 
@@ -208,16 +211,16 @@ def preprocess_pipeline0(patient_slices, target_size=(150, 150)):
 
 def preprocess_pipeline1(patient_slices, pix_spacings, target_size=(150, 150)):
     '''
-    Given a raw patient numpy with all the slices data. Returns the preprocessed version
+    Given a list of numpys with all the slices data from a patient. Returns the preprocessed version
     following this steps:
         1. Rescale the images (1 pixel = 1mm)
         2. Histogram normalization (to balance brightness)
         3. Find ROI and crop it (with fft through time)
     '''
     # 1.
-    rescaled_images = rescale_patient_slices(patient_slices, pix_spacings[0], pix_spacings[1])
+    rescaled_images = rescale_patient_slices(patient_slices, pix_spacings)
     # 2.
-    norm_images = histogram_normalize_4d(rescaled_images)
+    norm_images = histogram_normalize(rescaled_images)
     # 3.
     crop_images = crop_heart(norm_images, target_size[0], target_size[1])
 
@@ -260,13 +263,14 @@ def save_patient_slices(patient_slices, folder_path, n_proc=0):
     stored in 'folder_path' and if it doesn't exist it will be created. 
     '''
     os.makedirs(folder_path, exist_ok=True)  # Check or create the save path
-    n_slices, timesteps, h, w = patient_slices.shape
+    n_slices = len(patient_slices) 
+    timesteps, h, w = patient_slices[0].shape
     if n_proc < 1: 
         n_proc = multiprocessing.cpu_count()  # Get the number of CPU cores
     for s in range(n_slices):
         slice_path = os.path.join(folder_path, f"slice_{s}")
         os.makedirs(slice_path, exist_ok=True)
-        slice_images = patient_slices[s,:,:,:]
+        slice_images = patient_slices[s]
         slice_images_paths = [os.path.join(slice_path, f"{i:03}.png") for i in range(slice_images.shape[0])]
         pool_arguments = zip(slice_images, slice_images_paths)
         write_gif(gif_preprocessing(slice_images), os.path.join(slice_path, "animation.gif"), fps=30)
@@ -274,38 +278,64 @@ def save_patient_slices(patient_slices, folder_path, n_proc=0):
             pool.starmap(save_slice, pool_arguments)
 
 
+def get_dicom_files(slice_path):
+    '''Given the path to a slice folder with .dcm files, this function returns
+    the list (of length 30) of the valid files from the folder'''
+    dicom_files = sorted([f_name for f_name in os.listdir(slice_path) if f_name.endswith(".dcm")])
+    if len(dicom_files) == 30:
+        return dicom_files
+    elif len(dicom_files) > 30:
+        get_timestep = lambda name: int(name.split("-")[3][:-4])  # Order by acquisition index
+        selected_files = sorted(dicom_files, key=get_timestep)[-30:]  # Select the images from the last acquisition
+        return sorted(selected_files)
+    else:
+        return dicom_files + (["<BLACK>"] * (30-len(dicom_files))) # Fill with black images
+            
+
 def get_patient_slices(case_number, split, data_path="../cardiac_dataset/"):
     '''
-    Given a patient number and the partition that belongs returns a numpy array
-    with all the images for each slice (shape=(n_slices, timesptes, height, width))
-    and the pixel spacing (used for preprocessing)
+    Given a patient number and the partition that belongs returns a list of numpy arrays
+    each of them representing the images for a slice trough time (shape: (timesteps, height, width))
+    and a list with the pixel spacing for each slice (used for preprocessing)
     '''
     patient_path = os.path.join(data_path, f"{split}/{split}/{case_number}/study")
     patient_slices = []
-    pix_spacings = None
-    aux_shape = None
+    pix_spacings = []
     for sax_folder in sorted(os.listdir(patient_path)):
         if sax_folder.startswith("sax_"):
+            aux_shape = None
+            pix_spacing = None
             sax_images = []
             sax_path = os.path.join(patient_path, sax_folder)
+            dicom_files = get_dicom_files(sax_path)
+            if len(dicom_files) == 0: return None, None
+            '''
             dicom_files = sorted([f_name for f_name in os.listdir(sax_path) if f_name.endswith(".dcm")])
             if len(dicom_files) != 30:
-                print(f"get_patient_slices(): Error! The number of timesteps is not 30 (case {case_number})")
+                print(f"get_patient_slices(): Error! The number of timesteps is not 30, is {len(dicom_files)} (case {case_number})")
                 return None, None
+            '''
             for dicom_name in dicom_files:
-                dicom_data = dcmread(os.path.join(sax_path, dicom_name))
-                image_array = dicom_data.pixel_array
-                if aux_shape == None:
-                    aux_shape = image_array.shape
-                elif aux_shape != image_array.shape:
-                    print(f"get_patient_slices(): Error! The slices shapes don't match (case {case_number})")
-                    return None, None
-                sax_images.append(image_array)
-                if pix_spacings == None:
-                    pix_spacings = dicom_data.PixelSpacing
-            patient_slices.append(sax_images)
+                if dicom_name == "<BLACK>":
+                    sax_images.append(np.zeros(aux_shape))
+                else:
+                    dicom_data = dcmread(os.path.join(sax_path, dicom_name))
+                    image_array = dicom_data.pixel_array
+                    if aux_shape == None:
+                        aux_shape = image_array.shape
+                    elif aux_shape != image_array.shape:
+                        print(f"get_patient_slices(): Error! The slices shapes don't match {aux_shape} != {image_array.shape} (case {case_number})")
+                        return None, None
+                    sax_images.append(image_array)
+                    if pix_spacing == None:
+                        pix_spacing = dicom_data.PixelSpacing
+                    elif pix_spacing != dicom_data.PixelSpacing:
+                        print(f"get_patient_slices(): Warning! The pixel spacings don't match {pix_spacing} != {dicom_data.PixelSpacing} (case {case_number})")
 
-    return np.array(patient_slices), pix_spacings
+            patient_slices.append(np.array(sax_images))
+            pix_spacings.append(pix_spacing)
+
+    return patient_slices, pix_spacings
 
 ##################
 # TEST FUNCTIONS #
@@ -322,18 +352,16 @@ if __name__ == "__main__":
     ######################################
     split = "train"   # Split of the case to process
     case_number = 39
-    target_size = (100, 100)
+    target_size = (150, 150)
     patient_slices, pix_spacings = get_patient_slices(case_number, split)
     start = time()
     save_patient_slices(patient_slices, f"plots/images/case_{case_number}")  # Store the images of the case
     end = time()
-    print(f"orig_patient_slices shape = {patient_slices.shape}")
     print(f"Time elapsed during orig plot: {end-start:.2f} seconds")
     start = time()
     #preproc_patient = preprocess_pipeline0(patient_slices, target_size=target_size)  # Do preprocesing
     preproc_patient = preprocess_pipeline1(patient_slices, pix_spacings, target_size=target_size) # Do preprocesing
     end = time()
-    print(f"preproc_patient_slices shape = {preproc_patient.shape}")
     print(f"Time elapsed during processing: {end-start:.2f} seconds")
     start = time()
     save_patient_slices(preproc_patient, f"plots/images/case_{case_number}_preproc")  # Store preprocessed images of the case
