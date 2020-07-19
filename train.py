@@ -10,7 +10,7 @@ from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
 from lib.data_generators import Cardiac_dataset
 from lib.utils import *
-from models.TimeAsDepth import TimeAsDepth_0
+from models.TimeAsDepth import TimeAsDepth_0, TimeAsDepth_1, TimeAsDepth_2
 from models.WideResNet import WideResNet50_0
 
 #######################
@@ -27,7 +27,7 @@ arg_parser.add_argument("--gpu", help="Select the GPU to use by slot id", type=i
 arg_parser.add_argument("--multi_gpu", help="Use all the available GPU's for training", action="store_true", default=False)
 arg_parser.add_argument("--pin_mem", help="To use pinned memory for data loading into GPU", type=bool, default=True)
 arg_parser.add_argument("--tensorboard", help="To enable tensorboard logs", type=bool, default=True)
-arg_parser.add_argument("-m", "--model", help="Select the model to train", type=str, default="TimeAsDepth_0")
+arg_parser.add_argument("-m", "--model", help="Select the model to train", type=str, choices=["TimeAsDepth_0", "TimeAsDepth_1", "TimeAsDepth_2"], default="TimeAsDepth_0")
 arg_parser.add_argument("-opt", "--optimizer", help="Select the training optimizer", type=str, choices=["Adam", "SGD"], default="Adam")
 arg_parser.add_argument("-lr", "--learning_rate", help="Starting learning rate for the optimizer", type=float, default=0.01)
 arg_parser.add_argument("-da", "--data_augmentation", help="Enable data augmentation", action="store_true", default=False)
@@ -94,6 +94,10 @@ dev_datagen = DataLoader(dev_dataset, batch_size=batch_size, shuffle=True, num_w
 is_pretrained = False  # To unfreeze the weights
 if model_name == "TimeAsDepth_0":
     model = TimeAsDepth_0()
+elif model_name == "TimeAsDepth_1":
+    model = TimeAsDepth_1()
+elif model_name == "TimeAsDepth_2":
+    model = TimeAsDepth_2()
 elif model_name == "WideResNet50_0":
     model = WideResNet50_0()
     is_pretrained = True
