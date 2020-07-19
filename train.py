@@ -29,7 +29,7 @@ arg_parser.add_argument("--pin_mem", help="To use pinned memory for data loading
 arg_parser.add_argument("--tensorboard", help="To enable tensorboard logs", type=bool, default=True)
 arg_parser.add_argument("-m", "--model", help="Select the model to train", type=str, choices=["TimeAsDepth_0", "TimeAsDepth_1", "TimeAsDepth_2"], default="TimeAsDepth_0")
 arg_parser.add_argument("-opt", "--optimizer", help="Select the training optimizer", type=str, choices=["Adam", "SGD"], default="Adam")
-arg_parser.add_argument("-lr", "--learning_rate", help="Starting learning rate for the optimizer", type=float, default=0.01)
+arg_parser.add_argument("-lr", "--learning_rate", help="Starting learning rate for the optimizer", type=float, default=0.001)
 arg_parser.add_argument("-da", "--data_augmentation", help="Enable data augmentation", action="store_true", default=False)
 arg_parser.add_argument("-dp", "--data_path", help="Path to the preprocessed dataset folder", type=str, default="../preproc1_150x150_bySlices_dataset_full/")
 arg_parser.add_argument("-fr", "--freeze_ratio", help="Percentaje (range [0...1]) of epochs to freeze the model from the begining", type=float, default=0.3)
@@ -130,7 +130,7 @@ train_losses, test_losses = [], []
 train_diffs, test_diffs = [], []
 
 # Scheduler for changing the value of the laearning rate
-scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'min', factor=0.1, patience=10, verbose=True)
+scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'min', factor=0.5, patience=10, verbose=True)
 
 # Set the tensorboard writer
 if tensorboard:

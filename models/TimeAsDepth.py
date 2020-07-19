@@ -36,7 +36,7 @@ class TimeAsDepth_0(nn.Module):
                 nn.BatchNorm2d(256),
                 nn.ReLU(),
                 nn.Dropout(0.4),
-                nn.AvgPool2d((11, 11))
+                nn.AdaptiveAvgPool2d((1, 1))
                 )
         self.flatten = Flatten()
         self.dense_block = nn.Sequential(
@@ -86,7 +86,7 @@ class TimeAsDepth_1(nn.Module):
                 nn.BatchNorm2d(256),
                 nn.ReLU(),
                 nn.Dropout(0.4),
-                nn.AvgPool2d((11, 11))
+                nn.AdaptiveAvgPool2d((1, 1))
                 )
         self.flatten = Flatten()
         self.dense_block = nn.Sequential(
@@ -136,7 +136,7 @@ class TimeAsDepth_2(nn.Module):
                 nn.BatchNorm2d(256),
                 nn.ReLU(),
                 nn.Dropout(0.4),
-                nn.AvgPool2d((11, 11))
+                nn.AdaptiveAvgPool2d((1, 1))
                 )
         self.flatten = Flatten()
         self.dense_block = nn.Sequential(
