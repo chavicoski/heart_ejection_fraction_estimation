@@ -166,8 +166,8 @@ def submission_regresor(test_loader, net_systole, net_diastole, criterion, devic
                 systole_probs.append(0 if i < int(systole_value) else 1)
                 diastole_probs.append(0 if i < int(diastole_value) else 1)
             # Add the pred to the dataframe
-            df.loc[df_idx] = [f"{int(id_[0])}_systolic"] + systole_probs
-            df.loc[df_idx+1] = [f"{int(id_[0])}_diastolic"] + diastole_probs
+            df.loc[df_idx] = [f"{int(id_[0])}_Systole"] + systole_probs
+            df.loc[df_idx+1] = [f"{int(id_[0])}_Diastole"] + diastole_probs
             df_idx += 2
 
     # Store dataframe to csv
