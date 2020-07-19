@@ -4,7 +4,7 @@ import torch
 from lib.my_transforms import MyAffine
 
 class Cardiac_dataset(torch.utils.data.Dataset):
-    def __init__(self, data_df, target_label, norm_labels=False, data_augmentation=False):
+    def __init__(self, data_df, target_label, data_augmentation=False):
         '''Dataset constructor
         Params:
             data_df -> Pandas dataframe with the dataset info
@@ -14,10 +14,8 @@ class Cardiac_dataset(torch.utils.data.Dataset):
                     - Systole -> float value for Systole label
                     - Diastole -> float value for Diastole label
             target_label -> Label to return, "Sytole" or "Diastole"
-            norm_labels -> To enable the labels normalization between 0 and 1
         '''
         self.df = data_df
-        self.norm_labels = norm_labels
         if target_label in ["Systole", "Diastole"]:
             self.target_label = target_label
         else:
@@ -42,6 +40,40 @@ class Cardiac_dataset(torch.utils.data.Dataset):
         return {"X": sample_data, "Y": sample_label}
     
 
+class Submission_dataset(torch.utils.data.Dataset):
+    def __init__(self, data_df):
+        '''Dataset constructor
+        This dataset resturns all the samples for each patient Id
+        Params:
+            data_df -> Pandas dataframe with the dataset info
+                *data_df columns:
+                    - Id -> case Id in the dataset
+                    - X_path -> relative path from the workspace folder to the data tensor
+                    - Systole -> float value for Systole label
+                    - Diastole -> float value for Diastole label
+        '''
+        self.df = data_df
+        self.ids = data_df["Id"].unique()
+
+    def __len__(self):
+        '''Returns the number of samples in the dataset'''
+        return len(self.ids)  # Number of patients in the dataframe
+
+    def __getitem__(self, index):
+        '''Returns a sample by index from the dataset'''
+        case_id = self.ids[index]  # Get the corresponding patient id
+        selected_rows = self.df[self.df["Id"] == case_id]  # Get samples of the selected patient
+
+        slices = []
+        for idx, row in selected_rows.iterrows():
+            slices.append(torch.load(row["X_path"]))  # Load sample data
+        case_data = torch.stack(slices)
+
+        label_systole = torch.tensor([selected_rows.iloc[0]["Systole"]]).float()
+        label_diastole = torch.tensor([selected_rows.iloc[0]["Diastole"]]).float()
+        return {"ID": case_id, "X": case_data, "Y_systole": label_systole, "Y_diastole": label_diastole}
+
+
 if __name__ == "__main__":
     
     import pandas as pd
@@ -52,6 +84,7 @@ if __name__ == "__main__":
     df = pd.read_csv(partition_csv_path)  # Load partition info
     dataset = Cardiac_dataset(df, target_label, data_augmentation=True)  # Create the dataset for the partition
     samples_to_print = 5
+    print("TESTING Cardiac_dataset class:")
     print(f"Number of samples: {len(dataset)}")
     print(f"Going to show {samples_to_print} samples:")
     for i, sample in enumerate(dataset):
@@ -59,3 +92,16 @@ if __name__ == "__main__":
         x, y = sample['X'], sample['Y']
         print(f"\tX info: shape={x.shape} - mean={x.mean():.3f} - max={x.max()} - min={x.min()} - dtype={x.type()}")
         print(f"\tY info: {target_label}={y[0]:.3f} - dtype={y.type()}\n")
+
+
+    print("TESTING Submission_dataset class:")
+    dataset = Submission_dataset(df)  # Create the dataset for the partition
+    samples_to_print = 5
+    print(f"Number of samples: {len(dataset)}")
+    print(f"Going to show {samples_to_print} samples:")
+    for i, sample in enumerate(dataset):
+        if i == samples_to_print: break
+        id_, x, y_sys, y_dias = sample["ID"], sample['X'], sample['Y_systole'], sample["Y_diastole"]
+        print(f"\tSample Id: {id_}")
+        print(f"\tX info: shape={x.shape} - mean={x.mean():.3f} - max={x.max()} - min={x.min()} - dtype={x.type()}")
+        print(f"\tY info: systole={y_sys[0]:.3f} - diastole={y_dias[0]:.3f} - dtype={y.type()}\n")
