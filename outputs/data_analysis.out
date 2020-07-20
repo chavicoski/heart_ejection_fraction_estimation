@@ -1,0 +1,231 @@
+There are no valid slices for patient 234 of train split!
+There are no valid slices for patient 499 of train split!
+There are no valid slices for patient 279 of train split!
+There are no valid slices for patient 463 of train split!
+There are no valid slices for patient 590 of dev split!
+There are no valid slices for patient 597 of dev split!
+There are no valid slices for patient 850 of test split!
+There are no valid slices for patient 843 of test split!
+There are no valid slices for patient 832 of test split!
+There are no valid slices for patient 775 of test split!
+There are no valid slices for patient 731 of test split!
+There are no valid slices for patient 1065 of test split!
+There are no valid slices for patient 888 of test split!
+There are no valid slices for patient 834 of test split!
+There are no valid slices for patient 985 of test split!
+There are no valid slices for patient 831 of test split!
+There are no valid slices for patient 760 of test split!
+
+Slices count by patient:
+train: average=10.67, max=22, min=1
+dev: average=10.75, max=19, min=3
+test: average=10.63, max=25, min=1
+
+Ingnored slices (141):
+../cardiac_dataset/train/train/416/study/sax_14 -> 25 dicom files
+../cardiac_dataset/train/train/416/study/sax_18 -> 25 dicom files
+../cardiac_dataset/train/train/416/study/sax_12 -> 25 dicom files
+../cardiac_dataset/train/train/416/study/sax_15 -> 25 dicom files
+../cardiac_dataset/train/train/416/study/sax_13 -> 25 dicom files
+../cardiac_dataset/train/train/416/study/sax_9 -> 22 dicom files
+../cardiac_dataset/train/train/416/study/sax_7 -> 23 dicom files
+../cardiac_dataset/train/train/416/study/sax_11 -> 25 dicom files
+../cardiac_dataset/train/train/416/study/sax_17 -> 25 dicom files
+../cardiac_dataset/train/train/416/study/sax_10 -> 25 dicom files
+../cardiac_dataset/train/train/416/study/sax_16 -> 25 dicom files
+../cardiac_dataset/train/train/234/study/sax_20 -> 330 dicom files
+../cardiac_dataset/train/train/234/study/sax_19 -> 60 dicom files
+../cardiac_dataset/train/train/499/study/sax_18 -> 330 dicom files
+../cardiac_dataset/train/train/123/study/sax_20 -> 270 dicom files
+../cardiac_dataset/train/train/123/study/sax_10 -> 270 dicom files
+../cardiac_dataset/train/train/334/study/sax_29 -> 330 dicom files
+../cardiac_dataset/train/train/279/study/sax_14 -> 60 dicom files
+../cardiac_dataset/train/train/279/study/sax_18 -> 60 dicom files
+../cardiac_dataset/train/train/279/study/sax_12 -> 60 dicom files
+../cardiac_dataset/train/train/279/study/sax_15 -> 60 dicom files
+../cardiac_dataset/train/train/279/study/sax_13 -> 60 dicom files
+../cardiac_dataset/train/train/279/study/sax_9 -> 60 dicom files
+../cardiac_dataset/train/train/279/study/sax_19 -> 60 dicom files
+../cardiac_dataset/train/train/279/study/sax_11 -> 60 dicom files
+../cardiac_dataset/train/train/279/study/sax_17 -> 60 dicom files
+../cardiac_dataset/train/train/279/study/sax_10 -> 60 dicom files
+../cardiac_dataset/train/train/279/study/sax_16 -> 60 dicom files
+../cardiac_dataset/train/train/463/study/sax_14 -> 60 dicom files
+../cardiac_dataset/train/train/463/study/sax_8 -> 60 dicom files
+../cardiac_dataset/train/train/463/study/sax_12 -> 60 dicom files
+../cardiac_dataset/train/train/463/study/sax_15 -> 60 dicom files
+../cardiac_dataset/train/train/463/study/sax_72 -> 60 dicom files
+../cardiac_dataset/train/train/463/study/sax_13 -> 60 dicom files
+../cardiac_dataset/train/train/463/study/sax_9 -> 60 dicom files
+../cardiac_dataset/train/train/463/study/sax_7 -> 60 dicom files
+../cardiac_dataset/train/train/463/study/sax_11 -> 60 dicom files
+../cardiac_dataset/train/train/463/study/sax_10 -> 60 dicom files
+../cardiac_dataset/validate/validate/590/study/sax_14 -> 60 dicom files
+../cardiac_dataset/validate/validate/590/study/sax_18 -> 60 dicom files
+../cardiac_dataset/validate/validate/590/study/sax_20 -> 60 dicom files
+../cardiac_dataset/validate/validate/590/study/sax_12 -> 60 dicom files
+../cardiac_dataset/validate/validate/590/study/sax_15 -> 60 dicom files
+../cardiac_dataset/validate/validate/590/study/sax_13 -> 60 dicom files
+../cardiac_dataset/validate/validate/590/study/sax_19 -> 60 dicom files
+../cardiac_dataset/validate/validate/590/study/sax_11 -> 60 dicom files
+../cardiac_dataset/validate/validate/590/study/sax_17 -> 60 dicom files
+../cardiac_dataset/validate/validate/590/study/sax_10 -> 60 dicom files
+../cardiac_dataset/validate/validate/590/study/sax_16 -> 60 dicom files
+../cardiac_dataset/validate/validate/597/study/sax_7 -> 270 dicom files
+../cardiac_dataset/validate/validate/516/study/sax_104 -> 330 dicom files
+../cardiac_dataset/validate/validate/619/study/sax_21 -> 330 dicom files
+../cardiac_dataset/validate/validate/623/study/sax_56 -> 60 dicom files
+../cardiac_dataset/validate/validate/623/study/sax_57 -> 60 dicom files
+../cardiac_dataset/test/test/721/study/sax_47 -> 330 dicom files
+../cardiac_dataset/test/test/850/study/sax_14 -> 60 dicom files
+../cardiac_dataset/test/test/850/study/sax_8 -> 60 dicom files
+../cardiac_dataset/test/test/850/study/sax_12 -> 60 dicom files
+../cardiac_dataset/test/test/850/study/sax_15 -> 60 dicom files
+../cardiac_dataset/test/test/850/study/sax_13 -> 60 dicom files
+../cardiac_dataset/test/test/850/study/sax_9 -> 60 dicom files
+../cardiac_dataset/test/test/850/study/sax_7 -> 60 dicom files
+../cardiac_dataset/test/test/850/study/sax_11 -> 60 dicom files
+../cardiac_dataset/test/test/850/study/sax_17 -> 60 dicom files
+../cardiac_dataset/test/test/850/study/sax_10 -> 60 dicom files
+../cardiac_dataset/test/test/850/study/sax_16 -> 60 dicom files
+../cardiac_dataset/test/test/843/study/sax_14 -> 60 dicom files
+../cardiac_dataset/test/test/843/study/sax_18 -> 60 dicom files
+../cardiac_dataset/test/test/843/study/sax_12 -> 60 dicom files
+../cardiac_dataset/test/test/843/study/sax_15 -> 60 dicom files
+../cardiac_dataset/test/test/843/study/sax_13 -> 60 dicom files
+../cardiac_dataset/test/test/843/study/sax_9 -> 60 dicom files
+../cardiac_dataset/test/test/843/study/sax_19 -> 60 dicom files
+../cardiac_dataset/test/test/843/study/sax_11 -> 60 dicom files
+../cardiac_dataset/test/test/843/study/sax_17 -> 60 dicom files
+../cardiac_dataset/test/test/843/study/sax_10 -> 60 dicom files
+../cardiac_dataset/test/test/843/study/sax_16 -> 60 dicom files
+../cardiac_dataset/test/test/832/study/sax_14 -> 90 dicom files
+../cardiac_dataset/test/test/832/study/sax_12 -> 90 dicom files
+../cardiac_dataset/test/test/832/study/sax_15 -> 90 dicom files
+../cardiac_dataset/test/test/832/study/sax_13 -> 90 dicom files
+../cardiac_dataset/test/test/832/study/sax_9 -> 90 dicom files
+../cardiac_dataset/test/test/832/study/sax_11 -> 90 dicom files
+../cardiac_dataset/test/test/832/study/sax_17 -> 90 dicom files
+../cardiac_dataset/test/test/832/study/sax_10 -> 90 dicom files
+../cardiac_dataset/test/test/832/study/sax_16 -> 90 dicom files
+../cardiac_dataset/test/test/775/study/sax_18 -> 300 dicom files
+../cardiac_dataset/test/test/731/study/sax_20 -> 330 dicom files
+../cardiac_dataset/test/test/731/study/sax_10 -> 330 dicom files
+../cardiac_dataset/test/test/1065/study/sax_14 -> 60 dicom files
+../cardiac_dataset/test/test/1065/study/sax_8 -> 60 dicom files
+../cardiac_dataset/test/test/1065/study/sax_12 -> 60 dicom files
+../cardiac_dataset/test/test/1065/study/sax_15 -> 60 dicom files
+../cardiac_dataset/test/test/1065/study/sax_13 -> 60 dicom files
+../cardiac_dataset/test/test/1065/study/sax_9 -> 60 dicom files
+../cardiac_dataset/test/test/1065/study/sax_7 -> 60 dicom files
+../cardiac_dataset/test/test/1065/study/sax_11 -> 60 dicom files
+../cardiac_dataset/test/test/1065/study/sax_6 -> 60 dicom files
+../cardiac_dataset/test/test/1065/study/sax_10 -> 60 dicom files
+../cardiac_dataset/test/test/1065/study/sax_16 -> 60 dicom files
+../cardiac_dataset/test/test/888/study/sax_7 -> 270 dicom files
+../cardiac_dataset/test/test/834/study/sax_7 -> 330 dicom files
+../cardiac_dataset/test/test/793/study/sax_41 -> 390 dicom files
+../cardiac_dataset/test/test/985/study/sax_32 -> 60 dicom files
+../cardiac_dataset/test/test/985/study/sax_30 -> 60 dicom files
+../cardiac_dataset/test/test/985/study/sax_36 -> 60 dicom files
+../cardiac_dataset/test/test/985/study/sax_24 -> 60 dicom files
+../cardiac_dataset/test/test/985/study/sax_29 -> 60 dicom files
+../cardiac_dataset/test/test/985/study/sax_33 -> 60 dicom files
+../cardiac_dataset/test/test/985/study/sax_35 -> 60 dicom files
+../cardiac_dataset/test/test/985/study/sax_27 -> 60 dicom files
+../cardiac_dataset/test/test/985/study/sax_25 -> 60 dicom files
+../cardiac_dataset/test/test/985/study/sax_31 -> 60 dicom files
+../cardiac_dataset/test/test/985/study/sax_28 -> 60 dicom files
+../cardiac_dataset/test/test/985/study/sax_23 -> 60 dicom files
+../cardiac_dataset/test/test/985/study/sax_34 -> 60 dicom files
+../cardiac_dataset/test/test/985/study/sax_26 -> 60 dicom files
+../cardiac_dataset/test/test/1111/study/sax_32 -> 330 dicom files
+../cardiac_dataset/test/test/831/study/sax_14 -> 60 dicom files
+../cardiac_dataset/test/test/831/study/sax_8 -> 60 dicom files
+../cardiac_dataset/test/test/831/study/sax_18 -> 60 dicom files
+../cardiac_dataset/test/test/831/study/sax_20 -> 60 dicom files
+../cardiac_dataset/test/test/831/study/sax_12 -> 60 dicom files
+../cardiac_dataset/test/test/831/study/sax_15 -> 60 dicom files
+../cardiac_dataset/test/test/831/study/sax_21 -> 60 dicom files
+../cardiac_dataset/test/test/831/study/sax_13 -> 60 dicom files
+../cardiac_dataset/test/test/831/study/sax_22 -> 60 dicom files
+../cardiac_dataset/test/test/831/study/sax_9 -> 60 dicom files
+../cardiac_dataset/test/test/831/study/sax_19 -> 60 dicom files
+../cardiac_dataset/test/test/831/study/sax_7 -> 60 dicom files
+../cardiac_dataset/test/test/831/study/sax_11 -> 60 dicom files
+../cardiac_dataset/test/test/831/study/sax_17 -> 60 dicom files
+../cardiac_dataset/test/test/831/study/sax_6 -> 60 dicom files
+../cardiac_dataset/test/test/831/study/sax_10 -> 60 dicom files
+../cardiac_dataset/test/test/831/study/sax_16 -> 60 dicom files
+../cardiac_dataset/test/test/1082/study/sax_20 -> 270 dicom files
+../cardiac_dataset/test/test/1082/study/sax_10 -> 270 dicom files
+../cardiac_dataset/test/test/760/study/sax_18 -> 420 dicom files
+../cardiac_dataset/test/test/760/study/sax_21 -> 60 dicom files
+../cardiac_dataset/test/test/760/study/sax_23 -> 60 dicom files
+../cardiac_dataset/test/test/760/study/sax_16 -> 240 dicom files
+
+Shapes:
+	(256, 192):  529
+	(192, 256):  182
+	(512, 384):  101
+	(256, 218):   59
+	(448, 336):   41
+	(256, 256):   23
+	(384, 512):   22
+	(256, 230):   20
+	(352, 264):   19
+	(416, 312):   18
+	(608, 456):   12
+	(336, 448):   12
+	(512, 416):    9
+	(218, 256):    9
+	(264, 352):    8
+	(256, 204):    7
+	(312, 416):    6
+	(704, 528):    6
+	(288, 216):    4
+	(416, 512):    4
+	(320, 240):    3
+	(230, 256):    2
+	(256, 166):    2
+	(416, 288):    2
+	(528, 704):    2
+	(180, 256):    2
+	(512, 432):    2
+	(512, 368):    2
+	(256, 180):    2
+	(204, 256):    1
+	(244, 256):    1
+	(736, 552):    1
+	(256, 206):    1
+	(216, 256):    1
+	(160, 120):    1
+	(608, 608):    1
+	(704, 580):    1
+	(384, 288):    1
+	(202, 256):    1
+	(512, 352):    1
+	(166, 256):    1
+	(416, 300):    1
+
+Pixels spacings:
+	train split:
+		x_dist -> avg=1.2684149919979033 - max=1.953125 - min=0.61956518888474
+		y_dist -> avg=1.2684149919979033 - max=1.953125 - min=0.61956518888474
+		z_dist -> avg=7.747983870967742 - max=8.0 - min=5.0
+	dev split:
+		x_dist -> avg=1.2604391815686469 - max=1.7578125 - min=0.61363637447357
+		y_dist -> avg=1.2604391815686469 - max=1.7578125 - min=0.61363637447357
+		z_dist -> avg=7.626262626262626 - max=8.0 - min=4.0
+	test split:
+		x_dist -> avg=1.261443946189258 - max=1.953125 - min=0.58928573131561
+		y_dist -> avg=1.261443946189258 - max=1.953125 - min=0.58928573131561
+		z_dist -> avg=7.713286713286713 - max=8.0 - min=5.0
+
+Pixels values:
+	train split:
+		average_pixel=99.54810715659849 - max_pixel=4095 - min_pixel=0
+	dev split:
+		average_pixel=106.5136845419175 - max_pixel=4095 - min_pixel=0
+	test split:
+		average_pixel=114.99603043830733 - max_pixel=4095 - min_pixel=0
