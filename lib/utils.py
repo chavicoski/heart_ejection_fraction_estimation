@@ -299,4 +299,5 @@ def plot_results(train_values, test_values, title="", save_as=""):
     plt.title(title)
     if save_as is not "": 
         plt.savefig("plots/train_results/" + save_as + ".png")
-    plt.show() 
+    else:
+        plt.show() 
