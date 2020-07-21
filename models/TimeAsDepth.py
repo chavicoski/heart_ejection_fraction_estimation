@@ -197,7 +197,7 @@ class TimeAsDepth_3(nn.Module):
                 )
         self.flatten = Flatten()
         self.dense_block = nn.Sequential(
-                nn.Linear(256, 1024),
+                nn.Linear(512, 1024),
                 nn.ReLU(),
                 nn.Dropout(0.4),
                 nn.Linear(1024, 1)
