@@ -39,11 +39,31 @@ class MyAffine:
         return res
 
 
+class ChannelShift:
+    '''Given a 3D tensor (timesteps, height, width) shifts the channels in a circular way'''
+
+    def __init__(self, shift_range=[-0.3, 0.3]):
+        '''Constructor
+        Params:
+            shift_range -> maximum percentaje of channels to shift during transformation in each direction
+        '''
+        self.shift_range = shift_range
+
+    def __call__(self, x):
+        '''Shifts the channels by a randomly picked number of times, depending on the
+        sign of the picked number the shift direction changes'''
+        n_shift = int(x.size(0) * random.uniform(*self.shift_range))
+        print(f"n_shift={n_shift}")
+        return torch.cat([x[n_shift:], x[:n_shift]])
+
+
 if __name__ == "__main__":
 
     import torch
     from matplotlib import pyplot as plt
 
+
+    print("MyAffine test:")
     tensor = torch.load("../preproc1_150x150_bySlices_dataset/train/109_4.pt")
     print(f"orig stats: max: {tensor.max()} - min: {tensor.min()} - mean: {tensor.mean()}")
     transform = MyAffine(angle_range=(-15, 15))
@@ -58,3 +78,10 @@ if __name__ == "__main__":
         plt.savefig(f"test_transform/trans_{i}.png")
         plt.clf()
 
+
+    print("ChannelShift test:")
+    dummy = torch.tensor([[[0,0],[0,0]], [[1,1],[1,1]], [[2,2],[2,2]], [[3,3],[3,3]], [[4,4],[4,4]], [[5,5],[5,5]], [[6,6],[6,6]], [[7,7],[7,7]]])
+    print(f"dummy orig:\n{dummy}")
+    transform = ChannelShift()
+    shifted_dummy = transform(dummy)
+    print(f"dummy shifted:\n{shifted_dummy}")
