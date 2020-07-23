@@ -1,10 +1,11 @@
 import sys
 sys.path.insert(1, '.')  # To access the libraries
 import torch
-from lib.my_transforms import MyAffine
+from lib.my_transforms import MyAffine, ChannelShift
+from torchvision import transforms
 
 class Cardiac_dataset(torch.utils.data.Dataset):
-    def __init__(self, data_df, target_label, data_augmentation=False):
+    def __init__(self, data_df, target_label, data_augmentation=0):
         '''Dataset constructor
         Params:
             data_df -> Pandas dataframe with the dataset info
@@ -14,6 +15,9 @@ class Cardiac_dataset(torch.utils.data.Dataset):
                     - Systole -> float value for Systole label
                     - Diastole -> float value for Diastole label
             target_label -> Label to return, "Sytole" or "Diastole"
+            data_augmentation ->    0: Disables DA
+                                    1: Enables DA
+                                    2: Add ChannelShift to DA
         '''
         self.df = data_df
         if target_label in ["Systole", "Diastole"]:
@@ -23,8 +27,13 @@ class Cardiac_dataset(torch.utils.data.Dataset):
             sys.exit()
 
         self.da = data_augmentation
-        if self.da:
+        if self.da == 1:
             self.transform = MyAffine(angle_range=(-15, 15), translate_range=(0, 0.1))
+        elif self.da == 2:
+            self.transform = transforms.Compose([
+                    MyAffine(angle_range=(-15, 15), translate_range=(0, 0.1)),
+                    ChannelShift(shift_range=[-0.4, 0.4])
+                ])
 
     def __len__(self):
         '''Returns the number of samples in the dataset'''
@@ -82,7 +91,7 @@ if __name__ == "__main__":
     target_label = "Systole"
     print(f"Creating dataset from: {partition_csv_path}")
     df = pd.read_csv(partition_csv_path)  # Load partition info
-    dataset = Cardiac_dataset(df, target_label, data_augmentation=True)  # Create the dataset for the partition
+    dataset = Cardiac_dataset(df, target_label, data_augmentation=1)  # Create the dataset for the partition
     samples_to_print = 5
     print("TESTING Cardiac_dataset class:")
     print(f"Number of samples: {len(dataset)}")

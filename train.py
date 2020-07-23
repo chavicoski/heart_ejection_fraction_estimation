@@ -31,7 +31,7 @@ arg_parser.add_argument("-m", "--model", help="Select the model to train", type=
         choices=["TimeAsDepth_0", "TimeAsDepth_1", "TimeAsDepth_2", "TimeAsDepth_3"], default="TimeAsDepth_0")
 arg_parser.add_argument("-opt", "--optimizer", help="Select the training optimizer", type=str, choices=["Adam", "SGD"], default="Adam")
 arg_parser.add_argument("-lr", "--learning_rate", help="Starting learning rate for the optimizer", type=float, default=0.001)
-arg_parser.add_argument("-da", "--data_augmentation", help="Enable data augmentation", action="store_true", default=False)
+arg_parser.add_argument("-da", "--data_augmentation", help="Enable data augmentation", choices=[0, 1, 2], type=int, default=0)
 arg_parser.add_argument("-dp", "--data_path", help="Path to the preprocessed dataset folder", type=str, default="../preproc1_150x150_bySlices_dataset_full/")
 arg_parser.add_argument("-fr", "--freeze_ratio", help="Percentaje (range [0...1]) of epochs to freeze the model from the begining", type=float, default=0.3)
 args = arg_parser.parse_args()
@@ -52,8 +52,9 @@ opt_name = args.optimizer
 learning_rate = args.learning_rate
 data_augmentation = args.data_augmentation
 exp_name = f"{dataset_name}_{target_label}_{model_name}_{opt_name}-{learning_rate}"  # Experiment name
-if data_augmentation:
+if data_augmentation > 0:
     exp_name += "_DA"
+    if data_augmentation > 1: exp_name += f"{data_augmentation}"
 print(f"Running experiment {exp_name}")
 
 # Check computing device
