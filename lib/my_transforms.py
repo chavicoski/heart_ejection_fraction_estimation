@@ -42,7 +42,7 @@ class MyAffine:
 class ChannelShift:
     '''Given a 3D tensor (timesteps, height, width) shifts the channels in a circular way'''
 
-    def __init__(self, shift_range=[-0.3, 0.3]):
+    def __init__(self, shift_range=[-0.4, 0.4]):
         '''Constructor
         Params:
             shift_range -> maximum percentaje of channels to shift during transformation in each direction
@@ -52,8 +52,8 @@ class ChannelShift:
     def __call__(self, x):
         '''Shifts the channels by a randomly picked number of times, depending on the
         sign of the picked number the shift direction changes'''
-        n_shift = int(x.size(0) * random.uniform(*self.shift_range))
-        print(f"n_shift={n_shift}")
+        shift_size = random.uniform(*self.shift_range)  # Sign denotes direction
+        n_shift = round(x.size(0) * shift_size)
         return torch.cat([x[n_shift:], x[:n_shift]])
 
 
@@ -64,7 +64,7 @@ if __name__ == "__main__":
 
 
     print("MyAffine test:")
-    tensor = torch.load("../preproc1_150x150_bySlices_dataset/train/109_4.pt")
+    tensor = torch.load("../preproc1_150x150_bySlices_dataset_full/train/109_4.pt")
     print(f"orig stats: max: {tensor.max()} - min: {tensor.min()} - mean: {tensor.mean()}")
     transform = MyAffine(angle_range=(-15, 15))
     rot_tensor = transform(tensor)
