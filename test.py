@@ -15,7 +15,7 @@ from lib.utils import *
 
 # Parse script aguments
 arg_parser = argparse.ArgumentParser(description="Runs the testing of the deep learning model")
-arg_parser.add_argument("target_label", help="Value to train for", type=str, choices=["Systole", "Diastole"])
+arg_parser.add_argument("target_label", help="Target label to test", type=str, choices=["Systole", "Diastole"])
 arg_parser.add_argument("trained_model", help="Path to the trained model", type=str)
 arg_parser.add_argument("-bs", "--batch_size", help="Samples per training batch", type=int, default=128)
 arg_parser.add_argument("-w", "--workers", help="Number of workers for data loading", type=int, default=2)

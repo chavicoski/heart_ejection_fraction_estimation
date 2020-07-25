@@ -8,7 +8,7 @@ class WideResNet50_0(nn.Module):
     def __init__(self):
         super(WideResNet50_0, self).__init__()
         pretrained_model = wide_resnet50_2(pretrained=True)
-        self.first_conv = nn.Conv2d(30, 64, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3))
+        self.first_conv = nn.Conv2d(30, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
         self.pretrained_block = nn.Sequential(*list(pretrained_model.children())[1:7])
         self.reduction_block = nn.Sequential(
                 nn.AdaptiveAvgPool2d((1, 1)),
@@ -17,6 +17,7 @@ class WideResNet50_0(nn.Module):
         self.dense_block = nn.Sequential(
                 nn.Linear(1024, 512),
                 nn.ReLU(),
+                nn.Dropout(0.4),
                 nn.Linear(512, 1)
                 )
 

@@ -309,12 +309,6 @@ def get_patient_slices(case_number, split, data_path="../cardiac_dataset/"):
             sax_path = os.path.join(patient_path, sax_folder)
             dicom_files = get_dicom_files(sax_path)
             if len(dicom_files) == 0: return None, None
-            '''
-            dicom_files = sorted([f_name for f_name in os.listdir(sax_path) if f_name.endswith(".dcm")])
-            if len(dicom_files) != 30:
-                print(f"get_patient_slices(): Error! The number of timesteps is not 30, is {len(dicom_files)} (case {case_number})")
-                return None, None
-            '''
             for dicom_name in dicom_files:
                 if dicom_name == "<BLACK>":
                     sax_images.append(np.zeros(aux_shape))
