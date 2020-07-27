@@ -8,9 +8,10 @@ from torch import nn
 from torch.utils.data import DataLoader
 from lib.data_generators import Submission_dataset
 from lib.utils import *
-from captum.attr import IntegratedGradients
+from captum.attr import IntegratedGradients, NoiseTunnel
 from captum.attr import visualization as viz
 from matplotlib.colors import LinearSegmentedColormap
+import multiprocessing as mp
 
 #######################
 # Training parameters #
@@ -26,6 +27,8 @@ arg_parser.add_argument("--pin_mem", help="To use pinned memory for data loading
 arg_parser.add_argument("-dp", "--data_path", help="Path to the preprocessed dataset folder", type=str, default="../preproc1_150x150_bySlices_dataset_full/")
 arg_parser.add_argument("--split", help="Data split to take images", type=str, choices=["train", "validate", "test"], default="validate")
 arg_parser.add_argument("-out", "--output_path", help="Folder to save the plots of the attributions", type=str, default="attributions_plots")
+arg_parser.add_argument("-gifs", "--make_gifs", help="Enable the gifs creation", choices=[0, 1], type=bool, default=True)
+arg_parser.add_argument("--nproc_gifs", help="Number of processes to create the gifs in parallel (0 = all cores)", choices=[i for i in range(mp.cpu_count() + 1)], type=int, default=0)
 args = arg_parser.parse_args()
 
 systole_path = args.systole_model
@@ -36,6 +39,8 @@ split = args.split
 num_workers = args.workers
 selected_gpu = args.gpu
 pin_memory = args.pin_mem
+make_gifs = args.make_gifs
+gifs_cores = args.nproc_gifs
 
 # Check computing device
 if torch.cuda.is_available():
@@ -99,6 +104,10 @@ print(f"\nAbsolute error:\n\tsystole  = {err_systole:>5.2f}\n\tdiastole = {err_d
 ig_systole = IntegratedGradients(model_systole)
 ig_diastole = IntegratedGradients(model_diastole)
 
+# Noise tunnel (integrated gradients)
+noise_tunnel_ig_sys = NoiseTunnel(ig_systole)
+noise_tunnel_ig_dias = NoiseTunnel(ig_diastole)
+
 # For the attributions plots
 default_cmap = LinearSegmentedColormap.from_list(
         'custom blue',
@@ -110,6 +119,9 @@ default_cmap = LinearSegmentedColormap.from_list(
 os.makedirs(out_path, exist_ok=True)
 case_out_path = os.path.join(out_path, f"case_{id_.item()}")
 os.makedirs(case_out_path, exist_ok=True)
+
+# To store the paths to the plots folders for making later the animations
+if make_gifs: gifs_folders = []
 
 # Analyze every slice of the case
 for slice_id in range(n_slices):
@@ -136,7 +148,6 @@ for slice_id in range(n_slices):
     os.makedirs(slice_dias_out_path, exist_ok=True)
 
     '''Integrated Gradients'''
-
     # Create folders
     slice_ig_sys_out_path = os.path.join(slice_sys_out_path, f"integrated_gradients")
     os.makedirs(slice_ig_sys_out_path, exist_ok=True)
@@ -144,16 +155,31 @@ for slice_id in range(n_slices):
     os.makedirs(slice_ig_dias_out_path, exist_ok=True)
 
     # Compute attributions
-    attributions_ig_systole = ig_systole.attribute(slice_data, n_steps=200)
-    attributions_ig_diastole = ig_diastole.attribute(slice_data, n_steps=200)
+    attributions_ig_systole = ig_systole.attribute(slice_data, n_steps=400, internal_batch_size=1)
+    attributions_ig_diastole = ig_diastole.attribute(slice_data, n_steps=400, internal_batch_size=1)
 
     # Get RGB images from the attributions
     attr_ig_systole_images = to_RGB_images(attributions_ig_systole)
     attr_ig_diastole_images = to_RGB_images(attributions_ig_diastole)
 
-    for t in range(n_timesteps):
+    '''Noise tunnel for integrated gradients'''
+    # Create folders
+    slice_noise_ig_sys_out_path = os.path.join(slice_sys_out_path, f"noise_tunnel_ig")
+    os.makedirs(slice_noise_ig_sys_out_path, exist_ok=True)
+    slice_noise_ig_dias_out_path = os.path.join(slice_dias_out_path, f"noise_tunnel_ig")
+    os.makedirs(slice_noise_ig_dias_out_path, exist_ok=True)
 
-        # Make plots of the selected slice and timestep
+    # Compute attributions
+    attributions_noise_ig_systole = noise_tunnel_ig_sys.attribute(slice_data, n_samples=10, nt_type='smoothgrad_sq', internal_batch_size=1)
+    attributions_noise_ig_diastole = noise_tunnel_ig_dias.attribute(slice_data, n_samples=10, nt_type='smoothgrad_sq', internal_batch_size=1)
+
+    # Get RGB images from the attributions
+    attr_noise_ig_systole_images = to_RGB_images(attributions_noise_ig_systole)
+    attr_noise_ig_diastole_images = to_RGB_images(attributions_noise_ig_diastole)
+
+    # Make plots of the selected slice and timestep
+    for t in range(n_timesteps):
+        '''Integrated Gradients'''
         fig_sys, ax_sys = viz.visualize_image_attr_multiple(
                 attr_ig_systole_images[t],
                 slice_images[t],
@@ -177,6 +203,40 @@ for slice_id in range(n_slices):
         fig_sys.savefig(os.path.join(slice_ig_sys_out_path, f"ig_systole_step{t:02}_{err_systole:.2f}err.png"))
         fig_dias.savefig(os.path.join(slice_ig_dias_out_path, f"ig_diastole_step{t:02}_{err_diastole:.2f}err.png"))
 
-    # Create animations of the plots
-    create_gif_from_folder(slice_ig_sys_out_path)
-    create_gif_from_folder(slice_ig_dias_out_path)
+        '''Noise tunnel for integrated gradients'''
+        fig_sys, ax_sys = viz.visualize_image_attr_multiple(
+                attr_noise_ig_systole_images[t],
+                slice_images[t],
+                ["original_image", "heat_map"],
+                ["all", "positive"],
+                titles=["Original", "Noise tunnel (IG)"],
+                cmap=default_cmap,
+                show_colorbar=True,
+                use_pyplot=False)
+        fig_dias, ax_dias = viz.visualize_image_attr_multiple(
+                attr_noise_ig_diastole_images[t],
+                slice_images[t],
+                ["original_image", "heat_map"],
+                ["all", "positive"],
+                titles=["Original", "Noise tunnel (IG)"],
+                cmap=default_cmap,
+                show_colorbar=True,
+                use_pyplot=False)
+
+        # Save plots
+        fig_sys.savefig(os.path.join(slice_noise_ig_sys_out_path, f"noise_ig_systole_step{t:02}_{err_systole:.2f}err.png"))
+        fig_dias.savefig(os.path.join(slice_noise_ig_dias_out_path, f"noise_ig_diastole_step{t:02}_{err_diastole:.2f}err.png"))
+
+    if make_gifs:
+        # Add the paths to the plots folders for making the animations
+        gifs_folders.append(slice_ig_sys_out_path)
+        gifs_folders.append(slice_ig_dias_out_path)
+        gifs_folders.append(slice_noise_ig_sys_out_path)
+        gifs_folders.append(slice_noise_ig_dias_out_path)
+
+if make_gifs:
+    n_proc = mp.cpu_count() if gifs_cores == 0 else gifs_cores
+    pool = mp.Pool(processes=n_proc)
+    print(f"Creating the GIF animations from the plots (using {n_proc} cores)...")
+    pool.map(create_gif_from_folder, gifs_folders)
+    print("GIF animations created!")
