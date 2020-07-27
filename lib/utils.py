@@ -1,13 +1,40 @@
 import os
+import numpy as np
 from sys import stdout
 from time import time
 import torch
 from matplotlib import pyplot as plt
 from tqdm import tqdm
 import pandas as pd
+import cv2
+from array2gif import write_gif
+
+def create_gif_from_folder(path):
+    '''Given a path to a folder with png images, this function takes all the images
+    and creates a gif from them inside the folder'''
+    images = []
+    for f_name in sorted(os.listdir(path)):
+        if f_name.endswith(".png"):
+            images.append(cv2.imread(os.path.join(path, f_name)))
+    
+    write_gif(np.array(images), os.path.join(path, "animation.gif"), fps=30)
+
+def to_RGB_images(x):
+    '''Given a pytorch tensor with shape (1, timesteps, H, W) this functions returns
+    a list of length 'timesteps' with RGB images of shape (H, W, 3)
+    '''
+    images = []
+    # From (1, timesteps, H, W) to (H, W, timesteps)
+    x_trans = np.transpose(x.squeeze().cpu().detach().numpy(), (1,2,0))
+    for t in range(x.size(1)):
+        # Create the 3 channel image and store it contiguous
+        images.append(np.dstack([x_trans[:,:,t,None]] * 3).copy(order="C"))
+
+    return images
+
 
 def get_dataset_name(path):
-    """Given a path to a folder this function returns tha name of this folder"""
+    '''Given a path to a folder this function returns tha name of this folder'''
     parts = os.path.split(path)
     if parts[-1] is not '':  # To fix the case ending with '/'
         return parts[-1]
