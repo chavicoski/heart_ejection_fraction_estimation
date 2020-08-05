@@ -11,7 +11,8 @@ class VGG19(nn.Module):
 
         self.first_conv = nn.Sequential(
                 nn.Conv2d(30, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1)),
-                nn.ReLU()
+                nn.ReLU(),
+                nn.BatchNorm2d(64)
                 )
         
         # Get the pretrained convolutional part from VGG19 (avoiding the first layer)
