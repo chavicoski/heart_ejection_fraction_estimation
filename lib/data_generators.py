@@ -18,6 +18,7 @@ class Cardiac_dataset(torch.utils.data.Dataset):
             data_augmentation ->    0: Disables DA
                                     1: Enables DA
                                     2: Add ChannelShift to DA
+                                    3: Like the option 2 but more intense
         '''
         self.df = data_df
         if target_label in ["Systole", "Diastole"]:
@@ -33,6 +34,11 @@ class Cardiac_dataset(torch.utils.data.Dataset):
             self.transform = transforms.Compose([
                     MyAffine(angle_range=(-15, 15), translate_range=(0, 0.1)),
                     ChannelShift(shift_range=[-0.4, 0.4])
+                ])
+        elif self.da == 3:
+            self.transform = transforms.Compose([
+                    MyAffine(angle_range=(-30, 30), translate_range=(-0.1, 0.1)),
+                    ChannelShift(shift_range=[-0.6, 0.6])
                 ])
 
     def __len__(self):
