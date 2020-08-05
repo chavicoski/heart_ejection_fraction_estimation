@@ -1,5 +1,6 @@
 import os
 import numpy as np
+import sys
 from sys import stdout
 from time import time
 import torch
@@ -8,6 +9,7 @@ from tqdm import tqdm
 import pandas as pd
 import cv2
 from array2gif import write_gif
+from scipy.stats import norm
 
 def create_gif_from_folder(path):
     '''Given a path to a folder with png images, this function takes all the images
@@ -150,7 +152,29 @@ def test_regresor(test_loader, net, criterion, device, pin_memory):
     return test_loss, test_diff
 
 
-def submission_regresor(test_loader, net_systole, net_diastole, criterion, device, pin_memory, out_path="submissions/results.csv"):
+def get_PDF(systole_value, diastole_value, mode="cdf", mae=[10, 20]):
+    '''
+    Given the predicted volume values for systole and diastole computes the
+    PDF for the submission file of the competition.
+    Params:
+        systole_value -> predicted volume of systole
+        diastole_value -> predicted volume of diastole
+        mode -> choose from ["cdf", "step"] the way to compute the PDF
+        mae -> mean squared error for systole and diastole during validation
+    '''
+    if mode == "cdf":
+        systole_probs = list(norm.cdf(range(600), int(systole_value), mae[0]))
+        diastole_probs = list(norm.cdf(range(600), int(diastole_value), mae[1]))
+    elif mode == "step": 
+        systole_probs = [0 if i < int(systole_value) else 1 for i in range(600)]
+        diastole_probs = [0 if i < int(diastole_value) else 1 for i in range(600)]
+    else:
+        print(f"lib.utils.get_PDF(): The mode {mode} is not valid!")
+
+    return systole_probs, diastole_probs
+
+
+def submission_regresor(test_loader, net_systole, net_diastole, criterion, device, pin_memory, out_path="submissions/results.csv", mode="cdf", mae=[10, 20]):
     '''
     Submission function. Generates the submission CSV from the test data. For a 
     regresion model
@@ -161,6 +185,8 @@ def submission_regresor(test_loader, net_systole, net_diastole, criterion, devic
         criterion -> pytorch loss function
         device -> pytorch computing device
         out_path -> folder path to store results
+        mode -> choose from ["cdf", "step"] the way to compute the PDF
+        mae -> mean squared error for systole and diastole during validation
 
     Note: The batch_size of the test_loader must be 1
     '''
@@ -187,11 +213,7 @@ def submission_regresor(test_loader, net_systole, net_diastole, criterion, devic
             systole_value = pred_systole.mean()
             diastole_value = pred_diastole.mean()
             # Compute the prob for each ml value (from 0 to 599)
-            systole_probs = []
-            diastole_probs = []
-            for i in range(600): 
-                systole_probs.append(0 if i < int(systole_value) else 1)
-                diastole_probs.append(0 if i < int(diastole_value) else 1)
+            systole_probs, diastole_probs = get_PDF(systole_value, diastole_value, mode, mae)
             # Add the pred to the dataframe
             df.loc[df_idx] = [f"{int(id_[0])}_Systole"] + systole_probs
             df.loc[df_idx+1] = [f"{int(id_[0])}_Diastole"] + diastole_probs

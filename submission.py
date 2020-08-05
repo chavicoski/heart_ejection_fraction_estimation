@@ -20,12 +20,19 @@ arg_parser.add_argument("diastole_model", help="Path to the trained model for di
 arg_parser.add_argument("-w", "--workers", help="Number of workers for data loading", type=int, default=2)
 arg_parser.add_argument("--gpu", help="Select the GPU to use by slot id", type=int, metavar="GPU_SLOT", default=0)
 arg_parser.add_argument("--pin_mem", help="To use pinned memory for data loading into GPU", type=bool, default=True)
-arg_parser.add_argument("-dp", "--data_path", help="Path to the preprocessed dataset folder", type=str, default="../preproc1_150x150_bySlices_dataset_full/")
+arg_parser.add_argument("-dp", "--data_path", help="Path to the preprocessed dataset folder", type=str, 
+    default="../preproc1_150x150_bySlices_dataset_full/")
+arg_parser.add_argument("--pdf_mode", help="The way to compute the PDF", type=str, choices=["cdf", "step"], default="cdf")
+arg_parser.add_argument("--systole_mae", help="Mean Average Precition for systole in validation", type=float, default=10)
+arg_parser.add_argument("--diastole_mae", help="Mean Average Precition for diastole in validation", type=float, default=20)
 args = arg_parser.parse_args()
 
 systole_path = args.systole_model
 diastole_path = args.diastole_model
 data_path = args.data_path
+mode = args.pdf_mode
+systole_mae = args.systole_mae
+diastole_mae = args.diastole_mae
 num_workers = args.workers
 selected_gpu = args.gpu
 pin_memory = args.pin_mem
@@ -73,4 +80,11 @@ print("\n###############\n"\
       +f"# TEST PHASE #\n"\
       + "###############\n")
 
-submission_regresor(test_datagen, model_systole, model_diastole, criterion, device, pin_memory)
+submission_regresor(test_datagen, 
+    model_systole, 
+    model_diastole, 
+    criterion, 
+    device, 
+    pin_memory, 
+    mode=mode, 
+    mae=[systole_mae, diastole_mae])
