@@ -13,6 +13,7 @@ from lib.utils import *
 from models.TimeAsDepth import TimeAsDepth_0, TimeAsDepth_1, TimeAsDepth_2, TimeAsDepth_3, TimeAsDepth_4
 from models.WideResNet import WideResNet50_0
 from models.VGG import VGG19
+from models.DenseNet import DenseNet121_0
 
 #######################
 # Training parameters #
@@ -29,12 +30,14 @@ arg_parser.add_argument("--multi_gpu", help="Use all the available GPU's for tra
 arg_parser.add_argument("--pin_mem", help="To use pinned memory for data loading into GPU", type=bool, default=True)
 arg_parser.add_argument("--tensorboard", help="To enable tensorboard logs", type=bool, default=True)
 arg_parser.add_argument("-m", "--model", help="Select the model to train", type=str, 
-        choices=["TimeAsDepth_0", "TimeAsDepth_1", "TimeAsDepth_2", "TimeAsDepth_3", "TimeAsDepth_4", "WideResNet50_0", "VGG19"], default="TimeAsDepth_0")
+        choices=["TimeAsDepth_0", "TimeAsDepth_1", "TimeAsDepth_2", "TimeAsDepth_3", "TimeAsDepth_4", "WideResNet50_0", "VGG19", "DenseNet121_0"], default="TimeAsDepth_0")
 arg_parser.add_argument("-opt", "--optimizer", help="Select the training optimizer", type=str, choices=["Adam", "SGD"], default="Adam")
 arg_parser.add_argument("-lr", "--learning_rate", help="Starting learning rate for the optimizer", type=float, default=0.001)
+arg_parser.add_argument("-loss", "--loss_function", help="Loss function to optimize during training", type=str, choices=["MSE", "MAE"], default="MSE")
 arg_parser.add_argument("-da", "--data_augmentation", help="Enable data augmentation", choices=[0, 1, 2], type=int, default=0)
 arg_parser.add_argument("-dp", "--data_path", help="Path to the preprocessed dataset folder", type=str, default="../preproc1_150x150_bySlices_dataset_full/")
 arg_parser.add_argument("-fr", "--freeze_ratio", help="Percentaje (range [0...1]) of epochs to freeze the model from the begining", type=float, default=0.3)
+arg_parser.add_argument("--use_pretrained", help="To use or not the pretrained weights if the selected model can be pretrained", type=bool, default=True)
 args = arg_parser.parse_args()
 
 data_path = args.data_path
@@ -49,13 +52,17 @@ pin_memory = args.pin_mem
 tensorboard = args.tensorboard
 target_label = args.target_label
 model_name = args.model
+loss_function = args.loss_function
 opt_name = args.optimizer
 learning_rate = args.learning_rate
 data_augmentation = args.data_augmentation
-exp_name = f"{dataset_name}_{target_label}_{model_name}_{opt_name}-{learning_rate}"  # Experiment name
+use_pretrained = args.use_pretrained
+exp_name = f"{dataset_name}_{target_label}_{model_name}_{opt_name}-{learning_rate}_{loss_function}"  # Experiment name
 if data_augmentation > 0:
     exp_name += "_DA"
     if data_augmentation > 1: exp_name += f"{data_augmentation}"
+if not use_pretrained:
+    exp_name += "_no-pretrained"
 print(f"Running experiment {exp_name}")
 
 # Check computing device
@@ -106,15 +113,17 @@ elif model_name == "TimeAsDepth_3":
 elif model_name == "TimeAsDepth_4":
     model = TimeAsDepth_4()
 elif model_name == "WideResNet50_0":
-    model = WideResNet50_0()
-    is_pretrained = True
-    model.set_freeze(True)  # Freeze pretrained weights
+    model = WideResNet50_0(use_pretrained)
+    is_pretrained = use_pretrained
 elif model_name == "VGG19":
-    model = VGG19()
-    is_pretrained = True
-    model.set_freeze(True)  # Freeze pretrained weights
+    model = VGG19(use_pretrained)
+    is_pretrained = use_pretrained
+elif model_name == "DenseNet121_0":
+    model = DenseNet121_0(use_pretrained)
+    is_pretrained = use_pretrained
 else:
     print(f"The model name provided ({model_name}) is not valid")
+
 # Print model architecture
 print(f"Model architecture:\n {model} \n")
 
@@ -122,8 +131,19 @@ print(f"Model architecture:\n {model} \n")
 # Training phase #
 ##################
 
+# Check if we have to freeze the weights
+if is_pretrained:
+    model.set_freeze(True)  # Freeze pretrained weights
+
 # Get loss function
-criterion = nn.MSELoss()
+if loss_function == "MSE":
+    criterion = nn.MSELoss()
+elif loss_function == "MAE":
+    criterion = nn.L1Loss()
+else:
+    print(f"Loss function {loss_function} is not valid!")
+    sys.exit()
+
 # Get optimizer 
 if opt_name == "Adam":
     optimizer = optim.Adam(model.parameters(), lr=learning_rate)
@@ -215,8 +235,10 @@ if tensorboard:
             {"dataset": dataset_name,
             "label": target_label,
             "model": model_name,
+            "pretrained": is_pretrained,
             "DA": data_augmentation,
             "optimizer": opt_name,
+            "loss_func": loss_function,
             "lr": learning_rate},
             {"hparam/loss": best_loss, 
             "hparam/diff": best_diff, 

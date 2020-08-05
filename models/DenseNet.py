@@ -1,15 +1,20 @@
 import sys
 sys.path.insert(1, '.')  # To access the libraries
 from torch import nn
-from torchvision.models import wide_resnet50_2
+from torchvision.models import densenet121
 from models.utils import Flatten
 
-class WideResNet50_0(nn.Module):
+class DenseNet121_0(nn.Module):
     def __init__(self, pretrained=True):
-        super(WideResNet50_0, self).__init__()
-        pretrained_model = wide_resnet50_2(pretrained=pretrained)
-        self.first_conv = nn.Conv2d(30, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
-        self.pretrained_block = nn.Sequential(*list(pretrained_model.children())[1:7])
+        super(DenseNet121_0, self).__init__()
+        pretrained_model = densenet121(pretrained=pretrained)
+        self.first_conv = nn.Sequential( 
+                nn.Conv2d(30, 64, kernel_size=(5, 5), stride=(2, 2), padding=(2, 2)),
+                nn.BatchNorm2d(64),
+                nn.ReLU(),
+                nn.MaxPool2d(2)
+                )
+        self.pretrained_block = nn.Sequential(*list(pretrained_model.features.children())[4:])
         self.reduction_block = nn.Sequential(
                 nn.AdaptiveAvgPool2d((1, 1)),
                 Flatten()
@@ -38,7 +43,6 @@ class WideResNet50_0(nn.Module):
 
 if __name__ == "__main__":
     # Test models
-    model = WideResNet50_0()
+    model = DenseNet121_0()
     model.set_freeze(True)
     print(model)
-    

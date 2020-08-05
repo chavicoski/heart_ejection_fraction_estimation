@@ -1,1 +1,1 @@
-__all__ = ["WideResNet", "TimeAsDepth", "utils"]
+__all__ = ["WideResNet", "TimeAsDepth", "utils", "VGG", "DenseNet"]

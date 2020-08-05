@@ -5,9 +5,9 @@ from torchvision.models import vgg19
 from models.utils import Flatten
 
 class VGG19(nn.Module):
-    def __init__(self):
+    def __init__(self, pretrained=True):
         super(VGG19, self).__init__()
-        pretrained_model = vgg19(pretrained=True)
+        pretrained_model = vgg19(pretrained=pretrained)
 
         self.first_conv = nn.Sequential(
                 nn.Conv2d(30, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1)),
