@@ -11,7 +11,7 @@ from torch.utils.tensorboard import SummaryWriter
 from lib.data_generators import Cardiac_dataset
 from lib.utils import *
 from models.TimeAsDepth import TimeAsDepth_0, TimeAsDepth_1, TimeAsDepth_2, TimeAsDepth_3, TimeAsDepth_4
-from models.WideResNet import WideResNet50_0
+from models.WideResNet import WideResNet50_0, WideResNet50_1
 from models.VGG import VGG19
 from models.DenseNet import DenseNet121_0
 
@@ -30,8 +30,11 @@ arg_parser.add_argument("--multi_gpu", help="Use all the available GPU's for tra
 arg_parser.add_argument("--pin_mem", help="To use pinned memory for data loading into GPU", type=bool, default=True)
 arg_parser.add_argument("--tensorboard", help="To enable tensorboard logs", type=bool, default=True)
 arg_parser.add_argument("-m", "--model", help="Select the model to train", type=str, 
-        choices=["TimeAsDepth_0", "TimeAsDepth_1", "TimeAsDepth_2", "TimeAsDepth_3", "TimeAsDepth_4", "WideResNet50_0", "VGG19", "DenseNet121_0"], default="TimeAsDepth_0")
-arg_parser.add_argument("-opt", "--optimizer", help="Select the training optimizer", type=str, choices=["Adam", "SGD"], default="Adam")
+        choices=["TimeAsDepth_0", "TimeAsDepth_1", "TimeAsDepth_2", "TimeAsDepth_3", "TimeAsDepth_4", 
+                "WideResNet50_0", "WideResNet50_1",
+                "VGG19", 
+                "DenseNet121_0"], default="TimeAsDepth_0")
+arg_parser.add_argument("-opt", "--optimizer", help="Select the training optimizer", type=str, choices=["Adam", "AdamW", "SGD"], default="Adam")
 arg_parser.add_argument("-lr", "--learning_rate", help="Starting learning rate for the optimizer", type=float, default=0.001)
 arg_parser.add_argument("-loss", "--loss_function", help="Loss function to optimize during training", type=str, choices=["MSE", "MAE"], default="MSE")
 arg_parser.add_argument("-da", "--data_augmentation", help="Enable data augmentation", choices=[0, 1, 2, 3], type=int, default=0)
@@ -115,6 +118,9 @@ elif model_name == "TimeAsDepth_4":
 elif model_name == "WideResNet50_0":
     model = WideResNet50_0(use_pretrained)
     is_pretrained = use_pretrained
+elif model_name == "WideResNet50_1":
+    model = WideResNet50_1(use_pretrained)
+    is_pretrained = use_pretrained
 elif model_name == "VGG19":
     model = VGG19(use_pretrained)
     is_pretrained = use_pretrained
@@ -147,6 +153,8 @@ else:
 # Get optimizer 
 if opt_name == "Adam":
     optimizer = optim.Adam(model.parameters(), lr=learning_rate)
+elif opt_name == "AdamW":
+    optimizer = optim.AdamW(model.parameters(), lr=learning_rate)
 elif opt_name == "SGD":
     optimizer = optim.SGD(model.parameters(), lr=learning_rate, momentum=0.9)
 else:
