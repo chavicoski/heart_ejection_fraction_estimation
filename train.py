@@ -40,7 +40,7 @@ arg_parser.add_argument("-loss", "--loss_function", help="Loss function to optim
 arg_parser.add_argument("-da", "--data_augmentation", help="Enable data augmentation", choices=[0, 1, 2, 3], type=int, default=0)
 arg_parser.add_argument("-dp", "--data_path", help="Path to the preprocessed dataset folder", type=str, default="../preproc1_150x150_bySlices_dataset_full/")
 arg_parser.add_argument("-fr", "--freeze_ratio", help="Percentaje (range [0...1]) of epochs to freeze the model from the begining", type=float, default=0.3)
-arg_parser.add_argument("--use_pretrained", help="To use or not the pretrained weights if the selected model can be pretrained", type=bool, default=True)
+arg_parser.add_argument("--use_pretrained", help="To use or not the pretrained weights if the selected model can be pretrained", type=int, choices=[0, 1], default=1)
 args = arg_parser.parse_args()
 
 data_path = args.data_path
@@ -59,11 +59,14 @@ loss_function = args.loss_function
 opt_name = args.optimizer
 learning_rate = args.learning_rate
 data_augmentation = args.data_augmentation
-use_pretrained = args.use_pretrained
+use_pretrained = bool(args.use_pretrained)
+
 exp_name = f"{dataset_name}_{target_label}_{model_name}_{opt_name}-{learning_rate}_{loss_function}"  # Experiment name
+
 if data_augmentation > 0:
     exp_name += "_DA"
     if data_augmentation > 1: exp_name += f"{data_augmentation}"
+
 if not use_pretrained:
     exp_name += "_no-pretrained"
 print(f"Running experiment {exp_name}")
