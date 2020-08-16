@@ -60,20 +60,27 @@ def segment_multiple(patient_images):
 
     return segmented_images
 
-def roi_mean_yx(patient_images):
+def roi_mean_yx(patient_images, plots_path=""):
     """Returns mean(y) and mean(x) [double]
     Mean coordinates in segmented patients slices. To identify the ROI
     This function performs erosion to get a better result.
     Original: See https://nbviewer.jupyter.org/github/kmader/Quantitative-Big-Imaging-2019/blob/master/Lectures/06-ShapeAnalysis.ipynb
     """
     seg_images = segment_multiple(patient_images)
+    if plots_path != "": save_2D_slices(seg_images, os.path.join(plots_path, "4_base_segmentation"))
     num_images = len(seg_images)
     y_all, x_all = [], []
     neighborhood = disk(2)
 
+    if plots_path != "": 
+        # Prepare the folder to save the eroded images plots
+        erosion_path = os.path.join(plots_path, "5_erosion_segmentation")
+        os.makedirs(erosion_path, exist_ok=True)
+
     for i, seg_image in enumerate(seg_images):
         # Perform erosion to get rid of wrongly segmented small parts
         seg_images_eroded = binary_erosion(seg_image, neighborhood) 
+        if plots_path != "": save_slice(seg_images_eroded, os.path.join(erosion_path, f"{i:02}.png"))
 
         # Filter out background of slice, after erosion [background=0, foreground=1]
         y_coord, x_coord = seg_images_eroded.nonzero()
@@ -178,13 +185,17 @@ def crop_roi(image, dim_y, dim_x, coord_y, coord_x):
     return crop_image
 
 
-def crop_heart(patient_slices, target_height=150, target_width=150):
+def crop_heart(patient_slices, target_height=150, target_width=150, plots_path=""):
     '''
     Finds the heart and crops it. With the crop size provided (target_height, target_width).
     '''
     # Find center for cropping
     fft_images = fourier_time_transform(patient_slices)
-    roi_y, roi_x = roi_mean_yx(fft_images)
+    roi_y, roi_x = roi_mean_yx(fft_images, plots_path=plots_path)
+
+    if plots_path != "": 
+        save_2D_slices(fft_images, os.path.join(plots_path, "3_fft"))
+        save_patient_slices(patient_slices, os.path.join(plots_path, "6_ROI_detected"), roi=(roi_y, roi_x))
 
     # Create new 4d image array to store the crop
     num_slices = len(patient_slices)
@@ -209,20 +220,32 @@ def preprocess_pipeline0(patient_slices, target_size=(150, 150)):
     resized_images = resized_images / resized_images.max()  # Normalize [0...1]
     return resized_images
 
-def preprocess_pipeline1(patient_slices, pix_spacings, target_size=(150, 150)):
+def preprocess_pipeline1(patient_slices, pix_spacings, target_size=(150, 150), plots_path=""):
     '''
     Given a list of numpys with all the slices data from a patient. Returns the preprocessed version
     following this steps:
         1. Rescale the images (1 pixel = 1mm)
         2. Histogram normalization (to balance brightness)
         3. Find ROI and crop it (with fft through time)
+
+    If you pass a path to the "plots_path" argument the function will save in this path the images for each
+    step of the preprocessing
     '''
+
+    if plots_path != "": os.makedirs(plots_path, exist_ok=True)  # Create the plots folder
+
     # 1.
     rescaled_images = rescale_patient_slices(patient_slices, pix_spacings)
     # 2.
     norm_images = histogram_normalize(rescaled_images)
     # 3.
-    crop_images = crop_heart(norm_images, target_size[0], target_size[1])
+    crop_images = crop_heart(norm_images, target_size[0], target_size[1], plots_path=plots_path)
+
+    if plots_path != "": 
+        # Save images for each step
+        save_patient_slices(rescaled_images, os.path.join(plots_path, f"1_rescaled"))
+        save_patient_slices(norm_images, os.path.join(plots_path, f"2_hist_normalized"))
+        save_patient_slices(crop_images, os.path.join(plots_path, f"7_croped"))
 
     return crop_images
 
@@ -238,9 +261,9 @@ def save_slice(slice_image, path):
     '''
     plt.imshow(slice_image, cmap=plt.cm.bone)
     plt.savefig(path)
-            
 
-def gif_preprocessing(slice_images):
+       
+def gif_preprocessing(slice_images, roi=(None, None)):
     '''
     This function preprocesses the original images of a slice with 1 color 
     channel in order to have 3 channels and the values in the range [0,255]
@@ -248,34 +271,89 @@ def gif_preprocessing(slice_images):
     '''
     timesteps, h, w = slice_images.shape
     norm_slice = (slice_images*255.0) / slice_images.max()  # To range [0,255]
-    processed_slice = []  # List with an image for each timestep
+    processed_slices = []  # List with an image for each timestep
     for t in range(timesteps):
         selected_image = norm_slice[t,:,:]
-        processed_slice.append([selected_image, selected_image, selected_image])  # 3 channels
-    return np.array(processed_slice).astype(np.uint8)
+        processed_slices.append([selected_image, selected_image, selected_image])  # 3 channels
+
+    processed_slices_npy = np.array(processed_slices)
+    '''
+    Gives an error with the array2gif library: it says that there are 257 colors and the maximum number is 256
+    if roi[0] != None and roi[1] != None:
+        print(f"roi antes:\n0: {processed_slices_npy[:,0,roi[0],roi[1]]}\n1: {processed_slices_npy[:,1,roi[0],roi[1]]}\n2: {processed_slices_npy[:,2,roi[0],roi[1]]}")
+        processed_slices_npy[:,0,roi[0],roi[1]] = 255.0  # R
+        processed_slices_npy[:,1,roi[0],roi[1]] = 0.0    # G
+        processed_slices_npy[:,2,roi[0],roi[1]] = 0.0    # B
+        print(f"roi despues:\n0: {processed_slices_npy[:,0,roi[0],roi[1]]}\n1: {processed_slices_npy[:,1,roi[0],roi[1]]}\n2: {processed_slices_npy[:,2,roi[0],roi[1]]}")
+    '''
+    return processed_slices_npy.astype(np.uint8)
 
 
-def save_patient_slices(patient_slices, folder_path, n_proc=0):
+def save_2D_slices(patient_slices, folder_path, n_proc=0):
+    '''
+    Given a numpy array of shape (n_slices, height, with), this function creates 
+    and stores the plots for all the slices. This images are stored in 'folder_path' 
+    and if it doesn't exist it will be created. 
+    '''
+    os.makedirs(folder_path, exist_ok=True)  # Check or create the save path
+    n_slices = len(patient_slices) 
+    if n_proc < 1: 
+        n_proc = multiprocessing.cpu_count()  # Get the number of CPU cores
+
+    slice_images_paths = []
+    for s in range(n_slices):
+        slice_images_paths.append(os.path.join(folder_path, f"{s:02}.png"))
+
+    pool_arguments = zip(patient_slices, slice_images_paths)
+    with multiprocessing.Pool(processes=n_proc) as pool:
+        pool.starmap(save_slice, pool_arguments)
+
+
+def save_patient_slices(patient_slices, folder_path, n_proc=0, roi=(None, None)):
     '''
     Given a numpy array of shape (n_slices, timesteps, height, with) with the
     data of a patient, this function creates and stores the plots for all the
     slices and timesteps including a gift animation per slice. This images are
     stored in 'folder_path' and if it doesn't exist it will be created. 
+
+    If you provide the roi coordinates in the arguments it will be displayed in the plots
+    with a red dot.
     '''
     os.makedirs(folder_path, exist_ok=True)  # Check or create the save path
     n_slices = len(patient_slices) 
     timesteps, h, w = patient_slices[0].shape
+
     if n_proc < 1: 
         n_proc = multiprocessing.cpu_count()  # Get the number of CPU cores
+
+    # Get the function to plot the slices
+    if roi[0] != None and roi[1] != None:
+        def save_slice_ROI(slice_image, path):
+            '''
+            Auxiliary function that stores the given image (numpy) in the
+            given path (including the name of the output file)
+            '''
+            plt.imshow(slice_image, cmap=plt.cm.bone)
+            plt.scatter([roi[0]], [roi[1]], c='r')
+            plt.savefig(path)
+
+        aux_save_slice = save_slice_ROI
+    else:
+        aux_save_slice = save_slice
+
     for s in range(n_slices):
         slice_path = os.path.join(folder_path, f"slice_{s}")
         os.makedirs(slice_path, exist_ok=True)
         slice_images = patient_slices[s]
         slice_images_paths = [os.path.join(slice_path, f"{i:03}.png") for i in range(slice_images.shape[0])]
         pool_arguments = zip(slice_images, slice_images_paths)
-        write_gif(gif_preprocessing(slice_images), os.path.join(slice_path, "animation.gif"), fps=30)
-        with multiprocessing.Pool(processes=n_proc) as pool:
-            pool.starmap(save_slice, pool_arguments)
+        write_gif(gif_preprocessing(slice_images, roi=roi), os.path.join(slice_path, "animation.gif"), fps=30)
+        if roi[0] != None and roi[1] != None:
+            for frame, save_path in pool_arguments:
+                aux_save_slice(frame, save_path)
+        else:
+            with multiprocessing.Pool(processes=n_proc) as pool:
+                pool.starmap(aux_save_slice, pool_arguments)
 
 
 def get_dicom_files(slice_path):
@@ -347,6 +425,7 @@ if __name__ == "__main__":
     split = "train"   # Split of the case to process
     case_number = 39
     target_size = (150, 150)
+    plots_path = f"plots/images/case_{case_number}_preproc_steps"
     patient_slices, pix_spacings = get_patient_slices(case_number, split)
     start = time()
     save_patient_slices(patient_slices, f"plots/images/case_{case_number}")  # Store the images of the case
@@ -354,6 +433,7 @@ if __name__ == "__main__":
     print(f"Time elapsed during orig plot: {end-start:.2f} seconds")
     start = time()
     #preproc_patient = preprocess_pipeline0(patient_slices, target_size=target_size)  # Do preprocesing
+    #preproc_patient = preprocess_pipeline1(patient_slices, pix_spacings, target_size=target_size, plots_path=plots_path) # Do preprocesing and plots
     preproc_patient = preprocess_pipeline1(patient_slices, pix_spacings, target_size=target_size) # Do preprocesing
     end = time()
     print(f"Time elapsed during processing: {end-start:.2f} seconds")
