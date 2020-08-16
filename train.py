@@ -22,6 +22,7 @@ from models.DenseNet import DenseNet121_0
 # Parse script aguments
 arg_parser = argparse.ArgumentParser(description="Runs the training of the deep learning model")
 arg_parser.add_argument("target_label", help="Value to train for", type=str, choices=["Systole", "Diastole"])
+arg_parser.add_argument("--view", help="Type of view to train the model for", type=str, choices=["SAX", "2CH", "4CH"], default="SAX")
 arg_parser.add_argument("-e", "--epochs", help="Number of epochs to train the model", type=int, default=100)
 arg_parser.add_argument("-bs", "--batch_size", help="Samples per training batch", type=int, default=128)
 arg_parser.add_argument("-w", "--workers", help="Number of workers for data loading", type=int, default=2)
@@ -45,6 +46,7 @@ args = arg_parser.parse_args()
 
 data_path = args.data_path
 dataset_name = get_dataset_name(data_path)
+view = args.view
 epochs = args.epochs
 freeze_ratio = args.freeze_ratio
 batch_size = args.batch_size
@@ -61,7 +63,7 @@ learning_rate = args.learning_rate
 data_augmentation = args.data_augmentation
 use_pretrained = bool(args.use_pretrained)
 
-exp_name = f"{dataset_name}_{target_label}_{model_name}_{opt_name}-{learning_rate}_{loss_function}"  # Experiment name
+exp_name = f"{view}_{dataset_name}_{target_label}_{model_name}_{opt_name}-{learning_rate}_{loss_function}"  # Experiment name
 
 if data_augmentation > 0:
     exp_name += "_DA"
@@ -96,10 +98,10 @@ else:
 train_df = pd.read_csv(os.path.join(data_path, "train.csv"))
 dev_df = pd.read_csv(os.path.join(data_path, "validate.csv"))
 # Create train datagen
-train_dataset = Cardiac_dataset(train_df, target_label, data_augmentation=data_augmentation)
+train_dataset = Cardiac_dataset(train_df, target_label, data_augmentation=data_augmentation, view=view)
 train_datagen = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=num_workers, pin_memory=pin_memory)
 # Create develoment datagen
-dev_dataset = Cardiac_dataset(dev_df, target_label)
+dev_dataset = Cardiac_dataset(dev_df, target_label, view=view)
 dev_datagen = DataLoader(dev_dataset, batch_size=batch_size, shuffle=True, num_workers=num_workers, pin_memory=pin_memory)
 
 ########################
@@ -244,6 +246,7 @@ for epoch in range(epochs):
 if tensorboard:
     tboard_writer.add_hparams(
             {"dataset": dataset_name,
+            "view": view,
             "label": target_label,
             "model": model_name,
             "pretrained": is_pretrained,

@@ -90,6 +90,14 @@ def roi_mean_yx(patient_images, plots_path=""):
             y_all.append(np.mean(y_coord))
             x_all.append(np.mean(x_coord))
 
+    ''' If there is not a valid roi'''
+    if len(y_all) == 0: 
+        h, w = patient_images[0].shape
+        y_all.append(int(h / 2))
+    if len(x_all) == 0: 
+        h, w = patient_images[0].shape
+        x_all.append(int(w / 2))
+
     # Return mean of mean foregrounds - this gives an estimate of ROI coords.
     mean_y = int(np.mean(np.array(y_all)))
     mean_x = int(np.mean(np.array(x_all)))
@@ -370,6 +378,92 @@ def get_dicom_files(slice_path):
         return dicom_files + (["<BLACK>"] * (30-len(dicom_files))) # Fill with black images
             
 
+def get_patient_2ch(case_number, split, data_path="../cardiac_dataset/"):
+    '''
+    Given a patient number and the partition that belongs returns a list with a numpy array
+    with the 2CH view frames (shape: (timesteps, height, width))
+    and a list with the pixel spacing of the view (used for preprocessing)
+    '''
+    patient_path = os.path.join(data_path, f"{split}/{split}/{case_number}/study")
+    patient_slices = None
+    pix_spacings = None
+    for ch_folder in sorted(os.listdir(patient_path)):
+        if ch_folder.startswith("2ch_"):
+            patient_slices = []
+            pix_spacings = []
+            aux_shape = None
+            pix_spacing = None
+            ch_images = []
+            ch_path = os.path.join(patient_path, ch_folder)
+            dicom_files = get_dicom_files(ch_path)
+            if len(dicom_files) == 0: return None, None
+            for dicom_name in dicom_files:
+                if dicom_name == "<BLACK>":
+                    ch_images.append(np.zeros(aux_shape))
+                else:
+                    dicom_data = dcmread(os.path.join(ch_path, dicom_name))
+                    image_array = dicom_data.pixel_array
+                    if aux_shape == None:
+                        aux_shape = image_array.shape
+                    elif aux_shape != image_array.shape:
+                        print(f"get_patient_slices(): Error! The frames shapes don't match {aux_shape} != {image_array.shape} (case {case_number})")
+                        return None, None
+                    ch_images.append(image_array)
+                    if pix_spacing == None:
+                        pix_spacing = dicom_data.PixelSpacing
+                    elif pix_spacing != dicom_data.PixelSpacing:
+                        print(f"get_patient_slices(): Warning! The pixel spacings don't match {pix_spacing} != {dicom_data.PixelSpacing} (case {case_number})")
+
+            patient_slices.append(np.array(ch_images))
+            pix_spacings.append(pix_spacing)
+            break  # There is only one 2CH slice per case
+
+    return patient_slices, pix_spacings
+
+
+def get_patient_4ch(case_number, split, data_path="../cardiac_dataset/"):
+    '''
+    Given a patient number and the partition that belongs returns a list with a numpy array
+    with the 4CH view frames (shape: (timesteps, height, width))
+    and a list with the pixel spacing of the view (used for preprocessing)
+    '''
+    patient_path = os.path.join(data_path, f"{split}/{split}/{case_number}/study")
+    patient_slices = None
+    pix_spacings = None
+    for ch_folder in sorted(os.listdir(patient_path)):
+        if ch_folder.startswith("4ch_"):
+            patient_slices = []
+            pix_spacings = []
+            aux_shape = None
+            pix_spacing = None
+            ch_images = []
+            ch_path = os.path.join(patient_path, ch_folder)
+            dicom_files = get_dicom_files(ch_path)
+            if len(dicom_files) == 0: return None, None
+            for dicom_name in dicom_files:
+                if dicom_name == "<BLACK>":
+                    ch_images.append(np.zeros(aux_shape))
+                else:
+                    dicom_data = dcmread(os.path.join(ch_path, dicom_name))
+                    image_array = dicom_data.pixel_array
+                    if aux_shape == None:
+                        aux_shape = image_array.shape
+                    elif aux_shape != image_array.shape:
+                        print(f"get_patient_slices(): Error! The frames shapes don't match {aux_shape} != {image_array.shape} (case {case_number})")
+                        return None, None
+                    ch_images.append(image_array)
+                    if pix_spacing == None:
+                        pix_spacing = dicom_data.PixelSpacing
+                    elif pix_spacing != dicom_data.PixelSpacing:
+                        print(f"get_patient_slices(): Warning! The pixel spacings don't match {pix_spacing} != {dicom_data.PixelSpacing} (case {case_number})")
+
+            patient_slices.append(np.array(ch_images))
+            pix_spacings.append(pix_spacing)
+            break  # There is only one 4CH slice per case
+
+    return patient_slices, pix_spacings
+
+
 def get_patient_slices(case_number, split, data_path="../cardiac_dataset/"):
     '''
     Given a patient number and the partition that belongs returns a list of numpy arrays
@@ -441,3 +535,26 @@ if __name__ == "__main__":
     save_patient_slices(preproc_patient, f"plots/images/case_{case_number}_preproc")  # Store preprocessed images of the case
     end = time()
     print(f"Time elapsed during preproc plot: {end-start:.2f} seconds")
+    start = time()
+    patient_2ch, pix_spacings_2ch = get_patient_2ch(case_number, split)
+    end = time()
+    save_patient_slices(patient_2ch, f"plots/images/case_{case_number}/2ch")  # Store the images of the case
+    print(f"Time elapsed during 2ch plot: {end-start:.2f} seconds")
+    start = time()
+    patient_4ch, pix_spacings_4ch = get_patient_4ch(case_number, split)
+    end = time()
+    save_patient_slices(patient_4ch, f"plots/images/case_{case_number}/4ch")  # Store the images of the case
+    print(f"Time elapsed during 4ch plot: {end-start:.2f} seconds")
+    start = time()
+    preproc_patient_2ch = preprocess_pipeline1(patient_2ch, pix_spacings_2ch, target_size=target_size) # Do preprocesing
+    end = time()
+    print(f"Time elapsed during processing 2ch: {end-start:.2f} seconds")
+    start = time()
+    preproc_patient_4ch = preprocess_pipeline1(patient_4ch, pix_spacings_4ch, target_size=target_size) # Do preprocesing
+    end = time()
+    print(f"Time elapsed during processing 4ch: {end-start:.2f} seconds")
+    start = time()
+    save_patient_slices(preproc_patient_2ch, f"plots/images/case_{case_number}_preproc/2ch")  # Store preprocessed images of the case
+    save_patient_slices(preproc_patient_4ch, f"plots/images/case_{case_number}_preproc/4ch")  # Store preprocessed images of the case
+    end = time()
+    print(f"Time elapsed during preproc plot (2ch and 4ch): {end-start:.2f} seconds")

@@ -5,12 +5,14 @@ from lib.my_transforms import MyAffine, ChannelShift
 from torchvision import transforms
 
 class Cardiac_dataset(torch.utils.data.Dataset):
-    def __init__(self, data_df, target_label, data_augmentation=0):
+    def __init__(self, data_df, target_label, data_augmentation=0, view="SAX"):
         '''Dataset constructor
         Params:
             data_df -> Pandas dataframe with the dataset info
                 *data_df columns:
                     - Id -> case Id in the dataset
+                    - View -> "SAX", "2CH" or "4CH"
+                    - SliceId -> Id of the slice inside the case
                     - X_path -> relative path from the workspace folder to the data tensor
                     - Systole -> float value for Systole label
                     - Diastole -> float value for Diastole label
@@ -19,8 +21,14 @@ class Cardiac_dataset(torch.utils.data.Dataset):
                                     1: Enables DA
                                     2: Add ChannelShift to DA
                                     3: Like the option 2 but more intense
+            view -> To select a view for the generator. choices=["SAX", "2CH", "4CH"]
         '''
-        self.df = data_df
+        if view not in ["SAX", "2CH", "4CH"]:
+            print(f"View {view} is not valid!")
+            sys.exit()
+        else:
+            self.df = data_df[data_df["View"]==view]
+
         if target_label in ["Systole", "Diastole"]:
             self.target_label = target_label
         else:
@@ -63,6 +71,8 @@ class Submission_dataset(torch.utils.data.Dataset):
             data_df -> Pandas dataframe with the dataset info
                 *data_df columns:
                     - Id -> case Id in the dataset
+                    - View -> "SAX", "2CH" or "4CH"
+                    - SliceId -> Id of the slice inside the case
                     - X_path -> relative path from the workspace folder to the data tensor
                     - Systole -> float value for Systole label
                     - Diastole -> float value for Diastole label
@@ -79,14 +89,31 @@ class Submission_dataset(torch.utils.data.Dataset):
         case_id = self.ids[index]  # Get the corresponding patient id
         selected_rows = self.df[self.df["Id"] == case_id]  # Get samples of the selected patient
 
+        '''Get SAX slices'''
         slices = []
-        for idx, row in selected_rows.iterrows():
+        sax_rows = selected_rows[selected_rows["View"]=="SAX"]
+        for idx, row in sax_rows.iterrows():
             slices.append(torch.load(row["X_path"]))  # Load sample data
         case_data = torch.stack(slices)
 
+        '''Get CH slices'''
+        rows_2ch = selected_rows[selected_rows["View"]=="2CH"]
+        rows_4ch = selected_rows[selected_rows["View"]=="4CH"]
+        if len(rows_2ch.index) > 0:
+            row = rows_2ch.iloc[0]
+            data_2ch = torch.load(row["X_path"])
+        else:
+            data_2ch = None
+
+        if len(rows_4ch.index) > 0:
+            row = rows_4ch.iloc[0]
+            data_4ch = torch.load(row["X_path"])
+        else:
+            data_4ch = None
+
         label_systole = torch.tensor([selected_rows.iloc[0]["Systole"]]).float()
         label_diastole = torch.tensor([selected_rows.iloc[0]["Diastole"]]).float()
-        return {"ID": case_id, "X": case_data, "Y_systole": label_systole, "Y_diastole": label_diastole}
+        return {"ID": case_id, "X": case_data, "2CH": data_2ch, "4CH": data_4ch, "Y_systole": label_systole, "Y_diastole": label_diastole}
 
 
 if __name__ == "__main__":

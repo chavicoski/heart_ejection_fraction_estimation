@@ -25,6 +25,7 @@ arg_parser.add_argument("-dp", "--data_path", help="Path to the preprocessed dat
 arg_parser.add_argument("--pdf_mode", help="The way to compute the PDF", type=str, choices=["cdf", "step"], default="cdf")
 arg_parser.add_argument("--systole_mae", help="Mean Average Precition for systole in validation", type=float, default=10)
 arg_parser.add_argument("--diastole_mae", help="Mean Average Precition for diastole in validation", type=float, default=20)
+arg_parser.add_argument("-loss", "--loss_function", help="Loss function to optimize during training", type=str, choices=["MSE", "MAE"], default="MSE")
 args = arg_parser.parse_args()
 
 systole_path = args.systole_model
@@ -33,6 +34,7 @@ data_path = args.data_path
 mode = args.pdf_mode
 systole_mae = args.systole_mae
 diastole_mae = args.diastole_mae
+loss_function = args.loss_function
 num_workers = args.workers
 selected_gpu = args.gpu
 pin_memory = args.pin_mem
@@ -70,7 +72,13 @@ model_diastole = torch.load(diastole_path)
 #################
 
 # Get loss function
-criterion = nn.MSELoss()
+if loss_function == "MSE":
+    criterion = nn.MSELoss()
+elif loss_function == "MAE":
+    criterion = nn.L1Loss()
+else:
+    print(f"Loss function {loss_function} is not valid!")
+    sys.exit()
 
 # Move the models to the computing devices
 model_systole = model_systole.to(device)
