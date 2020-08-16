@@ -58,7 +58,7 @@ for sax_dir in tqdm(glob.glob(os.path.join(case_path, "study/sax_*"))):  # Go th
         write_gif(time_slices, f'plots/images/case_{case_id}/{sax_dir.split("/")[-1]}/animation.gif', fps=30)
 
     elif n_dicom_files > 30:
-        print(f'This case has {n_dicom_files} slices in sax folder {sax_dir.split("/")[-1]}')
+        print(f'This case has {n_dicom_files} frames in sax folder {sax_dir.split("/")[-1]}')
         n_adquisitions = int(n_dicom_files / 30)
 
         # Get the set of dicoms for each adquisition 
@@ -70,7 +70,41 @@ for sax_dir in tqdm(glob.glob(os.path.join(case_path, "study/sax_*"))):  # Go th
             pool.map(save_dicom_plot, adquisition_files)
 
     else:
-        print(f'This case has {n_dicom_files} slices in sax folder {sax_dir.split("/")[-1]}')
+        print(f'This case has {n_dicom_files} frames in sax folder {sax_dir.split("/")[-1]}')
+        # Create the plots in parallel
+        pool = mp.Pool(processes=n_proc)
+        pool.map(save_dicom_plot, dicom_files)
+
+
+'''
+Store all the auxiliary views of the case (2CH and 4CH) 
+'''
+for ch_dir in tqdm(glob.glob(os.path.join(case_path, "study/*ch*"))):  # Go through each sax folder in the case
+    dicom_files = glob.glob(os.path.join(ch_dir, "*.dcm"))  # Get the list of dicom files in the sax folder
+    n_dicom_files = len(dicom_files) 
+
+    if n_dicom_files == 30:
+        # Create the plots in parallel
+        pool = mp.Pool(processes=n_proc)
+        time_slices = [pool.apply(save_dicom_plot, args=(dicom_f, True)) for dicom_f in sorted(dicom_files)]
+        
+        # Create view gif
+        write_gif(time_slices, f'plots/images/case_{case_id}/{ch_dir.split("/")[-1]}/animation.gif', fps=30)
+
+    elif n_dicom_files > 30:
+        print(f'This case has {n_dicom_files} frames in ch folder {ch_dir.split("/")[-1]}')
+        n_adquisitions = int(n_dicom_files / 30)
+
+        # Get the set of dicoms for each adquisition 
+        for i in range(1, n_adquisitions + 1):
+            # Get the dicoms of the current sax adquisition
+            adquisition_files = list(filter(lambda x: x.endswith(f"{i}.dcm"), dicom_files))
+            # Create the plots in parallel
+            pool = mp.Pool(processes=n_proc)
+            pool.map(save_dicom_plot, adquisition_files)
+
+    else:
+        print(f'This case has {n_dicom_files} frames in ch folder {ch_dir.split("/")[-1]}')
         # Create the plots in parallel
         pool = mp.Pool(processes=n_proc)
         pool.map(save_dicom_plot, dicom_files)
