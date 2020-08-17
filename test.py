@@ -23,7 +23,7 @@ arg_parser.add_argument("-w", "--workers", help="Number of workers for data load
 arg_parser.add_argument("--gpu", help="Select the GPU to use by slot id", type=int, metavar="GPU_SLOT", default=0)
 arg_parser.add_argument("--multi_gpu", help="Use all the available GPU's for training", action="store_true", default=False)
 arg_parser.add_argument("--pin_mem", help="To use pinned memory for data loading into GPU", type=bool, default=True)
-arg_parser.add_argument("-dp", "--data_path", help="Path to the preprocessed dataset folder", type=str, default="../preproc1_150x150_bySlices_dataset_full/")
+arg_parser.add_argument("-dp", "--data_path", help="Path to the preprocessed dataset folder", type=str, default="../preproc1_150x150_bySlices_dataset_allViews/")
 arg_parser.add_argument("-loss", "--loss_function", help="Loss function to optimize during training", type=str, choices=["MSE", "MAE"], default="MSE")
 args = arg_parser.parse_args()
 
