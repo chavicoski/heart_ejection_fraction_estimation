@@ -1,11 +1,14 @@
 import sys
+sys.path.insert(1, '.')  # To access the libraries
 import os
+from statistics import mean, median, mode
 import pandas as pd
 import numpy as np
 from pydicom import dcmread
 from matplotlib import pyplot as plt
 from tqdm import tqdm
 import glob
+from lib.image_processing import get_dicom_files
 
 # Root data path
 dataset_path = "../cardiac_dataset"
@@ -32,12 +35,15 @@ test_df = pd.read_csv(test_csv_path)
 '''
 Info:
 - Each patient has N sax folders (1 per slice) where each folder should have 30 dicom images for each timestep.
-
-- The folders with more or less than 30 slices will be ignored.
+- The slices with less than 30 dicoms have <BLACK> synthetic slices to fill the frames up to 30.
+- In the case of having more than 30 frames, we take the last 30 of them that belongs to the same adquisition. Because
+  the cases with more than 30 have several adquisitions so the number of frames are a multiple of 30.
 '''
-ignored_slices = []
 pixels_stats   = {"train": [], "dev": [], "test": []}  # Tuples of pixels values (avg, max, min)
 slices_count   = {"train": [], "dev": [], "test": []}  # Number of slices per patient
+two_ch_count   = {"train": [], "dev": [], "test": []}  # Number of 2ch slices per patient
+four_ch_count  = {"train": [], "dev": [], "test": []}  # Number of 4ch slices per patient
+frames_count   = {"train": [], "dev": [], "test": []}  # Number of frames per slice 
 spacing_count  = {"train": [], "dev": [], "test": []}  # Tuples with spaces in each dimension (h, w, depth)
 shapes_count   = {"train": {}, "dev": {}, "test": {}}  # To store the different shapes in the data -> key: shape tuple string, value: number of adquisitions
 systole_count  = {"train": [], "dev": [], "test": []}  # List with float values for systole labels
@@ -47,16 +53,30 @@ data_splits    = [("train", train_data_path), ("dev", dev_data_path), ("test", t
 for split_name, data_path in data_splits:
     for patient in tqdm(os.listdir(data_path), desc=f"{split_name + ' split':<13}"):
         sax_dirs = glob.glob(os.path.join(data_path, patient, "study/sax_*"))  # Get all the slices folders of type sax
-        n_valid_slices = 0  # To count the number of slices per patient
-        first = True  # Take some data just from the first slice
-        for sax_dir in sax_dirs:
-            dicom_files = glob.glob(os.path.join(sax_dir, "*.dcm"))  # Get the list of dicom files in the sax folder
-            n_dicom_files = len(dicom_files) 
+        slices_count[split_name].append(len(sax_dirs))  # To count the number of slices per patient
 
-            if n_dicom_files == 30:
-                img_shape = (-1, -1)
-                for dicom_f in sorted(dicom_files):
-                    dicom_data = dcmread(dicom_f) 
+        # Get the number of auxiliary views (2ch and 4ch)
+        two_ch_slices = glob.glob(os.path.join(data_path, patient, "study/2ch_*"))  
+        four_ch_slices = glob.glob(os.path.join(data_path, patient, "study/4ch_*"))
+        two_ch_count[split_name].append(len(two_ch_slices))
+        four_ch_count[split_name].append(len(four_ch_slices))
+
+        for sax_dir in sax_dirs:
+            # Store the original number of frames
+            n_frames = len([f_name for f_name in os.listdir(sax_dir) if f_name.endswith(".dcm")])
+            frames_count[split_name].append(n_frames)
+
+            dicom_files = get_dicom_files(sax_dir)  # Get the list of valid dicom files in the sax folder
+
+            first = True  # Take some data just from the first frame of the slice
+
+            for dicom_name in dicom_files:
+                if dicom_name == "<BLACK>":
+                    ''' This is a black synthetic slice created for the slices
+                    with less than 30 frames in the slive video'''
+                    continue 
+                else:
+                    dicom_data = dcmread(os.path.join(sax_dir, dicom_name)) 
                     pixel_array = dicom_data.pixel_array
                     if first:
                         first = False
@@ -75,15 +95,6 @@ for split_name, data_path in data_splits:
                     pix_min = np.min(pixel_array)
                     pixels_stats[split_name].append((pix_avg, pix_max, pix_min))
 
-                n_valid_slices += 1
-
-            else:
-                ignored_slices.append((sax_dir, n_dicom_files))
-
-        if n_valid_slices > 0:
-            slices_count[split_name].append(n_valid_slices)
-        else:
-            print(f"There are no valid slices for patient {patient} of {split_name} split!")
 
 # Get stats from labels
 for split_name, df in [("train", train_df), ("dev", dev_df), ("test", test_df)]:
@@ -108,9 +119,9 @@ Slices stats
 '''
 print("\nSlices count by patient:")
 for split, counts in slices_count.items():
-    print(f"{split}: average={sum(counts)/len(counts):.2f}, max={max(counts)}, min={min(counts)}")
+    print(f"{split}: mean={mean(counts):.2f}, median={median(counts):.2f}, mode={mode(counts):.2f}, max={max(counts)}, min={min(counts)}")
 
-# Histogram version of slices counts
+# Histogram of slices counts
 plt.hist([x[1] for x in slices_count.items()], bins=30, label=[x[0] for x in slices_count.items()])
 plt.legend(loc="upper right")
 plt.xlabel("N slices")
@@ -119,9 +130,54 @@ plt.title(f"Count of slices by patient for each partition")
 plt.savefig(f"plots/analysis/slices_count.png")
 plt.clf()  # Reset figure for next plot
 
-print(f"\nIngnored slices ({len(ignored_slices)}):")
-for sax_dir, n_dicom_files in ignored_slices:
-    print(f"{sax_dir} -> {n_dicom_files} dicom files")
+'''
+Auxiliary views stats
+'''
+print("\n2CH views by patient:")
+for split, counts in two_ch_count.items():
+    print(f"{split}: mean={mean(counts):.2f}, median={median(counts):.2f}, mode={mode(counts):.2f}, max={max(counts)}, min={min(counts)}")
+
+# Histogram of 2ch counts
+plt.xlim(-0.25, 1.25)
+plt.xticks([0, 1])
+plt.hist([x[1] for x in two_ch_count.items()], bins=30, label=[x[0] for x in two_ch_count.items()])
+plt.legend(loc="upper left")
+plt.xlabel("N slices")
+plt.ylabel("Count")
+plt.title(f"Count of 2CH views by patient for each partition")
+plt.savefig(f"plots/analysis/2ch_count.png")
+plt.clf()  # Reset figure for next plot
+
+print("\n4CH views by patient:")
+for split, counts in four_ch_count.items():
+    print(f"{split}: mean={mean(counts):.2f}, median={median(counts):.2f}, mode={mode(counts):.2f}, max={max(counts)}, min={min(counts)}")
+
+# Histogram of 4ch counts
+plt.xlim(-0.25, 1.25)
+plt.xticks([0, 1])
+plt.hist([x[1] for x in four_ch_count.items()], bins=30, label=[x[0] for x in four_ch_count.items()])
+plt.legend(loc="upper left")
+plt.xlabel("N slices")
+plt.ylabel("Count")
+plt.title(f"Count of 4CH views by patient for each partition")
+plt.savefig(f"plots/analysis/4ch_count.png")
+plt.clf()  # Reset figure for next plot
+
+'''
+Frames stats
+'''
+print("\nFrames count by slice:")
+for split, counts in frames_count.items():
+    print(f"{split}: mean={mean(counts):.2f}, median={median(counts):.2f}, mode={mode(counts):.2f}, max={max(counts)}, min={min(counts)}")
+
+# Histogram of frame counts
+plt.hist([x[1] for x in frames_count.items()], bins=30, label=[x[0] for x in frames_count.items()])
+plt.legend(loc="upper right")
+plt.xlabel("N frames")
+plt.ylabel("Count")
+plt.title(f"Count of frames by slice for each partition")
+plt.savefig(f"plots/analysis/frames_count.png")
+plt.clf()  # Reset figure for next plot
 
 '''
 Shapes stats

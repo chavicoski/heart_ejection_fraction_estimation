@@ -3,7 +3,7 @@ sys.path.insert(1, '.')  # To access the libraries
 import os
 import pandas as pd
 import torch
-from lib.image_processing import get_patient_slices, preprocess_pipeline0, preprocess_pipeline1
+from lib.image_processing import get_patient_slices, preprocess_pipeline0, preprocess_pipeline1, get_patient_2ch, get_patient_4ch
 from tqdm import tqdm
 import argparse
 
@@ -82,32 +82,75 @@ splits_data = [
 for split_name, data_path, labels_dict in splits_data:
     split_path = os.path.join(out_path, split_name)
     os.makedirs(split_path, exist_ok=True) 
-    split_df = pd.DataFrame(columns=["Id", "SliceId", "X_path", "Systole", "Diastole"]) 
+    split_df = pd.DataFrame(columns=["Id", "View", "SliceId", "X_path", "Systole", "Diastole"]) 
     df_idx = 0  # Index to insert in the DataFrame
     for case_id, (systole, diastole) in tqdm(labels_dict.items()):
+        '''
+        SAX slices preprocessing
+        '''
         patient_slices, pix_spacings = get_patient_slices(case_id, split_name)  # Get case images
-        if patient_slices is None: continue
+        if patient_slices is None: 
+            print(f"WARNING: The case {case_id} has no slices")  # Sanity check
+            continue
 
         # Apply preprocessing pipeline
         if pipeline_id == 0:
             preproc_patient = preprocess_pipeline0(patient_slices, target_size=target_size)  
         elif pipeline_id == 1:
             preproc_patient = preprocess_pipeline1(patient_slices, pix_spacings, target_size=target_size)  
-        
+
+        '''
+        CH views preprocessing
+        '''
+        two_ch_slice, pix_spacings_2ch = get_patient_2ch(case_id, split_name)  # Get 2CH images
+        four_ch_slice, pix_spacings_4ch = get_patient_4ch(case_id, split_name)  # Get 4CH images
+
+        has_2ch, has_4ch = False, False
+        if two_ch_slice != None:
+            has_2ch = True
+            if pipeline_id == 0:
+                preproc_2ch = preprocess_pipeline0(two_ch_slice, target_size=target_size)  
+            elif pipeline_id == 1:
+                preproc_2ch = preprocess_pipeline1(two_ch_slice, pix_spacings_2ch, target_size=target_size)  
+
+        if four_ch_slice != None:
+            has_4ch = True
+            if pipeline_id == 0:
+                preproc_4ch = preprocess_pipeline0(four_ch_slice, target_size=target_size)  
+            elif pipeline_id == 1:
+                preproc_4ch = preprocess_pipeline1(four_ch_slice, pix_spacings_4ch, target_size=target_size)  
+
+        '''
+        Store data
+        '''
         if samples_format == "bySlices":
             # Save each slice image (timesteps, H, W) in a different tensor
             for slice_idx in range(preproc_patient.shape[0]):
                 slice_tensor = torch.from_numpy(preproc_patient[slice_idx]).float()  # Create pytorch tensor
                 save_path = os.path.join(split_path, f"{case_id}_{slice_idx}.pt")
                 torch.save(slice_tensor, save_path)  # Store the pytorch tensor
-                split_df.loc[df_idx] = [case_id, slice_idx, save_path, systole, diastole]  # Store the case info in the dataframe
+                split_df.loc[df_idx] = [case_id, "SAX", slice_idx, save_path, systole, diastole]  # Store the case info in the dataframe
                 df_idx += 1
         else:  # samples_format = "byPatients"
             # Save all the slices of a patient (slices, timesteps, H, W) in the same tensor
             patient_tensor = torch.from_numpy(preproc_patient).float()  # Create pytorch tensor
             save_path = os.path.join(split_path, f"{case_id}.pt")
             torch.save(patient_tensor, save_path)  # Store the pytorch tensor
-            split_df.loc[df_idx] = [case_id, save_path, systole, diastole]  # Store the case info in the dataframe
+            split_df.loc[df_idx] = [case_id, "SAX", save_path, systole, diastole]  # Store the case info in the dataframe
+            df_idx += 1
+
+        if has_2ch:
+            slice_2ch = torch.from_numpy(preproc_2ch[0]).float()
+            save_path = os.path.join(split_path, f"2ch_{case_id}_{slice_idx}.pt")
+            torch.save(slice_2ch, save_path)  # Store the pytorch tensor
+            split_df.loc[df_idx] = [case_id, "2CH", 0, save_path, systole, diastole]  # Store the case info in the dataframe
+            df_idx += 1
+
+        if has_4ch:
+            slice_4ch = torch.from_numpy(preproc_4ch[0]).float()
+            save_path = os.path.join(split_path, f"4ch_{case_id}_{slice_idx}.pt")
+            torch.save(slice_4ch, save_path)  # Store the pytorch tensor
+            split_df.loc[df_idx] = [case_id, "4CH", 0, save_path, systole, diastole]  # Store the case info in the dataframe
             df_idx += 1
     
     split_df.to_csv(os.path.join(out_path, f"{split_name}.csv"), index=False)  # Save the csv of the split

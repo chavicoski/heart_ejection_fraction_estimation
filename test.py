@@ -17,16 +17,20 @@ from lib.utils import *
 arg_parser = argparse.ArgumentParser(description="Runs the testing of the deep learning model")
 arg_parser.add_argument("target_label", help="Target label to test", type=str, choices=["Systole", "Diastole"])
 arg_parser.add_argument("trained_model", help="Path to the trained model", type=str)
+arg_parser.add_argument("--view", help="Type of view to train the model for", type=str, choices=["SAX", "2CH", "4CH"], default="SAX")
 arg_parser.add_argument("-bs", "--batch_size", help="Samples per training batch", type=int, default=128)
 arg_parser.add_argument("-w", "--workers", help="Number of workers for data loading", type=int, default=2)
 arg_parser.add_argument("--gpu", help="Select the GPU to use by slot id", type=int, metavar="GPU_SLOT", default=0)
 arg_parser.add_argument("--multi_gpu", help="Use all the available GPU's for training", action="store_true", default=False)
 arg_parser.add_argument("--pin_mem", help="To use pinned memory for data loading into GPU", type=bool, default=True)
 arg_parser.add_argument("-dp", "--data_path", help="Path to the preprocessed dataset folder", type=str, default="../preproc1_150x150_bySlices_dataset_full/")
+arg_parser.add_argument("-loss", "--loss_function", help="Loss function to optimize during training", type=str, choices=["MSE", "MAE"], default="MSE")
 args = arg_parser.parse_args()
 
 data_path = args.data_path
 dataset_name = get_dataset_name(data_path)
+view = args.view
+loss_function = args.loss_function
 batch_size = args.batch_size
 num_workers = args.workers
 selected_gpu = args.gpu
@@ -59,7 +63,7 @@ else:
 # Load dataset info
 test_df = pd.read_csv(os.path.join(data_path, "test.csv"))
 # Create test datagen
-test_dataset = Cardiac_dataset(test_df, target_label)
+test_dataset = Cardiac_dataset(test_df, target_label, view=view)
 test_datagen = DataLoader(test_dataset, batch_size=batch_size, num_workers=num_workers, pin_memory=pin_memory)
 
 #########################
@@ -75,7 +79,13 @@ print(f"Model architecture:\n {model} \n")
 #################
 
 # Get loss function
-criterion = nn.MSELoss()
+if loss_function == "MSE":
+    criterion = nn.MSELoss()
+elif loss_function == "MAE":
+    criterion = nn.L1Loss()
+else:
+    print(f"Loss function {loss_function} is not valid!")
+    sys.exit()
 
 # Prepare multi-gpu training if enabled
 if multi_gpu and n_gpus > 1 :

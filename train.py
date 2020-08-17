@@ -11,7 +11,7 @@ from torch.utils.tensorboard import SummaryWriter
 from lib.data_generators import Cardiac_dataset
 from lib.utils import *
 from models.TimeAsDepth import TimeAsDepth_0, TimeAsDepth_1, TimeAsDepth_2, TimeAsDepth_3, TimeAsDepth_4
-from models.WideResNet import WideResNet50_0
+from models.WideResNet import WideResNet50_0, WideResNet50_1
 from models.VGG import VGG19
 from models.DenseNet import DenseNet121_0
 
@@ -22,6 +22,7 @@ from models.DenseNet import DenseNet121_0
 # Parse script aguments
 arg_parser = argparse.ArgumentParser(description="Runs the training of the deep learning model")
 arg_parser.add_argument("target_label", help="Value to train for", type=str, choices=["Systole", "Diastole"])
+arg_parser.add_argument("--view", help="Type of view to train the model for", type=str, choices=["SAX", "2CH", "4CH"], default="SAX")
 arg_parser.add_argument("-e", "--epochs", help="Number of epochs to train the model", type=int, default=100)
 arg_parser.add_argument("-bs", "--batch_size", help="Samples per training batch", type=int, default=128)
 arg_parser.add_argument("-w", "--workers", help="Number of workers for data loading", type=int, default=2)
@@ -30,18 +31,22 @@ arg_parser.add_argument("--multi_gpu", help="Use all the available GPU's for tra
 arg_parser.add_argument("--pin_mem", help="To use pinned memory for data loading into GPU", type=bool, default=True)
 arg_parser.add_argument("--tensorboard", help="To enable tensorboard logs", type=bool, default=True)
 arg_parser.add_argument("-m", "--model", help="Select the model to train", type=str, 
-        choices=["TimeAsDepth_0", "TimeAsDepth_1", "TimeAsDepth_2", "TimeAsDepth_3", "TimeAsDepth_4", "WideResNet50_0", "VGG19", "DenseNet121_0"], default="TimeAsDepth_0")
-arg_parser.add_argument("-opt", "--optimizer", help="Select the training optimizer", type=str, choices=["Adam", "SGD"], default="Adam")
+        choices=["TimeAsDepth_0", "TimeAsDepth_1", "TimeAsDepth_2", "TimeAsDepth_3", "TimeAsDepth_4", 
+                "WideResNet50_0", "WideResNet50_1",
+                "VGG19", 
+                "DenseNet121_0"], default="TimeAsDepth_0")
+arg_parser.add_argument("-opt", "--optimizer", help="Select the training optimizer", type=str, choices=["Adam", "AdamW", "SGD"], default="Adam")
 arg_parser.add_argument("-lr", "--learning_rate", help="Starting learning rate for the optimizer", type=float, default=0.001)
 arg_parser.add_argument("-loss", "--loss_function", help="Loss function to optimize during training", type=str, choices=["MSE", "MAE"], default="MSE")
 arg_parser.add_argument("-da", "--data_augmentation", help="Enable data augmentation", choices=[0, 1, 2, 3], type=int, default=0)
 arg_parser.add_argument("-dp", "--data_path", help="Path to the preprocessed dataset folder", type=str, default="../preproc1_150x150_bySlices_dataset_full/")
 arg_parser.add_argument("-fr", "--freeze_ratio", help="Percentaje (range [0...1]) of epochs to freeze the model from the begining", type=float, default=0.3)
-arg_parser.add_argument("--use_pretrained", help="To use or not the pretrained weights if the selected model can be pretrained", type=bool, default=True)
+arg_parser.add_argument("--use_pretrained", help="To use or not the pretrained weights if the selected model can be pretrained", type=int, choices=[0, 1], default=1)
 args = arg_parser.parse_args()
 
 data_path = args.data_path
 dataset_name = get_dataset_name(data_path)
+view = args.view
 epochs = args.epochs
 freeze_ratio = args.freeze_ratio
 batch_size = args.batch_size
@@ -56,11 +61,14 @@ loss_function = args.loss_function
 opt_name = args.optimizer
 learning_rate = args.learning_rate
 data_augmentation = args.data_augmentation
-use_pretrained = args.use_pretrained
-exp_name = f"{dataset_name}_{target_label}_{model_name}_{opt_name}-{learning_rate}_{loss_function}"  # Experiment name
+use_pretrained = bool(args.use_pretrained)
+
+exp_name = f"{view}_{dataset_name}_{target_label}_{model_name}_{opt_name}-{learning_rate}_{loss_function}"  # Experiment name
+
 if data_augmentation > 0:
     exp_name += "_DA"
     if data_augmentation > 1: exp_name += f"{data_augmentation}"
+
 if not use_pretrained:
     exp_name += "_no-pretrained"
 print(f"Running experiment {exp_name}")
@@ -90,10 +98,10 @@ else:
 train_df = pd.read_csv(os.path.join(data_path, "train.csv"))
 dev_df = pd.read_csv(os.path.join(data_path, "validate.csv"))
 # Create train datagen
-train_dataset = Cardiac_dataset(train_df, target_label, data_augmentation=data_augmentation)
+train_dataset = Cardiac_dataset(train_df, target_label, data_augmentation=data_augmentation, view=view)
 train_datagen = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=num_workers, pin_memory=pin_memory)
 # Create develoment datagen
-dev_dataset = Cardiac_dataset(dev_df, target_label)
+dev_dataset = Cardiac_dataset(dev_df, target_label, view=view)
 dev_datagen = DataLoader(dev_dataset, batch_size=batch_size, shuffle=True, num_workers=num_workers, pin_memory=pin_memory)
 
 ########################
@@ -114,6 +122,9 @@ elif model_name == "TimeAsDepth_4":
     model = TimeAsDepth_4()
 elif model_name == "WideResNet50_0":
     model = WideResNet50_0(use_pretrained)
+    is_pretrained = use_pretrained
+elif model_name == "WideResNet50_1":
+    model = WideResNet50_1(use_pretrained)
     is_pretrained = use_pretrained
 elif model_name == "VGG19":
     model = VGG19(use_pretrained)
@@ -147,6 +158,8 @@ else:
 # Get optimizer 
 if opt_name == "Adam":
     optimizer = optim.Adam(model.parameters(), lr=learning_rate)
+elif opt_name == "AdamW":
+    optimizer = optim.AdamW(model.parameters(), lr=learning_rate)
 elif opt_name == "SGD":
     optimizer = optim.SGD(model.parameters(), lr=learning_rate, momentum=0.9)
 else:
@@ -165,7 +178,7 @@ scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'min', factor=
 
 # Set the tensorboard writer
 if tensorboard:
-    tboard_writer = SummaryWriter(comment=exp_name)
+    tboard_writer = SummaryWriter(comment=f"_{exp_name}")
 
 # Prepare multi-gpu training if enabled
 if multi_gpu and n_gpus > 1 :
@@ -233,6 +246,7 @@ for epoch in range(epochs):
 if tensorboard:
     tboard_writer.add_hparams(
             {"dataset": dataset_name,
+            "view": view,
             "label": target_label,
             "model": model_name,
             "pretrained": is_pretrained,
