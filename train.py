@@ -178,7 +178,7 @@ scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'min', factor=
 
 # Set the tensorboard writer
 if tensorboard:
-    tboard_writer = SummaryWriter(comment=exp_name)
+    tboard_writer = SummaryWriter(comment=f"_{exp_name}")
 
 # Prepare multi-gpu training if enabled
 if multi_gpu and n_gpus > 1 :
