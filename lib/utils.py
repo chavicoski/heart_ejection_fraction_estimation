@@ -38,7 +38,7 @@ def to_RGB_images(x):
 def get_dataset_name(path):
     '''Given a path to a folder this function returns tha name of this folder'''
     parts = os.path.split(path)
-    if parts[-1] is not '':  # To fix the case ending with '/'
+    if parts[-1] != '':  # To fix the case ending with '/'
         return parts[-1]
     else:
         return os.path.basename(parts[-2])
@@ -174,7 +174,7 @@ def get_PDF(systole_value, diastole_value, mode="cdf", mae=[10, 20]):
     return systole_probs, diastole_probs
 
 
-def submission_regresor(test_loader, net_systole, net_diastole, criterion, device, pin_memory, out_path="submissions/results.csv", mode="cdf", mae=[10, 20]):
+def submission_regresor(test_loader, net_systole, net_diastole, device, pin_memory, mode="cdf", mae=[15, 20]):
     '''
     Submission function. Generates the submission CSV from the test data. For a 
     regresion model
@@ -182,9 +182,7 @@ def submission_regresor(test_loader, net_systole, net_diastole, criterion, devic
         test_loader -> pytorch DataLoader for testing data
         net_systole -> pytorch model for systole estimation
         net_diastole -> pytorch model for diastole estimation
-        criterion -> pytorch loss function
         device -> pytorch computing device
-        out_path -> folder path to store results
         mode -> choose from ["cdf", "step"] the way to compute the PDF
         mae -> mean squared error for systole and diastole during validation
 
@@ -197,6 +195,9 @@ def submission_regresor(test_loader, net_systole, net_diastole, criterion, devic
     # Initialize results dataframe
     df = pd.DataFrame(columns = ["Id"] + [f"P{i}" for i in range(600)])
 
+    # To store the ID os the cases without data for the selected view
+    no_data_cases = []
+
     # Set no_grad to avoid gradient computations
     with torch.no_grad():     
         # Testing loop
@@ -204,6 +205,9 @@ def submission_regresor(test_loader, net_systole, net_diastole, criterion, devic
         for batch in tqdm(test_loader):       
             # Get input and target from batch
             id_, data, target_systole, target_diastole = batch["ID"], batch["X"], batch["Y_systole"], batch["Y_diastole"]
+            if data.size(1) == 0:  # Check if there is data
+                no_data_cases.append(id_[0])
+                continue
             # Move tensors to computing device
             data = data.to(device, non_blocking=pin_memory)[0]
             # Compute forward and get output predictions
@@ -219,8 +223,52 @@ def submission_regresor(test_loader, net_systole, net_diastole, criterion, devic
             df.loc[df_idx+1] = [f"{int(id_[0])}_Diastole"] + diastole_probs
             df_idx += 2
 
-    # Store dataframe to csv
-    df.to_csv(out_path, index=False)
+    return df, no_data_cases
+
+
+def complete_missing_with_SAX(df, missing_cases, test_loader, net_systole, net_diastole, device, pin_memory, mode="cdf", mae=[15, 20]):
+    '''
+    Completes the given DataFrame with the cases that are not predicted.
+    Params:
+        df -> DataFrame to complete
+        missing_cases -> A list with the cases without estimation
+        test_loader -> pytorch DataLoader for testing data
+        net_systole -> pytorch model for systole estimation
+        net_diastole -> pytorch model for diastole estimation
+        device -> pytorch computing device
+        mode -> choose from ["cdf", "step"] the way to compute the PDF
+        mae -> mean squared error for systole and diastole during validation
+
+    Note: The batch_size of the test_loader must be 1
+    '''
+    # Set the nets in eval mode
+    net_systole.eval()
+    net_diastole.eval()
+    
+    # Set no_grad to avoid gradient computations
+    with torch.no_grad():     
+        # Testing loop
+        df_idx = len(df.index)  # To append at the end
+        for batch in tqdm(test_loader):       
+            # Get input and target from batch
+            id_, data, target_systole, target_diastole = batch["ID"], batch["X"], batch["Y_systole"], batch["Y_diastole"]
+            if id_[0] not in missing_cases: continue
+            # Move tensors to computing device
+            data = data.to(device, non_blocking=pin_memory)[0]
+            # Compute forward and get output predictions
+            pred_systole = net_systole(data)       
+            pred_diastole = net_diastole(data)       
+            # Compute mean from the predictions for each slice of the case
+            systole_value = pred_systole.mean()
+            diastole_value = pred_diastole.mean()
+            # Compute the prob for each ml value (from 0 to 599)
+            systole_probs, diastole_probs = get_PDF(systole_value, diastole_value, mode, mae)
+            # Add the pred to the dataframe
+            df.loc[df_idx] = [f"{int(id_[0])}_Systole"] + systole_probs
+            df.loc[df_idx+1] = [f"{int(id_[0])}_Diastole"] + diastole_probs
+            df_idx += 2
+
+    return df
 
 
 def train_classifier(train_loader, net, criterion, optimizer, device, pin_memory):
@@ -346,7 +394,7 @@ def plot_results(train_values, test_values, title="", save_as=""):
     plt.plot(test_values, "g", label="test")
     plt.legend()
     plt.title(title)
-    if save_as is not "": 
+    if save_as != "": 
         plt.savefig("plots/train_results/" + save_as + ".png")
     else:
         plt.show() 

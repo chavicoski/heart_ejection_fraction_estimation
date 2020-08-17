@@ -17,27 +17,35 @@ from lib.utils import *
 arg_parser = argparse.ArgumentParser(description="Runs the testing of the deep learning model")
 arg_parser.add_argument("systole_model", help="Path to the trained model for systole", type=str)
 arg_parser.add_argument("diastole_model", help="Path to the trained model for diastole", type=str)
+arg_parser.add_argument("--view", help="Type of view to test the model", type=str, choices=["SAX", "2CH", "4CH"], default="SAX")
 arg_parser.add_argument("-w", "--workers", help="Number of workers for data loading", type=int, default=2)
 arg_parser.add_argument("--gpu", help="Select the GPU to use by slot id", type=int, metavar="GPU_SLOT", default=0)
 arg_parser.add_argument("--pin_mem", help="To use pinned memory for data loading into GPU", type=bool, default=True)
 arg_parser.add_argument("-dp", "--data_path", help="Path to the preprocessed dataset folder", type=str, 
-    default="../preproc1_150x150_bySlices_dataset_full/")
+    default="../preproc1_150x150_bySlices_dataset_allViews/")
 arg_parser.add_argument("--pdf_mode", help="The way to compute the PDF", type=str, choices=["cdf", "step"], default="cdf")
-arg_parser.add_argument("--systole_mae", help="Mean Average Precition for systole in validation", type=float, default=10)
-arg_parser.add_argument("--diastole_mae", help="Mean Average Precition for diastole in validation", type=float, default=20)
-arg_parser.add_argument("-loss", "--loss_function", help="Loss function to optimize during training", type=str, choices=["MSE", "MAE"], default="MSE")
+arg_parser.add_argument("--systole_mae", help="Mean Average Error for systole in validation", type=float, default=15)
+arg_parser.add_argument("--diastole_mae", help="Mean Average Error for diastole in validation", type=float, default=20)
+arg_parser.add_argument("--out_path", help="File path to store the submission CSV", type=str, default="submissions/results.csv")
+arg_parser.add_argument("--sax_systole_model", help="Path to the SAX model for systole to use for the missing cases", type=str, 
+    default="models/checkpoints/preproc1_150x150_bySlices_dataset_full_Systole_WideResNet50_0_Adam-0.001_MSE_DA3_best")
+arg_parser.add_argument("--sax_diastole_model", help="Path to the SAX model for diastole to use for the missing cases", type=str,
+    default="models/checkpoints/preproc1_150x150_bySlices_dataset_full_Diastole_WideResNet50_0_Adam-0.001_MSE_DA3_best")
+arg_parser.add_argument("--sax_systole_mae", help="MAE for systole in validation, for the auxiliar SAX model", type=float, default=17.27)
+arg_parser.add_argument("--sax_diastole_mae", help="MAE for diastole in validation, for the auxiliar SAX model", type=float, default=22.55)
 args = arg_parser.parse_args()
 
 systole_path = args.systole_model
 diastole_path = args.diastole_model
 data_path = args.data_path
+view = args.view
 mode = args.pdf_mode
 systole_mae = args.systole_mae
 diastole_mae = args.diastole_mae
-loss_function = args.loss_function
 num_workers = args.workers
 selected_gpu = args.gpu
 pin_memory = args.pin_mem
+out_path = args.out_path
 
 # Check computing device
 if torch.cuda.is_available():
@@ -57,7 +65,7 @@ else:
 # Load dataset info
 test_df = pd.read_csv(os.path.join(data_path, "test.csv"))
 # Create test datagen
-test_dataset = Submission_dataset(test_df)
+test_dataset = Submission_dataset(test_df, view=view)
 test_datagen = DataLoader(test_dataset, batch_size=1, num_workers=num_workers, pin_memory=pin_memory)
 
 ##########################
@@ -71,15 +79,6 @@ model_diastole = torch.load(diastole_path)
 # Testing phase #
 #################
 
-# Get loss function
-if loss_function == "MSE":
-    criterion = nn.MSELoss()
-elif loss_function == "MAE":
-    criterion = nn.L1Loss()
-else:
-    print(f"Loss function {loss_function} is not valid!")
-    sys.exit()
-
 # Move the models to the computing devices
 model_systole = model_systole.to(device)
 model_diastole = model_diastole.to(device)
@@ -88,11 +87,41 @@ print("\n###############\n"\
       +f"# TEST PHASE #\n"\
       + "###############\n")
 
-submission_regresor(test_datagen, 
-    model_systole, 
-    model_diastole, 
-    criterion, 
-    device, 
-    pin_memory, 
-    mode=mode, 
-    mae=[systole_mae, diastole_mae])
+# Get the CDF for all the cases with the selected view avalilable
+df, no_data_cases = submission_regresor(test_datagen, 
+        model_systole, 
+        model_diastole, 
+        device, 
+        pin_memory, 
+        mode=mode, 
+        mae=[systole_mae, diastole_mae])
+
+# Check for missing cases to complete with the SAX based regresion
+if len(no_data_cases) > 0:
+    # Free memory for the new SAX models
+    del model_systole
+    del model_diastole
+    # Load the SAX models
+    model_systole = torch.load(args.sax_systole_model)
+    model_diastole = torch.load(args.sax_diastole_model)
+    # Move models to computing device
+    model_systole = model_systole.to(device)
+    model_diastole = model_diastole.to(device)
+    systole_mae = args.sax_systole_mae
+    diastole_mae = args.sax_diastole_mae
+    # Create the dataset for SAX view
+    sax_test_dataset = Submission_dataset(test_df, view="SAX")
+    sax_test_datagen = DataLoader(sax_test_dataset, batch_size=1, num_workers=num_workers, pin_memory=pin_memory)
+    # Fill the DataFrame with the SAX models
+    df = complete_missing_with_SAX(df,
+            no_data_cases,
+            sax_test_datagen,
+            model_systole,
+            model_diastole,
+            device,
+            pin_memory,
+            mode=mode,
+            mae=[systole_mae, diastole_mae])
+
+# Save the DataFrame to a CSV file
+df.to_csv(out_path, index=False)

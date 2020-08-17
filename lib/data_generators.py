@@ -64,9 +64,69 @@ class Cardiac_dataset(torch.utils.data.Dataset):
     
 
 class Submission_dataset(torch.utils.data.Dataset):
-    def __init__(self, data_df):
+    def __init__(self, data_df, view="SAX"):
         '''Dataset constructor
         This dataset resturns all the samples for each patient Id
+        Params:
+            data_df -> Pandas dataframe with the dataset info
+                *data_df columns:
+                    - Id -> case Id in the dataset
+                    - View -> "SAX", "2CH" or "4CH"
+                    - SliceId -> Id of the slice inside the case
+                    - X_path -> relative path from the workspace folder to the data tensor
+                    - Systole -> float value for Systole label
+                    - Diastole -> float value for Diastole label
+            view -> To select a view for the generator. choices=["SAX", "2CH", "4CH"]
+        '''
+        self.df = data_df
+        self.ids = data_df["Id"].unique()
+        self.view = view
+
+    def __len__(self):
+        '''Returns the number of samples in the dataset'''
+        return len(self.ids)  # Number of patients in the dataframe
+
+    def __getitem__(self, index):
+        '''Returns a sample by index from the dataset'''
+        case_id = self.ids[index]  # Get the corresponding patient id
+        selected_rows = self.df[self.df["Id"] == case_id]  # Get samples of the selected patient
+
+        if self.view == "SAX":
+            '''Get SAX slices'''
+            slices = []
+            sax_rows = selected_rows[selected_rows["View"]=="SAX"]
+            for idx, row in sax_rows.iterrows():
+                slices.append(torch.load(row["X_path"]))  # Load sample data
+            case_data = torch.stack(slices)
+
+        elif self.view == "2CH":
+            '''Get 2CH slices'''
+            rows_2ch = selected_rows[selected_rows["View"]=="2CH"]
+            if len(rows_2ch.index) > 0:
+                row = rows_2ch.iloc[0]
+                case_data = torch.stack([torch.load(row["X_path"])])
+            else:
+                case_data = torch.tensor([])
+
+        elif self.view == "4CH":
+            '''Get 4CH slices'''
+            rows_4ch = selected_rows[selected_rows["View"]=="4CH"]
+            if len(rows_4ch.index) > 0:
+                row = rows_4ch.iloc[0]
+                case_data = torch.stack([torch.load(row["X_path"])])
+            else:
+                case_data = torch.tensor([])
+
+        label_systole = torch.tensor([selected_rows.iloc[0]["Systole"]]).float()
+        label_diastole = torch.tensor([selected_rows.iloc[0]["Diastole"]]).float()
+
+        return {"ID": case_id, "X": case_data, "Y_systole": label_systole, "Y_diastole": label_diastole}
+
+
+class Ensemble_submission_dataset(torch.utils.data.Dataset):
+    def __init__(self, data_df):
+        '''Dataset constructor
+        This dataset resturns all the samples (for all the views) for each patient Id
         Params:
             data_df -> Pandas dataframe with the dataset info
                 *data_df columns:
@@ -103,17 +163,18 @@ class Submission_dataset(torch.utils.data.Dataset):
             row = rows_2ch.iloc[0]
             data_2ch = torch.load(row["X_path"])
         else:
-            data_2ch = None
+            data_2ch = torch.tensor([])
 
         if len(rows_4ch.index) > 0:
             row = rows_4ch.iloc[0]
             data_4ch = torch.load(row["X_path"])
         else:
-            data_4ch = None
+            data_4ch = torch.tensor([])
 
         label_systole = torch.tensor([selected_rows.iloc[0]["Systole"]]).float()
         label_diastole = torch.tensor([selected_rows.iloc[0]["Diastole"]]).float()
-        return {"ID": case_id, "X": case_data, "2CH": data_2ch, "4CH": data_4ch, "Y_systole": label_systole, "Y_diastole": label_diastole}
+        return {"ID": case_id, "SAX": case_data, "2CH": data_2ch, "4CH": data_4ch, "Y_systole": label_systole, "Y_diastole": label_diastole}
+
 
 
 if __name__ == "__main__":
