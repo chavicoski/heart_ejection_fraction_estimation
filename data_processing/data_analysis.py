@@ -12,6 +12,9 @@ from lib.image_processing import get_dicom_files
 
 # Root data path
 dataset_path = "../cardiac_dataset"
+# Output path
+out_path = "plots/analysis"
+os.makedirs(out_path, exist_ok=True)
 # Partitons paths
 train_path = os.path.join(dataset_path, "train")
 dev_path = os.path.join(dataset_path, "validate")
@@ -43,6 +46,7 @@ pixels_stats   = {"train": [], "dev": [], "test": []}  # Tuples of pixels values
 slices_count   = {"train": [], "dev": [], "test": []}  # Number of slices per patient
 two_ch_count   = {"train": [], "dev": [], "test": []}  # Number of 2ch slices per patient
 four_ch_count  = {"train": [], "dev": [], "test": []}  # Number of 4ch slices per patient
+miss_ch_count  = {"train": [], "dev": [], "test": []}  # Available CH slices for the patients that miss at least one of them
 frames_count   = {"train": [], "dev": [], "test": []}  # Number of frames per slice 
 spacing_count  = {"train": [], "dev": [], "test": []}  # Tuples with spaces in each dimension (h, w, depth)
 shapes_count   = {"train": {}, "dev": {}, "test": {}}  # To store the different shapes in the data -> key: shape tuple string, value: number of adquisitions
@@ -60,6 +64,13 @@ for split_name, data_path in data_splits:
         four_ch_slices = glob.glob(os.path.join(data_path, patient, "study/4ch_*"))
         two_ch_count[split_name].append(len(two_ch_slices))
         four_ch_count[split_name].append(len(four_ch_slices))
+
+        if len(two_ch_slices) == 0 and len(four_ch_slices) > 0:
+            miss_ch_count[split_name].append(1)  # 1 for missing 2CH
+        elif len(two_ch_slices) > 0 and len(four_ch_slices) == 0:
+            miss_ch_count[split_name].append(2)  # 2 for missing 4CH
+        elif len(two_ch_slices) == 0 and len(four_ch_slices) == 0:
+            miss_ch_count[split_name].append(3)  # 3 for missing 2CH and 4CH
 
         for sax_dir in sax_dirs:
             # Store the original number of frames
@@ -127,7 +138,7 @@ plt.legend(loc="upper right")
 plt.xlabel("N slices")
 plt.ylabel("Count")
 plt.title(f"Count of slices by patient for each partition")
-plt.savefig(f"plots/analysis/slices_count.png")
+plt.savefig(os.path.join(out_path, f"slices_count.png"))
 plt.clf()  # Reset figure for next plot
 
 '''
@@ -140,12 +151,24 @@ for split, counts in two_ch_count.items():
 # Histogram of 2ch counts
 plt.xlim(-0.25, 1.25)
 plt.xticks([0, 1])
-plt.hist([x[1] for x in two_ch_count.items()], bins=30, label=[x[0] for x in two_ch_count.items()])
+plt.hist([x[1] for x in two_ch_count.items()], bins=5, label=[x[0] for x in two_ch_count.items()])
 plt.legend(loc="upper left")
 plt.xlabel("N slices")
 plt.ylabel("Count")
 plt.title(f"Count of 2CH views by patient for each partition")
-plt.savefig(f"plots/analysis/2ch_count.png")
+plt.savefig(os.path.join(out_path, f"2ch_count.png"))
+plt.clf()  # Reset figure for next plot
+
+# Histogram of 2ch counts (log scale)
+plt.xlim(-0.25, 1.25)
+plt.xticks([0, 1])
+plt.hist([x[1] for x in two_ch_count.items()], bins=5, label=[x[0] for x in two_ch_count.items()])
+plt.legend(loc="upper left")
+plt.xlabel("N slices")
+plt.ylabel("Count (log scale)")
+plt.title(f"Count of 2CH views by patient for each partition")
+plt.yscale('log', nonposy='clip')
+plt.savefig(os.path.join(out_path, f"log_2ch_count.png"))
 plt.clf()  # Reset figure for next plot
 
 print("\n4CH views by patient:")
@@ -155,12 +178,33 @@ for split, counts in four_ch_count.items():
 # Histogram of 4ch counts
 plt.xlim(-0.25, 1.25)
 plt.xticks([0, 1])
-plt.hist([x[1] for x in four_ch_count.items()], bins=30, label=[x[0] for x in four_ch_count.items()])
+plt.hist([x[1] for x in four_ch_count.items()], bins=5, label=[x[0] for x in four_ch_count.items()])
 plt.legend(loc="upper left")
 plt.xlabel("N slices")
 plt.ylabel("Count")
 plt.title(f"Count of 4CH views by patient for each partition")
-plt.savefig(f"plots/analysis/4ch_count.png")
+plt.savefig(os.path.join(out_path, f"4ch_count.png"))
+plt.clf()  # Reset figure for next plot
+
+# Histogram of 4ch counts (log scale)
+plt.xlim(-0.25, 1.25)
+plt.xticks([0, 1])
+plt.hist([x[1] for x in four_ch_count.items()], bins=5, label=[x[0] for x in four_ch_count.items()])
+plt.legend(loc="upper left")
+plt.xlabel("N slices")
+plt.ylabel("Count (log scale)")
+plt.title(f"Count of 4CH views by patient for each partition")
+plt.yscale('log', nonposy='clip')
+plt.savefig(os.path.join(out_path, f"log_4ch_count.png"))
+plt.clf()  # Reset figure for next plot
+
+# Histogram of different cases of missing CH views
+plt.xticks([1, 2, 3], ["Only 4CH", "Only 2CH", "No CH"])
+plt.hist([x[1] for x in miss_ch_count.items()], bins=10, label=[x[0] for x in miss_ch_count.items()])
+plt.legend(loc="upper right")
+plt.ylabel("Count")
+plt.title(f"Count of cases for missing CH views for each partition")
+plt.savefig(os.path.join(out_path, f"missing_ch_count.png"))
 plt.clf()  # Reset figure for next plot
 
 '''
@@ -171,12 +215,22 @@ for split, counts in frames_count.items():
     print(f"{split}: mean={mean(counts):.2f}, median={median(counts):.2f}, mode={mode(counts):.2f}, max={max(counts)}, min={min(counts)}")
 
 # Histogram of frame counts
-plt.hist([x[1] for x in frames_count.items()], bins=30, label=[x[0] for x in frames_count.items()])
+plt.hist([x[1] for x in frames_count.items()], bins=20, label=[x[0] for x in frames_count.items()])
 plt.legend(loc="upper right")
 plt.xlabel("N frames")
 plt.ylabel("Count")
 plt.title(f"Count of frames by slice for each partition")
-plt.savefig(f"plots/analysis/frames_count.png")
+plt.savefig(os.path.join(out_path, f"frames_count.png"))
+plt.clf()  # Reset figure for next plot
+
+# Histogram of frame counts (log scale)
+plt.hist([x[1] for x in frames_count.items()], bins=20, label=[x[0] for x in frames_count.items()])
+plt.legend(loc="upper right")
+plt.xlabel("N frames")
+plt.ylabel("Count (log scale)")
+plt.title(f"Count of frames by slice for each partition")
+plt.yscale('log', nonposy='clip')
+plt.savefig(os.path.join(out_path, f"log_frames_count.png"))
 plt.clf()  # Reset figure for next plot
 
 '''
@@ -225,7 +279,7 @@ plt.hist(x_dists, bins=30)
 plt.xlabel("Distance")
 plt.ylabel("Count")
 plt.title(f"Count of row spacings")
-plt.savefig(f"plots/analysis/spacings_x.png")
+plt.savefig(os.path.join(out_path, f"spacings_x.png"))
 plt.clf()  # Reset figure for next plot
 
 # Column spacings histogram
@@ -233,7 +287,7 @@ plt.hist(y_dists, bins=30)
 plt.xlabel("Distance")
 plt.ylabel("Count")
 plt.title(f"Count of column spacings")
-plt.savefig(f"plots/analysis/spacings_y.png")
+plt.savefig(os.path.join(out_path, f"spacings_y.png"))
 plt.clf()  # Reset figure for next plot
 
 # Depth spacings histogram
@@ -241,7 +295,7 @@ plt.hist(z_dists, bins=30)
 plt.xlabel("Distance")
 plt.ylabel("Count")
 plt.title(f"Count of depth spacings")
-plt.savefig(f"plots/analysis/spacings_z.png")
+plt.savefig(os.path.join(out_path, f"spacings_z.png"))
 plt.clf()  # Reset figure for next plot
 
 '''
@@ -272,7 +326,7 @@ plt.hist(pix_avgs, bins=30)
 plt.xlabel("Pixel value")
 plt.ylabel("Count")
 plt.title(f"Count of average pixel value for every dicom image")
-plt.savefig(f"plots/analysis/pixels_averages.png")
+plt.savefig(os.path.join(out_path, f"pixels_averages.png"))
 plt.clf()  # Reset figure for next plot
 
 # Pixels maximums histogram
@@ -280,7 +334,7 @@ plt.hist(pix_maxs, bins=30)
 plt.xlabel("Pixel value")
 plt.ylabel("Count")
 plt.title(f"Count of maximum pixel values for every dicom image")
-plt.savefig(f"plots/analysis/pixels_maxspng")
+plt.savefig(os.path.join(out_path, f"pixels_maxspng"))
 plt.clf()  # Reset figure for next plot
 
 # Pixels minimums histogram
@@ -288,7 +342,7 @@ plt.hist(pix_mins, bins=30)
 plt.xlabel("Pixel value")
 plt.ylabel("Count")
 plt.title(f"Count of minimum pixel values for every dicom image")
-plt.savefig(f"plots/analysis/pixels_mins.png")
+plt.savefig(os.path.join(out_path, f"pixels_mins.png"))
 plt.clf()  # Reset figure for next plot
 
 '''
@@ -312,5 +366,5 @@ plt.legend(loc="upper right")
 plt.xlabel("Volume")
 plt.ylabel("Count")
 plt.title(f"Count of systole and diastole values for all the dataset")
-plt.savefig(f"plots/analysis/labels_count.png")
+plt.savefig(os.path.join(out_path, f"labels_count.png"))
 plt.clf()  # Reset figure for next plot
