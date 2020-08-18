@@ -251,6 +251,7 @@ def preprocess_pipeline1(patient_slices, pix_spacings, target_size=(150, 150), p
 
     if plots_path != "": 
         # Save images for each step
+        save_patient_slices(patient_slices, os.path.join(plots_path, f"0_original"))
         save_patient_slices(rescaled_images, os.path.join(plots_path, f"1_rescaled"))
         save_patient_slices(norm_images, os.path.join(plots_path, f"2_hist_normalized"))
         save_patient_slices(crop_images, os.path.join(plots_path, f"7_croped"))
@@ -269,6 +270,7 @@ def save_slice(slice_image, path):
     '''
     plt.imshow(slice_image, cmap=plt.cm.bone)
     plt.savefig(path)
+    plt.clf()  # Clear figure
 
        
 def gif_preprocessing(slice_images, roi=(None, None)):
@@ -342,8 +344,9 @@ def save_patient_slices(patient_slices, folder_path, n_proc=0, roi=(None, None))
             given path (including the name of the output file)
             '''
             plt.imshow(slice_image, cmap=plt.cm.bone)
-            plt.scatter([roi[0]], [roi[1]], c='r')
+            plt.scatter([roi[1]], [roi[0]], c='r')
             plt.savefig(path)
+            plt.clf()  # Clear figure
 
         aux_save_slice = save_slice_ROI
     else:
