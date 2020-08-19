@@ -271,6 +271,96 @@ def complete_missing_with_SAX(df, missing_cases, test_loader, net_systole, net_d
     return df
 
 
+def submission_ensemble(sys_sax_model_path, dias_sax_model_path, 
+                        sys_2ch_model_path, dias_2ch_model_path,
+                        sys_4ch_model_path, dias_4ch_model_path,
+                        test_loader, device, pin_memory, mode="cdf", mae=[15, 20]):
+    '''
+    Submission function. Generates the submission CSV from the test data. For an 
+    ensemble of the models for three different views
+    Params:
+        sys_sax_model_path -> path to pytorch model for systole estimation with SAX view
+        dias_sax_model_path -> path to pytorch model for diastole estimation with SAX view
+        sys_2ch_model_path -> path to pytorch model for systole estimation with 2CH view
+        dias_2ch_model_path -> path to pytorch model for diastole estimation with 2CH view
+        sys_4ch_model_path -> path to pytorch model for systole estimation with 4CH view
+        dias_4ch_model_path -> path to pytorch model for diastole estimation with 4CH view
+        test_loader -> pytorch DataLoader for testing data
+        device -> pytorch computing device
+        mode -> choose from ["cdf", "step"] the way to compute the PDF
+        mae -> mean squared error for systole and diastole during validation
+
+    Note: The batch_size of the test_loader must be 1
+    '''
+    ensemble_models = [
+        ("SAX", sys_sax_model_path, dias_sax_model_path),
+        ("2CH", sys_2ch_model_path, dias_2ch_model_path),
+        ("4CH", sys_4ch_model_path, dias_4ch_model_path)]
+
+    views_predictions = {"SAX":{}, "2CH":{}, "4CH":{}}
+
+    for view, systole_path, diastole_path in ensemble_models:
+        print(f"Going to predict with {view} models:")
+        # Load the models for the current view
+        model_systole = torch.load(systole_path)
+        model_diastole = torch.load(diastole_path)
+        # Move the models to the computing device
+        model_systole = model_systole.to(device)
+        model_diastole = model_diastole.to(device)
+        # Set the models in inference mode
+        model_systole.eval()
+        model_diastole.eval()
+        # Set no_grad to avoid gradient computations
+        with torch.no_grad():     
+            # Testing loop
+            for batch in tqdm(test_loader):       
+                # Get input and target from batch
+                id_ = int(batch["ID"][0])
+                data  = batch[view]
+                if data.size(1) == 0: continue  # Check if there is data
+                target_systole, target_diastole = batch["Y_systole"], batch["Y_diastole"]
+                # Move tensors to computing device
+                data = data.to(device, non_blocking=pin_memory)[0]
+                # Compute forward and get output predictions
+                pred_systole = model_systole(data)       
+                pred_diastole = model_diastole(data)       
+                # Compute mean from the predictions for each slice of the case
+                systole_value = pred_systole.mean()
+                diastole_value = pred_diastole.mean()
+                # Store the prediction for later computation
+                views_predictions[view][id_] = (systole_value, diastole_value)
+    
+    # Initialize results dataframe
+    df = pd.DataFrame(columns = ["Id"] + [f"P{i}" for i in range(600)])
+    df_idx = 0  # Index to insert in the DataFrame
+    for id_, predictions in views_predictions["SAX"].items():
+        acc_systole = predictions[0]
+        acc_diastole = predictions[1]
+        n_ensemble_models = 1
+        if id_ in views_predictions["2CH"]:
+            preds_2ch_systole = views_predictions["2CH"][id_]
+            acc_systole += preds_2ch_systole[0]
+            acc_diastole += preds_2ch_systole[1]
+            n_ensemble_models += 1
+        if id_ in views_predictions["4CH"]:
+            preds_4ch_systole = views_predictions["4CH"][id_]
+            acc_systole += preds_4ch_systole[0]
+            acc_diastole += preds_4ch_systole[1]
+            n_ensemble_models += 1
+
+        # Compute mean of the models predictions
+        final_systole = acc_systole / n_ensemble_models
+        final_diastole = acc_diastole / n_ensemble_models
+        # Compute the prob for each ml value (from 0 to 599)
+        systole_probs, diastole_probs = get_PDF(final_systole, final_diastole, mode, mae)
+        # Add the pred to the dataframe
+        df.loc[df_idx] = [f"{id_}_Systole"] + systole_probs
+        df.loc[df_idx+1] = [f"{id_}_Diastole"] + diastole_probs
+        df_idx += 2
+
+    return df
+
+
 def train_classifier(train_loader, net, criterion, optimizer, device, pin_memory):
     '''
     Training loop function for a classifier model

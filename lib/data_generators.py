@@ -161,13 +161,13 @@ class Ensemble_submission_dataset(torch.utils.data.Dataset):
         rows_4ch = selected_rows[selected_rows["View"]=="4CH"]
         if len(rows_2ch.index) > 0:
             row = rows_2ch.iloc[0]
-            data_2ch = torch.load(row["X_path"])
+            data_2ch = torch.stack([torch.load(row["X_path"])])
         else:
             data_2ch = torch.tensor([])
 
         if len(rows_4ch.index) > 0:
             row = rows_4ch.iloc[0]
-            data_4ch = torch.load(row["X_path"])
+            data_4ch = torch.stack([torch.load(row["X_path"])])
         else:
             data_4ch = torch.tensor([])
 
