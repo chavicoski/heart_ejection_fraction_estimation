@@ -228,6 +228,18 @@ plt.title(f"Count of slices by patient for each partition")
 plt.savefig(os.path.join(out_path, f"slices_count.png"))
 plt.clf()  # Reset figure for next plot
 
+print("\nSlices count by patient (log scale):")
+
+# Histogram of slices counts
+plt.hist([x[1] for x in slices_count.items()], bins=30, label=[x[0] for x in slices_count.items()])
+plt.legend(loc="upper right")
+plt.xlabel("N slices")
+plt.ylabel("Count (log scale)")
+plt.title(f"Count of slices by patient for each partition")
+plt.yscale('log', nonpositive='clip')
+plt.savefig(os.path.join(out_path, f"log_slices_count.png"))
+plt.clf()  # Reset figure for next plot
+
 '''
 Auxiliary views stats
 '''
