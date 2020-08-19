@@ -522,7 +522,7 @@ plt.hist(pix_maxs, bins=30)
 plt.xlabel("Pixel value")
 plt.ylabel("Count")
 plt.title(f"Count of maximum pixel values for every dicom image")
-plt.savefig(os.path.join(out_path, f"pixels_maxspng"))
+plt.savefig(os.path.join(out_path, f"pixels_maxs.png"))
 plt.clf()  # Reset figure for next plot
 
 # Pixels minimums histogram
