@@ -8,7 +8,7 @@ from torch import nn
 from torch.utils.data import DataLoader
 from lib.data_generators import Submission_dataset
 from lib.utils import *
-from captum.attr import IntegratedGradients, NoiseTunnel
+from captum.attr import IntegratedGradients, Saliency
 from captum.attr import visualization as viz
 from matplotlib.colors import LinearSegmentedColormap
 import multiprocessing as mp
@@ -28,7 +28,8 @@ arg_parser.add_argument("--pin_mem", help="To use pinned memory for data loading
 arg_parser.add_argument("-dp", "--data_path", help="Path to the preprocessed dataset folder", type=str, default="../preproc1_150x150_bySlices_dataset_allViews/")
 arg_parser.add_argument("--split", help="Data split to take images", type=str, choices=["train", "validate", "test"], default="validate")
 arg_parser.add_argument("-out", "--output_path", help="Folder to save the plots of the attributions", type=str, default="plots/interpretability")
-arg_parser.add_argument("-gifs", "--make_gifs", help="Enable the gifs creation", choices=[0, 1], type=bool, default=True)
+arg_parser.add_argument("-gifs", "--make_gifs", help="Enable the gifs creation", choices=[0, 1], type=int, default=1)
+arg_parser.add_argument("-rand", "--random_sample", help="To take a random sample", choices=[0, 1], type=int, default=1)
 arg_parser.add_argument("--nproc_gifs", help="Number of processes to create the gifs in parallel (0 = all cores)", choices=[i for i in range(mp.cpu_count() + 1)], type=int, default=0)
 args = arg_parser.parse_args()
 
@@ -41,7 +42,8 @@ split = args.split
 num_workers = args.workers
 selected_gpu = args.gpu
 pin_memory = args.pin_mem
-make_gifs = args.make_gifs
+make_gifs = bool(args.make_gifs)
+random_sample = bool(args.random_sample)
 gifs_cores = args.nproc_gifs
 
 # Check computing device
@@ -63,7 +65,7 @@ else:
 df = pd.read_csv(os.path.join(data_path, f"{split}.csv"))
 # Create test datagen
 dataset = Submission_dataset(df, view=view)
-datagen = DataLoader(dataset, batch_size=1, num_workers=num_workers, pin_memory=pin_memory)
+datagen = DataLoader(dataset, batch_size=1, num_workers=num_workers, pin_memory=pin_memory, shuffle=random_sample)
 # Load the sample to analyze
 sample = next(iter(datagen))
 id_, data, y_systole, y_diastole = sample["ID"], sample["X"], sample["Y_systole"], sample["Y_diastole"]
@@ -128,16 +130,14 @@ for label, model_path in [("systole", systole_path), ("diastole", diastole_path)
     print(f"\tPredicted: {pred:.2f}")
     print(f"\tAbsolute error: {err:.2f}")
 
+    attr_algorithms = [("Integrated Gradients", "ig"), ("Saliency", "saliency")]
     # Integrated gradients algorithm
     ig = IntegratedGradients(model)
 
-    # Noise tunnel (integrated gradients)
-    noise_tunnel_ig = NoiseTunnel(ig)
-
     # Analyze every slice of the case
     print(f"Slice level analysis for {label}:")
-    for slice_id in range(n_slices):
 
+    for slice_id in range(n_slices):
         # Get slice data with shape (1, timesteps, H, W)
         slice_data = data[slice_id].unsqueeze_(0)
 
@@ -152,43 +152,89 @@ for label, model_path in [("systole", systole_path), ("diastole", diastole_path)
         slice_label_out_path = os.path.join(slice_out_path, f"{label}_{err:.2f}")
         os.makedirs(slice_label_out_path, exist_ok=True)
 
-        '''Integrated Gradients'''
-        # Create folders
-        slice_ig_out_path = os.path.join(slice_label_out_path, f"integrated_gradients")
-        os.makedirs(slice_ig_out_path, exist_ok=True)
+        for algorithm_name, aux_algo_name in attr_algorithms:
+            # Create folder for the current algorithm
+            slice_algo_out_path = os.path.join(slice_label_out_path, f"{algorithm_name}")
+            os.makedirs(slice_algo_out_path, exist_ok=True)
 
-        # Compute attributions
-        attributions_ig = ig.attribute(slice_data, n_steps=400, internal_batch_size=1)
+            # Compute the algorithm attributions
+            if algorithm_name == "Integrated Gradients":
+                aux_algorithm = IntegratedGradients(model)
+                attributions = aux_algorithm.attribute(slice_data, n_steps=400, internal_batch_size=1)
+            elif algorithm_name == "Saliency":
+                aux_algorithm = Saliency(model)
+                attributions = aux_algorithm.attribute(slice_data, abs=False)
+                attributions = torch.cat((torch.clamp(attributions, min=0), torch.abs(torch.clamp(attributions, max=0))), dim=1)
+                positive_path = os.path.join(slice_algo_out_path, "positive_grads")
+                negative_path = os.path.join(slice_algo_out_path, "negative_grads")
+                os.makedirs(positive_path, exist_ok=True)
+                os.makedirs(negative_path, exist_ok=True)
+            else:
+                print(f"The algorithm name {algorithm_name} is not valid!")
+                sys.exit()
 
-        # Get RGB images from the attributions
-        attr_ig_images = to_RGB_images(attributions_ig)
+            # Get RGB images from the attributions
+            attr_images = to_RGB_images(attributions)
 
-        # Get RGB images from the slice for plots
-        slice_images = to_RGB_images(slice_data)
+            # Get RGB images from the slice for plots
+            slice_images = to_RGB_images(slice_data)
 
-        # Make plots of the selected slice and timestep
-        for t in range(n_timesteps):
-            '''Integrated Gradients'''
-            fig, ax = viz.visualize_image_attr_multiple(
-                    attr_ig_images[t],
-                    slice_images[t],
-                    ["original_image", "heat_map"],
-                    ["all", "positive"],
-                    titles=["Original", f"Integrated Gradients ({label})"],
-                    cmap=default_cmap,
-                    show_colorbar=True,
-                    use_pyplot=False)
+            # Make plots of the selected slice and timestep
+            if algorithm_name == "Saliency":
+                for t in range(n_timesteps):
+                    fig, ax = viz.visualize_image_attr_multiple(
+                            attr_images[t],
+                            slice_images[t],
+                            ["original_image", "heat_map"],
+                            ["all", "positive"],
+                            titles=["Original", f"{algorithm_name} positive values ({label})"],
+                            cmap=default_cmap,
+                            show_colorbar=True,
+                            use_pyplot=False)
+                    # Save plots
+                    fig.savefig(os.path.join(positive_path, f"positive_{aux_algo_name}_step{t:02}_{err:.2f}err.png"))
 
-            # Save plots
-            fig.savefig(os.path.join(slice_ig_out_path, f"ig_{label}_step{t:02}_{err:.2f}err.png"))
+                    fig, ax = viz.visualize_image_attr_multiple(
+                            attr_images[t+n_timesteps],
+                            slice_images[t],
+                            ["original_image", "heat_map"],
+                            ["all", "positive"],
+                            titles=["Original", f"{algorithm_name} negative values ({label})"],
+                            cmap=default_cmap,
+                            show_colorbar=True,
+                            use_pyplot=False)
+                    # Save plots
+                    fig.savefig(os.path.join(negative_path, f"negative_{aux_algo_name}_step{t:02}_{err:.2f}err.png"))
 
-        if make_gifs:
-            # Add the paths to the plots folders for making the animations
-            gifs_folders.append(slice_ig_out_path)
+                if make_gifs:
+                    # Add the paths to the plots folders for making the animations
+                    gifs_folders.append(positive_path)
+                    gifs_folders.append(negative_path)
+            else:
+                for t in range(n_timesteps):
+                    fig, ax = viz.visualize_image_attr_multiple(
+                            attr_images[t],
+                            slice_images[t],
+                            ["original_image", "heat_map"],
+                            ["all", "positive"],
+                            titles=["Original", f"{algorithm_name} ({label})"],
+                            cmap=default_cmap,
+                            show_colorbar=True,
+                            use_pyplot=False)
+
+                    # Save plots
+                    fig.savefig(os.path.join(slice_algo_out_path, f"{aux_algo_name}_step{t:02}_{err:.2f}err.png"))
+
+                if make_gifs:
+                    # Add the paths to the plots folders for making the animations
+                    gifs_folders.append(slice_algo_out_path)
+
+            # Free memory
+            del attributions
 
         # Free memory
+        del aux_algorithm
         del slice_data
-        del attributions_ig
 
     # Free memory
     del model

@@ -1,0 +1,38 @@
+
+Going use the GPU in the slot 0 -> device model: GeForce RTX 2080
+
+Going to analyze case 501 from validate split:
+Results systole:
+	Ground truth: 104.30
+	Predicted: 96.67
+	Absolute error: 7.63
+Slice level analysis for systole:
+	Slice 0: err = -10.32
+	Slice 1: err = -17.77
+	Slice 2: err = -11.45
+	Slice 3: err = -12.85
+	Slice 4: err = -3.01
+	Slice 5: err = -6.97
+	Slice 6: err = -1.32
+	Slice 7: err = -13.82
+	Slice 8: err = -16.31
+	Slice 9: err = 9.84
+	Slice 10: err = 0.06
+Results diastole:
+	Ground truth: 212.50
+	Predicted: 213.68
+	Absolute error: 1.18
+Slice level analysis for diastole:
+	Slice 0: err = 2.91
+	Slice 1: err = -25.52
+	Slice 2: err = 15.64
+	Slice 3: err = 13.97
+	Slice 4: err = 2.45
+	Slice 5: err = -35.72
+	Slice 6: err = 11.14
+	Slice 7: err = -11.84
+	Slice 8: err = -12.61
+	Slice 9: err = 34.15
+	Slice 10: err = 18.38
+Creating the GIF animations from the plots (using 12 cores)...
+GIF animations created!
