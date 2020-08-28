@@ -42,6 +42,7 @@ arg_parser.add_argument("-da", "--data_augmentation", help="Enable data augmenta
 arg_parser.add_argument("-dp", "--data_path", help="Path to the preprocessed dataset folder", type=str, default="../preproc1_150x150_bySlices_dataset_allViews/")
 arg_parser.add_argument("-fr", "--freeze_ratio", help="Percentaje (range [0...1]) of epochs to freeze the model from the begining", type=float, default=0.3)
 arg_parser.add_argument("--use_pretrained", help="To use or not the pretrained weights if the selected model can be pretrained", type=int, choices=[0, 1], default=1)
+arg_parser.add_argument("--lr_scheduler", help="To enable or disable the learning rate scheduler", type=int, choices=[0, 1], default=1)
 args = arg_parser.parse_args()
 
 data_path = args.data_path
@@ -62,6 +63,7 @@ opt_name = args.optimizer
 learning_rate = args.learning_rate
 data_augmentation = args.data_augmentation
 use_pretrained = bool(args.use_pretrained)
+use_lr_scheduler = bool(args.lr_scheduler)
 
 exp_name = f"{view}_{dataset_name}_{target_label}_{model_name}_{opt_name}-{learning_rate}_{loss_function}"  # Experiment name
 
@@ -174,7 +176,8 @@ train_losses, test_losses = [], []
 train_diffs, test_diffs = [], []
 
 # Scheduler for changing the value of the laearning rate
-scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'min', factor=0.5, patience=10, verbose=True)
+if use_lr_scheduler:
+    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'min', factor=0.5, patience=10, verbose=True)
 
 # Set the tensorboard writer
 if tensorboard:
@@ -215,7 +218,8 @@ for epoch in range(epochs):
     # Development split 
     test_loss, test_diff = test_regresor(dev_datagen, model, criterion, device, pin_memory)
     # Apply the lr scheduler
-    scheduler.step(test_loss)
+    if use_lr_scheduler:
+        scheduler.step(test_loss)
     # Save the results of the epoch
     train_losses.append(train_loss)
     test_losses.append(test_loss)
