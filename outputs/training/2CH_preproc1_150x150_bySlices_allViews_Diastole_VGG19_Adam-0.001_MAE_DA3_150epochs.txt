@@ -1,0 +1,700 @@
+nohup: ignoring input
+Running experiment 2CH_preproc1_150x150_bySlices_dataset_allViews_Diastole_VGG19_Adam-0.001_MAE_DA3
+Going to train with the GPU in the slot 0 -> device model: GeForce RTX 2080
+Model architecture:
+ VGG19(
+  (first_conv): Sequential(
+    (0): Conv2d(30, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    (1): ReLU()
+    (2): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+  )
+  (pretrained_block): Sequential(
+    (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    (1): ReLU(inplace=True)
+    (2): MaxPool2d(kernel_size=2, stride=2, padding=0, dilation=1, ceil_mode=False)
+    (3): Conv2d(64, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    (4): ReLU(inplace=True)
+    (5): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    (6): ReLU(inplace=True)
+    (7): MaxPool2d(kernel_size=2, stride=2, padding=0, dilation=1, ceil_mode=False)
+    (8): Conv2d(128, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    (9): ReLU(inplace=True)
+    (10): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    (11): ReLU(inplace=True)
+    (12): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    (13): ReLU(inplace=True)
+    (14): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    (15): ReLU(inplace=True)
+    (16): MaxPool2d(kernel_size=2, stride=2, padding=0, dilation=1, ceil_mode=False)
+    (17): Conv2d(256, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    (18): ReLU(inplace=True)
+    (19): Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    (20): ReLU(inplace=True)
+    (21): Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    (22): ReLU(inplace=True)
+    (23): Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    (24): ReLU(inplace=True)
+    (25): MaxPool2d(kernel_size=2, stride=2, padding=0, dilation=1, ceil_mode=False)
+    (26): Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    (27): ReLU(inplace=True)
+    (28): Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    (29): ReLU(inplace=True)
+    (30): Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    (31): ReLU(inplace=True)
+    (32): Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    (33): ReLU(inplace=True)
+    (34): MaxPool2d(kernel_size=2, stride=2, padding=0, dilation=1, ceil_mode=False)
+  )
+  (reduction_block): Sequential(
+    (0): AdaptiveAvgPool2d(output_size=(1, 1))
+    (1): Flatten()
+  )
+  (dense_block): Sequential(
+    (0): Linear(in_features=512, out_features=512, bias=True)
+    (1): ReLU()
+    (2): Dropout(p=0.4, inplace=False)
+    (3): Linear(in_features=512, out_features=1, bias=True)
+  )
+) 
+
+
+############################
+# TRAIN PHASE:  150 epochs #
+############################
+
+Epoch 0: 
+Train batch 1/7 - 311.1ms/batch - loss: 1.98069 - diff: 158.46mlTrain batch 2/7 - 276.1ms/batch - loss: 2.01504 - diff: 161.20mlTrain batch 3/7 - 299.9ms/batch - loss: 1.97475 - diff: 157.98mlTrain batch 4/7 - 275.8ms/batch - loss: 2.02057 - diff: 161.65mlTrain batch 5/7 - 300.9ms/batch - loss: 2.02883 - diff: 162.31mlTrain batch 6/7 - 277.3ms/batch - loss: 2.04140 - diff: 163.31mlTrain batch 7/7 - 86.7ms/batch - loss: 2.28251 - diff: 163.23mlTrain batch 7/7 - 15.9s 86.7ms/batch - loss: 2.28251 - diff: 163.23ml
+Test 1.2s: val_loss: 2.36001 - diff: 157.94ml
+Saving new best model in models/checkpoints/2CH_preproc1_150x150_bySlices_dataset_allViews_Diastole_VGG19_Adam-0.001_MAE_DA3_best
+
+Epoch 1: current best loss = 2.36001, at epoch 0
+Train batch 1/7 - 292.9ms/batch - loss: 2.00475 - diff: 160.38mlTrain batch 2/7 - 276.6ms/batch - loss: 1.89633 - diff: 151.71mlTrain batch 3/7 - 315.5ms/batch - loss: 1.87500 - diff: 150.00mlTrain batch 4/7 - 277.8ms/batch - loss: 1.86067 - diff: 148.85mlTrain batch 5/7 - 291.8ms/batch - loss: 1.86476 - diff: 149.18mlTrain batch 6/7 - 277.7ms/batch - loss: 1.85245 - diff: 148.20mlTrain batch 7/7 - 86.9ms/batch - loss: 2.06423 - diff: 147.99mlTrain batch 7/7 - 16.6s 86.9ms/batch - loss: 2.06423 - diff: 147.99ml
+Test 1.3s: val_loss: 2.32385 - diff: 154.05ml
+Saving new best model in models/checkpoints/2CH_preproc1_150x150_bySlices_dataset_allViews_Diastole_VGG19_Adam-0.001_MAE_DA3_best
+
+Epoch 2: current best loss = 2.32385, at epoch 1
+Train batch 1/7 - 292.0ms/batch - loss: 1.63014 - diff: 130.41mlTrain batch 2/7 - 281.4ms/batch - loss: 1.56173 - diff: 124.94mlTrain batch 3/7 - 289.6ms/batch - loss: 1.56366 - diff: 125.09mlTrain batch 4/7 - 275.8ms/batch - loss: 1.53047 - diff: 122.44mlTrain batch 5/7 - 293.2ms/batch - loss: 1.47545 - diff: 118.04mlTrain batch 6/7 - 277.3ms/batch - loss: 1.44793 - diff: 115.83mlTrain batch 7/7 - 94.4ms/batch - loss: 1.56841 - diff: 114.77mlTrain batch 7/7 - 17.1s 94.4ms/batch - loss: 1.56841 - diff: 114.77ml
+Test 1.3s: val_loss: 2.14137 - diff: 143.90ml
+Saving new best model in models/checkpoints/2CH_preproc1_150x150_bySlices_dataset_allViews_Diastole_VGG19_Adam-0.001_MAE_DA3_best
+
+Epoch 3: current best loss = 2.14137, at epoch 2
+Train batch 1/7 - 283.2ms/batch - loss: 0.97571 - diff: 78.06mlTrain batch 2/7 - 278.0ms/batch - loss: 0.97392 - diff: 77.91mlTrain batch 3/7 - 292.0ms/batch - loss: 0.97597 - diff: 78.08mlTrain batch 4/7 - 283.8ms/batch - loss: 0.91998 - diff: 73.60mlTrain batch 5/7 - 294.0ms/batch - loss: 0.89654 - diff: 71.72mlTrain batch 6/7 - 277.6ms/batch - loss: 0.85897 - diff: 68.72mlTrain batch 7/7 - 87.3ms/batch - loss: 0.90644 - diff: 67.61mlTrain batch 7/7 - 16.6s 87.3ms/batch - loss: 0.90644 - diff: 67.61ml
+Test 1.3s: val_loss: 1.86381 - diff: 123.86ml
+Saving new best model in models/checkpoints/2CH_preproc1_150x150_bySlices_dataset_allViews_Diastole_VGG19_Adam-0.001_MAE_DA3_best
+
+Epoch 4: current best loss = 1.86381, at epoch 3
+Train batch 1/7 - 307.8ms/batch - loss: 0.70520 - diff: 56.42mlTrain batch 2/7 - 279.7ms/batch - loss: 0.68536 - diff: 54.83mlTrain batch 3/7 - 303.2ms/batch - loss: 0.69746 - diff: 55.80mlTrain batch 4/7 - 277.7ms/batch - loss: 0.66454 - diff: 53.16mlTrain batch 5/7 - 302.6ms/batch - loss: 0.67091 - diff: 53.67mlTrain batch 6/7 - 278.3ms/batch - loss: 0.67585 - diff: 54.07mlTrain batch 7/7 - 87.1ms/batch - loss: 0.79368 - diff: 54.80mlTrain batch 7/7 - 16.4s 87.1ms/batch - loss: 0.79368 - diff: 54.80ml
+Test 1.5s: val_loss: 1.57610 - diff: 106.35ml
+Saving new best model in models/checkpoints/2CH_preproc1_150x150_bySlices_dataset_allViews_Diastole_VGG19_Adam-0.001_MAE_DA3_best
+
+Epoch 5: current best loss = 1.57610, at epoch 4
+Train batch 1/7 - 283.3ms/batch - loss: 0.63355 - diff: 50.68mlTrain batch 2/7 - 278.2ms/batch - loss: 0.70481 - diff: 56.38mlTrain batch 3/7 - 313.7ms/batch - loss: 0.69518 - diff: 55.61mlTrain batch 4/7 - 277.4ms/batch - loss: 0.69254 - diff: 55.40mlTrain batch 5/7 - 301.9ms/batch - loss: 0.67079 - diff: 53.66mlTrain batch 6/7 - 277.8ms/batch - loss: 0.67400 - diff: 53.92mlTrain batch 7/7 - 87.3ms/batch - loss: 0.74056 - diff: 53.63mlTrain batch 7/7 - 16.9s 87.3ms/batch - loss: 0.74056 - diff: 53.63ml
+Test 1.3s: val_loss: 1.42899 - diff: 97.57ml
+Saving new best model in models/checkpoints/2CH_preproc1_150x150_bySlices_dataset_allViews_Diastole_VGG19_Adam-0.001_MAE_DA3_best
+
+Epoch 6: current best loss = 1.42899, at epoch 5
+Train batch 1/7 - 304.0ms/batch - loss: 0.65977 - diff: 52.78mlTrain batch 2/7 - 277.4ms/batch - loss: 0.65294 - diff: 52.24mlTrain batch 3/7 - 288.6ms/batch - loss: 0.67764 - diff: 54.21mlTrain batch 4/7 - 277.7ms/batch - loss: 0.65147 - diff: 52.12mlTrain batch 5/7 - 291.5ms/batch - loss: 0.64238 - diff: 51.39mlTrain batch 6/7 - 278.2ms/batch - loss: 0.64392 - diff: 51.51mlTrain batch 7/7 - 91.4ms/batch - loss: 0.73268 - diff: 51.74mlTrain batch 7/7 - 17.4s 91.4ms/batch - loss: 0.73268 - diff: 51.74ml
+Test 1.5s: val_loss: 0.92223 - diff: 62.54ml
+Saving new best model in models/checkpoints/2CH_preproc1_150x150_bySlices_dataset_allViews_Diastole_VGG19_Adam-0.001_MAE_DA3_best
+
+Epoch 7: current best loss = 0.92223, at epoch 6
+Train batch 1/7 - 286.3ms/batch - loss: 0.61180 - diff: 48.94mlTrain batch 2/7 - 277.9ms/batch - loss: 0.61338 - diff: 49.07mlTrain batch 3/7 - 296.3ms/batch - loss: 0.63547 - diff: 50.84mlTrain batch 4/7 - 277.8ms/batch - loss: 0.62698 - diff: 50.16mlTrain batch 5/7 - 307.3ms/batch - loss: 0.61411 - diff: 49.13mlTrain batch 6/7 - 296.8ms/batch - loss: 0.63123 - diff: 50.50mlTrain batch 7/7 - 97.6ms/batch - loss: 0.67785 - diff: 49.92mlTrain batch 7/7 - 16.6s 97.6ms/batch - loss: 0.67785 - diff: 49.92ml
+Test 1.3s: val_loss: 1.17373 - diff: 78.71ml
+
+Epoch 8: current best loss = 0.92223, at epoch 6
+Train batch 1/7 - 283.4ms/batch - loss: 0.61969 - diff: 49.57mlTrain batch 2/7 - 278.6ms/batch - loss: 0.65919 - diff: 52.73mlTrain batch 3/7 - 293.8ms/batch - loss: 0.67592 - diff: 54.07mlTrain batch 4/7 - 278.1ms/batch - loss: 0.64831 - diff: 51.86mlTrain batch 5/7 - 284.7ms/batch - loss: 0.64614 - diff: 51.69mlTrain batch 6/7 - 285.6ms/batch - loss: 0.63383 - diff: 50.71mlTrain batch 7/7 - 87.5ms/batch - loss: 0.67232 - diff: 49.96mlTrain batch 7/7 - 18.2s 87.5ms/batch - loss: 0.67232 - diff: 49.96ml
+Test 1.3s: val_loss: 1.17709 - diff: 80.77ml
+
+Epoch 9: current best loss = 0.92223, at epoch 6
+Train batch 1/7 - 293.0ms/batch - loss: 0.71688 - diff: 57.35mlTrain batch 2/7 - 278.4ms/batch - loss: 0.65668 - diff: 52.53mlTrain batch 3/7 - 294.9ms/batch - loss: 0.66565 - diff: 53.25mlTrain batch 4/7 - 279.0ms/batch - loss: 0.63431 - diff: 50.74mlTrain batch 5/7 - 288.4ms/batch - loss: 0.61772 - diff: 49.42mlTrain batch 6/7 - 277.7ms/batch - loss: 0.62260 - diff: 49.81mlTrain batch 7/7 - 87.4ms/batch - loss: 0.69362 - diff: 49.73mlTrain batch 7/7 - 16.7s 87.4ms/batch - loss: 0.69362 - diff: 49.73ml
+Test 1.4s: val_loss: 0.87940 - diff: 59.10ml
+Saving new best model in models/checkpoints/2CH_preproc1_150x150_bySlices_dataset_allViews_Diastole_VGG19_Adam-0.001_MAE_DA3_best
+
+Epoch 10: current best loss = 0.87940, at epoch 9
+Train batch 1/7 - 286.3ms/batch - loss: 0.56169 - diff: 44.93mlTrain batch 2/7 - 278.3ms/batch - loss: 0.58261 - diff: 46.61mlTrain batch 3/7 - 288.5ms/batch - loss: 0.55894 - diff: 44.72mlTrain batch 4/7 - 282.5ms/batch - loss: 0.58099 - diff: 46.48mlTrain batch 5/7 - 291.5ms/batch - loss: 0.60291 - diff: 48.23mlTrain batch 6/7 - 278.6ms/batch - loss: 0.59474 - diff: 47.58mlTrain batch 7/7 - 87.2ms/batch - loss: 0.63933 - diff: 47.04mlTrain batch 7/7 - 17.6s 87.2ms/batch - loss: 0.63933 - diff: 47.04ml
+Test 1.4s: val_loss: 0.85256 - diff: 54.36ml
+Saving new best model in models/checkpoints/2CH_preproc1_150x150_bySlices_dataset_allViews_Diastole_VGG19_Adam-0.001_MAE_DA3_best
+
+Epoch 11: current best loss = 0.85256, at epoch 10
+Train batch 1/7 - 284.8ms/batch - loss: 0.60354 - diff: 48.28mlTrain batch 2/7 - 287.4ms/batch - loss: 0.61132 - diff: 48.91mlTrain batch 3/7 - 285.4ms/batch - loss: 0.58419 - diff: 46.74mlTrain batch 4/7 - 278.6ms/batch - loss: 0.57757 - diff: 46.21mlTrain batch 5/7 - 305.7ms/batch - loss: 0.58211 - diff: 46.57mlTrain batch 6/7 - 279.1ms/batch - loss: 0.57647 - diff: 46.12mlTrain batch 7/7 - 87.4ms/batch - loss: 0.65969 - diff: 46.40mlTrain batch 7/7 - 17.5s 87.4ms/batch - loss: 0.65969 - diff: 46.40ml
+Test 1.2s: val_loss: 0.77017 - diff: 52.20ml
+Saving new best model in models/checkpoints/2CH_preproc1_150x150_bySlices_dataset_allViews_Diastole_VGG19_Adam-0.001_MAE_DA3_best
+
+Epoch 12: current best loss = 0.77017, at epoch 11
+Train batch 1/7 - 285.7ms/batch - loss: 0.48451 - diff: 38.76mlTrain batch 2/7 - 281.7ms/batch - loss: 0.53678 - diff: 42.94mlTrain batch 3/7 - 294.4ms/batch - loss: 0.55412 - diff: 44.33mlTrain batch 4/7 - 278.5ms/batch - loss: 0.56362 - diff: 45.09mlTrain batch 5/7 - 288.4ms/batch - loss: 0.57411 - diff: 45.93mlTrain batch 6/7 - 278.4ms/batch - loss: 0.57345 - diff: 45.88mlTrain batch 7/7 - 87.4ms/batch - loss: 0.62665 - diff: 45.56mlTrain batch 7/7 - 16.2s 87.4ms/batch - loss: 0.62665 - diff: 45.56ml
+Test 1.3s: val_loss: 0.71069 - diff: 47.85ml
+Saving new best model in models/checkpoints/2CH_preproc1_150x150_bySlices_dataset_allViews_Diastole_VGG19_Adam-0.001_MAE_DA3_best
+
+Epoch 13: current best loss = 0.71069, at epoch 12
+Train batch 1/7 - 295.2ms/batch - loss: 0.55970 - diff: 44.78mlTrain batch 2/7 - 277.9ms/batch - loss: 0.63800 - diff: 51.04mlTrain batch 3/7 - 289.1ms/batch - loss: 0.60469 - diff: 48.38mlTrain batch 4/7 - 279.0ms/batch - loss: 0.58908 - diff: 47.13mlTrain batch 5/7 - 295.3ms/batch - loss: 0.59004 - diff: 47.20mlTrain batch 6/7 - 277.0ms/batch - loss: 0.57377 - diff: 45.90mlTrain batch 7/7 - 87.4ms/batch - loss: 0.64812 - diff: 46.01mlTrain batch 7/7 - 17.1s 87.4ms/batch - loss: 0.64812 - diff: 46.01ml
+Test 1.2s: val_loss: 0.71390 - diff: 47.12ml
+
+Epoch 14: current best loss = 0.71069, at epoch 12
+Train batch 1/7 - 293.3ms/batch - loss: 0.61091 - diff: 48.87mlTrain batch 2/7 - 292.7ms/batch - loss: 0.57892 - diff: 46.31mlTrain batch 3/7 - 284.0ms/batch - loss: 0.59373 - diff: 47.50mlTrain batch 4/7 - 278.9ms/batch - loss: 0.57301 - diff: 45.84mlTrain batch 5/7 - 291.8ms/batch - loss: 0.56598 - diff: 45.28mlTrain batch 6/7 - 278.1ms/batch - loss: 0.56262 - diff: 45.01mlTrain batch 7/7 - 87.6ms/batch - loss: 0.64208 - diff: 45.25mlTrain batch 7/7 - 16.4s 87.6ms/batch - loss: 0.64208 - diff: 45.25ml
+Test 1.3s: val_loss: 0.70321 - diff: 45.83ml
+Saving new best model in models/checkpoints/2CH_preproc1_150x150_bySlices_dataset_allViews_Diastole_VGG19_Adam-0.001_MAE_DA3_best
+
+Epoch 15: current best loss = 0.70321, at epoch 14
+Train batch 1/7 - 296.1ms/batch - loss: 0.61369 - diff: 49.10mlTrain batch 2/7 - 278.7ms/batch - loss: 0.54036 - diff: 43.23mlTrain batch 3/7 - 283.8ms/batch - loss: 0.53245 - diff: 42.60mlTrain batch 4/7 - 287.0ms/batch - loss: 0.57452 - diff: 45.96mlTrain batch 5/7 - 300.2ms/batch - loss: 0.57317 - diff: 45.85mlTrain batch 6/7 - 279.1ms/batch - loss: 0.56374 - diff: 45.10mlTrain batch 7/7 - 87.5ms/batch - loss: 0.65454 - diff: 45.56mlTrain batch 7/7 - 16.3s 87.5ms/batch - loss: 0.65454 - diff: 45.56ml
+Test 1.3s: val_loss: 0.68497 - diff: 45.84ml
+Saving new best model in models/checkpoints/2CH_preproc1_150x150_bySlices_dataset_allViews_Diastole_VGG19_Adam-0.001_MAE_DA3_best
+
+Epoch 16: current best loss = 0.68497, at epoch 15
+Train batch 1/7 - 285.8ms/batch - loss: 0.49096 - diff: 39.28mlTrain batch 2/7 - 279.3ms/batch - loss: 0.52263 - diff: 41.81mlTrain batch 3/7 - 296.9ms/batch - loss: 0.54678 - diff: 43.74mlTrain batch 4/7 - 278.4ms/batch - loss: 0.56341 - diff: 45.07mlTrain batch 5/7 - 287.9ms/batch - loss: 0.55254 - diff: 44.20mlTrain batch 6/7 - 278.7ms/batch - loss: 0.55922 - diff: 44.74mlTrain batch 7/7 - 87.6ms/batch - loss: 0.63692 - diff: 44.95mlTrain batch 7/7 - 16.7s 87.6ms/batch - loss: 0.63692 - diff: 44.95ml
+Test 1.4s: val_loss: 0.66646 - diff: 44.65ml
+Saving new best model in models/checkpoints/2CH_preproc1_150x150_bySlices_dataset_allViews_Diastole_VGG19_Adam-0.001_MAE_DA3_best
+
+Epoch 17: current best loss = 0.66646, at epoch 16
+Train batch 1/7 - 289.6ms/batch - loss: 0.59533 - diff: 47.63mlTrain batch 2/7 - 285.9ms/batch - loss: 0.57697 - diff: 46.16mlTrain batch 3/7 - 289.7ms/batch - loss: 0.57578 - diff: 46.06mlTrain batch 4/7 - 278.3ms/batch - loss: 0.55911 - diff: 44.73mlTrain batch 5/7 - 288.8ms/batch - loss: 0.57413 - diff: 45.93mlTrain batch 6/7 - 278.9ms/batch - loss: 0.56131 - diff: 44.90mlTrain batch 7/7 - 87.3ms/batch - loss: 0.64485 - diff: 45.23mlTrain batch 7/7 - 16.3s 87.3ms/batch - loss: 0.64485 - diff: 45.23ml
+Test 1.6s: val_loss: 0.70355 - diff: 46.82ml
+
+Epoch 18: current best loss = 0.66646, at epoch 16
+Train batch 1/7 - 297.3ms/batch - loss: 0.53041 - diff: 42.43mlTrain batch 2/7 - 278.5ms/batch - loss: 0.55031 - diff: 44.03mlTrain batch 3/7 - 312.1ms/batch - loss: 0.55494 - diff: 44.40mlTrain batch 4/7 - 279.1ms/batch - loss: 0.55745 - diff: 44.60mlTrain batch 5/7 - 289.3ms/batch - loss: 0.53078 - diff: 42.46mlTrain batch 6/7 - 278.6ms/batch - loss: 0.53827 - diff: 43.06mlTrain batch 7/7 - 87.2ms/batch - loss: 0.59186 - diff: 42.84mlTrain batch 7/7 - 16.2s 87.2ms/batch - loss: 0.59186 - diff: 42.84ml
+Test 1.3s: val_loss: 0.69566 - diff: 46.49ml
+
+Epoch 19: current best loss = 0.66646, at epoch 16
+Train batch 1/7 - 291.0ms/batch - loss: 0.56241 - diff: 44.99mlTrain batch 2/7 - 278.8ms/batch - loss: 0.53533 - diff: 42.83mlTrain batch 3/7 - 283.6ms/batch - loss: 0.49146 - diff: 39.32mlTrain batch 4/7 - 278.3ms/batch - loss: 0.52909 - diff: 42.33mlTrain batch 5/7 - 284.1ms/batch - loss: 0.53221 - diff: 42.58mlTrain batch 6/7 - 279.0ms/batch - loss: 0.54014 - diff: 43.21mlTrain batch 7/7 - 87.4ms/batch - loss: 0.63197 - diff: 43.75mlTrain batch 7/7 - 17.1s 87.4ms/batch - loss: 0.63197 - diff: 43.75ml
+Test 1.2s: val_loss: 0.69485 - diff: 45.83ml
+
+Epoch 20: current best loss = 0.66646, at epoch 16
+Train batch 1/7 - 301.0ms/batch - loss: 0.56209 - diff: 44.97mlTrain batch 2/7 - 289.9ms/batch - loss: 0.57613 - diff: 46.09mlTrain batch 3/7 - 309.1ms/batch - loss: 0.53482 - diff: 42.79mlTrain batch 4/7 - 278.5ms/batch - loss: 0.54847 - diff: 43.88mlTrain batch 5/7 - 306.6ms/batch - loss: 0.54330 - diff: 43.46mlTrain batch 6/7 - 278.5ms/batch - loss: 0.55847 - diff: 44.68mlTrain batch 7/7 - 87.5ms/batch - loss: 0.60607 - diff: 44.29mlTrain batch 7/7 - 16.7s 87.5ms/batch - loss: 0.60607 - diff: 44.29ml
+Test 1.4s: val_loss: 0.65132 - diff: 43.45ml
+Saving new best model in models/checkpoints/2CH_preproc1_150x150_bySlices_dataset_allViews_Diastole_VGG19_Adam-0.001_MAE_DA3_best
+
+Epoch 21: current best loss = 0.65132, at epoch 20
+Train batch 1/7 - 298.4ms/batch - loss: 0.70966 - diff: 56.77mlTrain batch 2/7 - 277.8ms/batch - loss: 0.59555 - diff: 47.64mlTrain batch 3/7 - 305.4ms/batch - loss: 0.53249 - diff: 42.60mlTrain batch 4/7 - 277.8ms/batch - loss: 0.55002 - diff: 44.00mlTrain batch 5/7 - 291.1ms/batch - loss: 0.55171 - diff: 44.14mlTrain batch 6/7 - 279.1ms/batch - loss: 0.54250 - diff: 43.40mlTrain batch 7/7 - 87.4ms/batch - loss: 0.61324 - diff: 43.51mlTrain batch 7/7 - 16.8s 87.4ms/batch - loss: 0.61324 - diff: 43.51ml
+Test 1.1s: val_loss: 0.59994 - diff: 41.38ml
+Saving new best model in models/checkpoints/2CH_preproc1_150x150_bySlices_dataset_allViews_Diastole_VGG19_Adam-0.001_MAE_DA3_best
+
+Epoch 22: current best loss = 0.59994, at epoch 21
+Train batch 1/7 - 288.5ms/batch - loss: 0.58463 - diff: 46.77mlTrain batch 2/7 - 288.6ms/batch - loss: 0.50082 - diff: 40.07mlTrain batch 3/7 - 286.4ms/batch - loss: 0.51366 - diff: 41.09mlTrain batch 4/7 - 280.1ms/batch - loss: 0.52797 - diff: 42.24mlTrain batch 5/7 - 286.3ms/batch - loss: 0.52791 - diff: 42.23mlTrain batch 6/7 - 278.6ms/batch - loss: 0.53119 - diff: 42.50mlTrain batch 7/7 - 87.4ms/batch - loss: 0.61081 - diff: 42.81mlTrain batch 7/7 - 17.7s 87.4ms/batch - loss: 0.61081 - diff: 42.81ml
+Test 1.3s: val_loss: 0.61429 - diff: 40.95ml
+
+Epoch 23: current best loss = 0.59994, at epoch 21
+Train batch 1/7 - 285.2ms/batch - loss: 0.48629 - diff: 38.90mlTrain batch 2/7 - 278.7ms/batch - loss: 0.47828 - diff: 38.26mlTrain batch 3/7 - 291.9ms/batch - loss: 0.50129 - diff: 40.10mlTrain batch 4/7 - 278.9ms/batch - loss: 0.50891 - diff: 40.71mlTrain batch 5/7 - 285.6ms/batch - loss: 0.50895 - diff: 40.72mlTrain batch 6/7 - 278.5ms/batch - loss: 0.52628 - diff: 42.10mlTrain batch 7/7 - 87.3ms/batch - loss: 0.64213 - diff: 43.16mlTrain batch 7/7 - 16.5s 87.3ms/batch - loss: 0.64213 - diff: 43.16ml
+Test 1.2s: val_loss: 0.67031 - diff: 44.94ml
+
+Epoch 24: current best loss = 0.59994, at epoch 21
+Train batch 1/7 - 297.9ms/batch - loss: 0.51815 - diff: 41.45mlTrain batch 2/7 - 277.9ms/batch - loss: 0.54222 - diff: 43.38mlTrain batch 3/7 - 298.2ms/batch - loss: 0.51387 - diff: 41.11mlTrain batch 4/7 - 277.5ms/batch - loss: 0.53528 - diff: 42.82mlTrain batch 5/7 - 304.6ms/batch - loss: 0.52708 - diff: 42.17mlTrain batch 6/7 - 277.7ms/batch - loss: 0.52628 - diff: 42.10mlTrain batch 7/7 - 87.3ms/batch - loss: 0.60527 - diff: 42.42mlTrain batch 7/7 - 16.9s 87.3ms/batch - loss: 0.60527 - diff: 42.42ml
+Test 1.4s: val_loss: 0.67738 - diff: 43.72ml
+
+Epoch 25: current best loss = 0.59994, at epoch 21
+Train batch 1/7 - 362.5ms/batch - loss: 0.49139 - diff: 39.31mlTrain batch 2/7 - 284.2ms/batch - loss: 0.59117 - diff: 47.29mlTrain batch 3/7 - 296.1ms/batch - loss: 0.57647 - diff: 46.12mlTrain batch 4/7 - 279.1ms/batch - loss: 0.56455 - diff: 45.16mlTrain batch 5/7 - 287.0ms/batch - loss: 0.54558 - diff: 43.65mlTrain batch 6/7 - 278.0ms/batch - loss: 0.53939 - diff: 43.15mlTrain batch 7/7 - 87.4ms/batch - loss: 0.61727 - diff: 43.41mlTrain batch 7/7 - 17.4s 87.4ms/batch - loss: 0.61727 - diff: 43.41ml
+Test 1.1s: val_loss: 0.67751 - diff: 45.01ml
+
+Epoch 26: current best loss = 0.59994, at epoch 21
+Train batch 1/7 - 296.7ms/batch - loss: 0.54947 - diff: 43.96mlTrain batch 2/7 - 283.4ms/batch - loss: 0.54215 - diff: 43.37mlTrain batch 3/7 - 301.7ms/batch - loss: 0.58123 - diff: 46.50mlTrain batch 4/7 - 277.7ms/batch - loss: 0.55326 - diff: 44.26mlTrain batch 5/7 - 300.8ms/batch - loss: 0.55283 - diff: 44.23mlTrain batch 6/7 - 277.7ms/batch - loss: 0.54861 - diff: 43.89mlTrain batch 7/7 - 88.2ms/batch - loss: 0.60932 - diff: 43.79mlTrain batch 7/7 - 16.9s 88.2ms/batch - loss: 0.60932 - diff: 43.79ml
+Test 1.4s: val_loss: 0.61769 - diff: 41.23ml
+
+Epoch 27: current best loss = 0.59994, at epoch 21
+Train batch 1/7 - 288.7ms/batch - loss: 0.54032 - diff: 43.23mlTrain batch 2/7 - 276.5ms/batch - loss: 0.49717 - diff: 39.77mlTrain batch 3/7 - 296.8ms/batch - loss: 0.53346 - diff: 42.68mlTrain batch 4/7 - 279.1ms/batch - loss: 0.53972 - diff: 43.18mlTrain batch 5/7 - 290.3ms/batch - loss: 0.55086 - diff: 44.07mlTrain batch 6/7 - 278.6ms/batch - loss: 0.54420 - diff: 43.54mlTrain batch 7/7 - 99.6ms/batch - loss: 0.60589 - diff: 43.46mlTrain batch 7/7 - 16.0s 99.6ms/batch - loss: 0.60589 - diff: 43.46ml
+Test 1.4s: val_loss: 0.64693 - diff: 42.42ml
+
+Epoch 28: current best loss = 0.59994, at epoch 21
+Train batch 1/7 - 295.2ms/batch - loss: 0.59919 - diff: 47.94mlTrain batch 2/7 - 291.8ms/batch - loss: 0.56580 - diff: 45.26mlTrain batch 3/7 - 285.3ms/batch - loss: 0.56761 - diff: 45.41mlTrain batch 4/7 - 278.6ms/batch - loss: 0.53992 - diff: 43.19mlTrain batch 5/7 - 284.8ms/batch - loss: 0.53194 - diff: 42.56mlTrain batch 6/7 - 280.5ms/batch - loss: 0.52629 - diff: 42.10mlTrain batch 7/7 - 87.5ms/batch - loss: 0.62862 - diff: 42.89mlTrain batch 7/7 - 16.1s 87.5ms/batch - loss: 0.62862 - diff: 42.89ml
+Test 1.3s: val_loss: 0.62904 - diff: 42.25ml
+
+Epoch 29: current best loss = 0.59994, at epoch 21
+Train batch 1/7 - 297.4ms/batch - loss: 0.59539 - diff: 47.63mlTrain batch 2/7 - 290.9ms/batch - loss: 0.55808 - diff: 44.65mlTrain batch 3/7 - 293.0ms/batch - loss: 0.56081 - diff: 44.86mlTrain batch 4/7 - 278.5ms/batch - loss: 0.54259 - diff: 43.41mlTrain batch 5/7 - 300.7ms/batch - loss: 0.55614 - diff: 44.49mlTrain batch 6/7 - 281.8ms/batch - loss: 0.55201 - diff: 44.16mlTrain batch 7/7 - 87.5ms/batch - loss: 0.61489 - diff: 44.09mlTrain batch 7/7 - 17.3s 87.5ms/batch - loss: 0.61489 - diff: 44.09ml
+Test 1.2s: val_loss: 0.65565 - diff: 43.83ml
+
+Epoch 30: current best loss = 0.59994, at epoch 21
+Train batch 1/7 - 330.6ms/batch - loss: 0.47326 - diff: 37.86mlTrain batch 2/7 - 281.9ms/batch - loss: 0.52201 - diff: 41.76mlTrain batch 3/7 - 295.6ms/batch - loss: 0.51606 - diff: 41.28mlTrain batch 4/7 - 284.7ms/batch - loss: 0.53222 - diff: 42.58mlTrain batch 5/7 - 284.7ms/batch - loss: 0.54170 - diff: 43.34mlTrain batch 6/7 - 278.8ms/batch - loss: 0.54250 - diff: 43.40mlTrain batch 7/7 - 87.5ms/batch - loss: 0.58973 - diff: 43.04mlTrain batch 7/7 - 15.9s 87.5ms/batch - loss: 0.58973 - diff: 43.04ml
+Test 1.1s: val_loss: 0.64019 - diff: 42.79ml
+
+Epoch 31: current best loss = 0.59994, at epoch 21
+Train batch 1/7 - 296.8ms/batch - loss: 0.50069 - diff: 40.05mlTrain batch 2/7 - 278.4ms/batch - loss: 0.58068 - diff: 46.45mlTrain batch 3/7 - 306.8ms/batch - loss: 0.56296 - diff: 45.04mlTrain batch 4/7 - 279.0ms/batch - loss: 0.54167 - diff: 43.33mlTrain batch 5/7 - 302.4ms/batch - loss: 0.54041 - diff: 43.23mlTrain batch 6/7 - 278.4ms/batch - loss: 0.52066 - diff: 41.65mlTrain batch 7/7 - 87.4ms/batch - loss: 0.63243 - diff: 42.64mlTrain batch 7/7 - 14.4s 87.4ms/batch - loss: 0.63243 - diff: 42.64ml
+Test 1.3s: val_loss: 0.71542 - diff: 46.24ml
+
+Epoch 32: current best loss = 0.59994, at epoch 21
+Train batch 1/7 - 304.0ms/batch - loss: 0.42188 - diff: 33.75mlTrain batch 2/7 - 278.5ms/batch - loss: 0.49639 - diff: 39.71mlTrain batch 3/7 - 290.6ms/batch - loss: 0.50871 - diff: 40.70mlTrain batch 4/7 - 278.4ms/batch - loss: 0.51068 - diff: 40.85mlTrain batch 5/7 - 298.5ms/batch - loss: 0.52913 - diff: 42.33mlTrain batch 6/7 - 278.4ms/batch - loss: 0.53200 - diff: 42.56mlTrain batch 7/7 - 87.4ms/batch - loss: 0.57647 - diff: 42.17mlTrain batch 7/7 - 16.8s 87.4ms/batch - loss: 0.57647 - diff: 42.17ml
+Test 1.3s: val_loss: 0.63743 - diff: 41.38ml
+Epoch    33: reducing learning rate of group 0 to 5.0000e-04.
+
+Epoch 33: current best loss = 0.59994, at epoch 21
+Train batch 1/7 - 294.3ms/batch - loss: 0.46698 - diff: 37.36mlTrain batch 2/7 - 278.7ms/batch - loss: 0.52008 - diff: 41.61mlTrain batch 3/7 - 300.4ms/batch - loss: 0.51731 - diff: 41.38mlTrain batch 4/7 - 278.3ms/batch - loss: 0.52227 - diff: 41.78mlTrain batch 5/7 - 307.2ms/batch - loss: 0.51109 - diff: 40.89mlTrain batch 6/7 - 298.4ms/batch - loss: 0.51235 - diff: 40.99mlTrain batch 7/7 - 87.4ms/batch - loss: 0.60407 - diff: 41.59mlTrain batch 7/7 - 16.2s 87.4ms/batch - loss: 0.60407 - diff: 41.59ml
+Test 1.3s: val_loss: 0.60543 - diff: 41.35ml
+
+Epoch 34: current best loss = 0.59994, at epoch 21
+Train batch 1/7 - 292.3ms/batch - loss: 0.45684 - diff: 36.55mlTrain batch 2/7 - 277.4ms/batch - loss: 0.48653 - diff: 38.92mlTrain batch 3/7 - 293.8ms/batch - loss: 0.52360 - diff: 41.89mlTrain batch 4/7 - 287.8ms/batch - loss: 0.53121 - diff: 42.50mlTrain batch 5/7 - 292.5ms/batch - loss: 0.54215 - diff: 43.37mlTrain batch 6/7 - 279.0ms/batch - loss: 0.53513 - diff: 42.81mlTrain batch 7/7 - 87.4ms/batch - loss: 0.61306 - diff: 43.08mlTrain batch 7/7 - 17.2s 87.4ms/batch - loss: 0.61306 - diff: 43.08ml
+Test 1.3s: val_loss: 0.63964 - diff: 44.48ml
+
+Epoch 35: current best loss = 0.59994, at epoch 21
+Train batch 1/7 - 296.7ms/batch - loss: 0.55928 - diff: 44.74mlTrain batch 2/7 - 283.8ms/batch - loss: 0.61510 - diff: 49.21mlTrain batch 3/7 - 302.3ms/batch - loss: 0.58291 - diff: 46.63mlTrain batch 4/7 - 288.7ms/batch - loss: 0.55484 - diff: 44.39mlTrain batch 5/7 - 279.2ms/batch - loss: 0.53898 - diff: 43.12mlTrain batch 6/7 - 291.0ms/batch - loss: 0.54705 - diff: 43.76mlTrain batch 7/7 - 87.4ms/batch - loss: 0.61329 - diff: 43.78mlTrain batch 7/7 - 16.1s 87.4ms/batch - loss: 0.61329 - diff: 43.78ml
+Test 1.2s: val_loss: 0.64669 - diff: 41.87ml
+
+Epoch 36: current best loss = 0.59994, at epoch 21
+Train batch 1/7 - 296.8ms/batch - loss: 0.51841 - diff: 41.47mlTrain batch 2/7 - 278.4ms/batch - loss: 0.52195 - diff: 41.76mlTrain batch 3/7 - 287.8ms/batch - loss: 0.52635 - diff: 42.11mlTrain batch 4/7 - 288.1ms/batch - loss: 0.50588 - diff: 40.47mlTrain batch 5/7 - 284.8ms/batch - loss: 0.52168 - diff: 41.73mlTrain batch 6/7 - 279.0ms/batch - loss: 0.52738 - diff: 42.19mlTrain batch 7/7 - 87.4ms/batch - loss: 0.60033 - diff: 42.38mlTrain batch 7/7 - 16.8s 87.4ms/batch - loss: 0.60033 - diff: 42.38ml
+Test 1.3s: val_loss: 0.66639 - diff: 43.63ml
+
+Epoch 37: current best loss = 0.59994, at epoch 21
+Train batch 1/7 - 300.2ms/batch - loss: 0.53814 - diff: 43.05mlTrain batch 2/7 - 278.8ms/batch - loss: 0.53838 - diff: 43.07mlTrain batch 3/7 - 287.7ms/batch - loss: 0.57316 - diff: 45.85mlTrain batch 4/7 - 278.7ms/batch - loss: 0.55632 - diff: 44.51mlTrain batch 5/7 - 298.6ms/batch - loss: 0.53508 - diff: 42.81mlTrain batch 6/7 - 278.8ms/batch - loss: 0.51600 - diff: 41.28mlTrain batch 7/7 - 87.7ms/batch - loss: 0.57770 - diff: 41.28mlTrain batch 7/7 - 16.5s 87.7ms/batch - loss: 0.57770 - diff: 41.28ml
+Test 1.4s: val_loss: 0.72576 - diff: 48.64ml
+
+Epoch 38: current best loss = 0.59994, at epoch 21
+Train batch 1/7 - 303.4ms/batch - loss: 0.58671 - diff: 46.94mlTrain batch 2/7 - 275.4ms/batch - loss: 0.54625 - diff: 43.70mlTrain batch 3/7 - 291.7ms/batch - loss: 0.53398 - diff: 42.72mlTrain batch 4/7 - 278.4ms/batch - loss: 0.52753 - diff: 42.20mlTrain batch 5/7 - 293.5ms/batch - loss: 0.52293 - diff: 41.83mlTrain batch 6/7 - 279.0ms/batch - loss: 0.52650 - diff: 42.12mlTrain batch 7/7 - 87.4ms/batch - loss: 0.58273 - diff: 41.98mlTrain batch 7/7 - 16.8s 87.4ms/batch - loss: 0.58273 - diff: 41.98ml
+Test 1.4s: val_loss: 0.65180 - diff: 43.87ml
+
+Epoch 39: current best loss = 0.59994, at epoch 21
+Train batch 1/7 - 293.8ms/batch - loss: 0.48668 - diff: 38.93mlTrain batch 2/7 - 278.1ms/batch - loss: 0.47746 - diff: 38.20mlTrain batch 3/7 - 284.7ms/batch - loss: 0.50268 - diff: 40.21mlTrain batch 4/7 - 278.8ms/batch - loss: 0.52030 - diff: 41.62mlTrain batch 5/7 - 296.5ms/batch - loss: 0.52410 - diff: 41.93mlTrain batch 6/7 - 278.5ms/batch - loss: 0.52948 - diff: 42.36mlTrain batch 7/7 - 90.4ms/batch - loss: 0.57911 - diff: 42.08mlTrain batch 7/7 - 17.3s 90.4ms/batch - loss: 0.57911 - diff: 42.08ml
+Test 1.3s: val_loss: 0.65539 - diff: 44.71ml
+
+Epoch 40: current best loss = 0.59994, at epoch 21
+Train batch 1/7 - 293.1ms/batch - loss: 0.69544 - diff: 55.64mlTrain batch 2/7 - 278.5ms/batch - loss: 0.56595 - diff: 45.28mlTrain batch 3/7 - 293.5ms/batch - loss: 0.54699 - diff: 43.76mlTrain batch 4/7 - 278.7ms/batch - loss: 0.51479 - diff: 41.18mlTrain batch 5/7 - 293.4ms/batch - loss: 0.52285 - diff: 41.83mlTrain batch 6/7 - 278.4ms/batch - loss: 0.52857 - diff: 42.29mlTrain batch 7/7 - 87.3ms/batch - loss: 0.59374 - diff: 42.32mlTrain batch 7/7 - 17.6s 87.3ms/batch - loss: 0.59374 - diff: 42.32ml
+Test 1.3s: val_loss: 0.71370 - diff: 45.56ml
+
+Epoch 41: current best loss = 0.59994, at epoch 21
+Train batch 1/7 - 300.7ms/batch - loss: 0.48639 - diff: 38.91mlTrain batch 2/7 - 286.0ms/batch - loss: 0.46998 - diff: 37.60mlTrain batch 3/7 - 303.1ms/batch - loss: 0.50724 - diff: 40.58mlTrain batch 4/7 - 278.4ms/batch - loss: 0.49702 - diff: 39.76mlTrain batch 5/7 - 296.6ms/batch - loss: 0.50945 - diff: 40.76mlTrain batch 6/7 - 278.8ms/batch - loss: 0.50670 - diff: 40.54mlTrain batch 7/7 - 95.3ms/batch - loss: 0.57777 - diff: 40.74mlTrain batch 7/7 - 16.7s 95.3ms/batch - loss: 0.57777 - diff: 40.74ml
+Test 1.2s: val_loss: 0.67887 - diff: 43.42ml
+
+Epoch 42: current best loss = 0.59994, at epoch 21
+Train batch 1/7 - 296.6ms/batch - loss: 0.45388 - diff: 36.31mlTrain batch 2/7 - 278.3ms/batch - loss: 0.50664 - diff: 40.53mlTrain batch 3/7 - 287.5ms/batch - loss: 0.51078 - diff: 40.86mlTrain batch 4/7 - 278.2ms/batch - loss: 0.51347 - diff: 41.08mlTrain batch 5/7 - 305.5ms/batch - loss: 0.51693 - diff: 41.35mlTrain batch 6/7 - 278.2ms/batch - loss: 0.51575 - diff: 41.26mlTrain batch 7/7 - 87.7ms/batch - loss: 0.59439 - diff: 41.59mlTrain batch 7/7 - 16.4s 87.7ms/batch - loss: 0.59439 - diff: 41.59ml
+Test 1.4s: val_loss: 0.63873 - diff: 41.92ml
+
+Epoch 43: current best loss = 0.59994, at epoch 21
+Train batch 1/7 - 291.7ms/batch - loss: 0.46342 - diff: 37.07mlTrain batch 2/7 - 289.3ms/batch - loss: 0.49688 - diff: 39.75mlTrain batch 3/7 - 304.3ms/batch - loss: 0.51096 - diff: 40.88mlTrain batch 4/7 - 278.5ms/batch - loss: 0.49606 - diff: 39.68mlTrain batch 5/7 - 286.1ms/batch - loss: 0.51401 - diff: 41.12mlTrain batch 6/7 - 279.2ms/batch - loss: 0.53070 - diff: 42.46mlTrain batch 7/7 - 87.6ms/batch - loss: 0.57348 - diff: 42.04mlTrain batch 7/7 - 17.2s 87.6ms/batch - loss: 0.57348 - diff: 42.04ml
+Test 1.2s: val_loss: 0.64720 - diff: 43.18ml
+Epoch    44: reducing learning rate of group 0 to 2.5000e-04.
+
+Epoch 44: current best loss = 0.59994, at epoch 21
+Train batch 1/7 - 283.1ms/batch - loss: 0.55092 - diff: 44.07mlTrain batch 2/7 - 281.4ms/batch - loss: 0.58188 - diff: 46.55mlTrain batch 3/7 - 292.1ms/batch - loss: 0.54289 - diff: 43.43mlTrain batch 4/7 - 278.8ms/batch - loss: 0.52908 - diff: 42.33mlTrain batch 5/7 - 286.2ms/batch - loss: 0.52922 - diff: 42.34mlTrain batch 6/7 - 279.8ms/batch - loss: 0.53129 - diff: 42.50mlTrain batch 7/7 - 87.3ms/batch - loss: 0.57217 - diff: 42.05mlTrain batch 7/7 - 16.7s 87.3ms/batch - loss: 0.57217 - diff: 42.05ml
+Test 1.3s: val_loss: 0.63503 - diff: 43.18ml
+
+Epoch 45: current best loss = 0.59994, at epoch 21
+Going to unfreeze the pretrained weights
+Train batch 1/7 - 456.8ms/batch - loss: 0.51988 - diff: 41.59mlTrain batch 2/7 - 385.1ms/batch - loss: 8.04113 - diff: 643.29mlTrain batch 3/7 - 412.4ms/batch - loss: 5.84978 - diff: 467.98mlTrain batch 4/7 - 390.0ms/batch - loss: 4.68015 - diff: 374.41mlTrain batch 5/7 - 389.0ms/batch - loss: 3.88058 - diff: 310.45mlTrain batch 6/7 - 383.2ms/batch - loss: 3.54590 - diff: 283.67mlTrain batch 7/7 - 118.9ms/batch - loss: 3.49449 - diff: 274.13mlTrain batch 7/7 - 16.9s 118.9ms/batch - loss: 3.49449 - diff: 274.13ml
+Test 1.3s: val_loss: 1.36073 - diff: 90.24ml
+
+Epoch 46: current best loss = 0.59994, at epoch 21
+Train batch 1/7 - 388.3ms/batch - loss: 0.88510 - diff: 70.81mlTrain batch 2/7 - 383.6ms/batch - loss: 0.99508 - diff: 79.61mlTrain batch 3/7 - 416.4ms/batch - loss: 0.93931 - diff: 75.14mlTrain batch 4/7 - 383.9ms/batch - loss: 0.86946 - diff: 69.56mlTrain batch 5/7 - 396.4ms/batch - loss: 0.84312 - diff: 67.45mlTrain batch 6/7 - 403.0ms/batch - loss: 0.80474 - diff: 64.38mlTrain batch 7/7 - 119.4ms/batch - loss: 0.87345 - diff: 63.82mlTrain batch 7/7 - 15.4s 119.4ms/batch - loss: 0.87345 - diff: 63.82ml
+Test 1.3s: val_loss: 0.87682 - diff: 59.08ml
+
+Epoch 47: current best loss = 0.59994, at epoch 21
+Train batch 1/7 - 399.1ms/batch - loss: 0.67994 - diff: 54.39mlTrain batch 2/7 - 383.8ms/batch - loss: 0.64786 - diff: 51.83mlTrain batch 3/7 - 396.4ms/batch - loss: 0.66245 - diff: 53.00mlTrain batch 4/7 - 389.6ms/batch - loss: 0.68365 - diff: 54.69mlTrain batch 5/7 - 403.8ms/batch - loss: 0.65994 - diff: 52.79mlTrain batch 6/7 - 383.1ms/batch - loss: 0.68411 - diff: 54.73mlTrain batch 7/7 - 118.6ms/batch - loss: 0.77666 - diff: 54.94mlTrain batch 7/7 - 17.1s 118.6ms/batch - loss: 0.77666 - diff: 54.94ml
+Test 1.4s: val_loss: 0.71203 - diff: 47.15ml
+
+Epoch 48: current best loss = 0.59994, at epoch 21
+Train batch 1/7 - 394.4ms/batch - loss: 0.65092 - diff: 52.07mlTrain batch 2/7 - 383.3ms/batch - loss: 0.60528 - diff: 48.42mlTrain batch 3/7 - 400.8ms/batch - loss: 0.66328 - diff: 53.06mlTrain batch 4/7 - 393.8ms/batch - loss: 0.63254 - diff: 50.60mlTrain batch 5/7 - 393.4ms/batch - loss: 0.64354 - diff: 51.48mlTrain batch 6/7 - 384.6ms/batch - loss: 0.64360 - diff: 51.49mlTrain batch 7/7 - 126.9ms/batch - loss: 0.68733 - diff: 50.82mlTrain batch 7/7 - 16.3s 126.9ms/batch - loss: 0.68733 - diff: 50.82ml
+Test 1.2s: val_loss: 0.74028 - diff: 49.58ml
+
+Epoch 49: current best loss = 0.59994, at epoch 21
+Train batch 1/7 - 397.9ms/batch - loss: 0.55974 - diff: 44.78mlTrain batch 2/7 - 383.7ms/batch - loss: 0.58224 - diff: 46.58mlTrain batch 3/7 - 395.2ms/batch - loss: 0.55473 - diff: 44.38mlTrain batch 4/7 - 393.9ms/batch - loss: 0.57234 - diff: 45.79mlTrain batch 5/7 - 393.0ms/batch - loss: 0.59244 - diff: 47.40mlTrain batch 6/7 - 384.4ms/batch - loss: 0.58078 - diff: 46.46mlTrain batch 7/7 - 118.9ms/batch - loss: 0.62910 - diff: 46.03mlTrain batch 7/7 - 17.0s 118.9ms/batch - loss: 0.62910 - diff: 46.03ml
+Test 1.4s: val_loss: 0.61467 - diff: 41.57ml
+
+Epoch 50: current best loss = 0.59994, at epoch 21
+Train batch 1/7 - 404.6ms/batch - loss: 0.57205 - diff: 45.76mlTrain batch 2/7 - 383.8ms/batch - loss: 0.55364 - diff: 44.29mlTrain batch 3/7 - 398.0ms/batch - loss: 0.54425 - diff: 43.54mlTrain batch 4/7 - 387.8ms/batch - loss: 0.56364 - diff: 45.09mlTrain batch 5/7 - 391.5ms/batch - loss: 0.58302 - diff: 46.64mlTrain batch 6/7 - 401.0ms/batch - loss: 0.56390 - diff: 45.11mlTrain batch 7/7 - 121.8ms/batch - loss: 0.61819 - diff: 44.84mlTrain batch 7/7 - 17.0s 121.8ms/batch - loss: 0.61819 - diff: 44.84ml
+Test 1.1s: val_loss: 0.67549 - diff: 45.89ml
+
+Epoch 51: current best loss = 0.59994, at epoch 21
+Train batch 1/7 - 399.5ms/batch - loss: 0.58480 - diff: 46.78mlTrain batch 2/7 - 391.3ms/batch - loss: 0.54109 - diff: 43.29mlTrain batch 3/7 - 403.8ms/batch - loss: 0.52727 - diff: 42.18mlTrain batch 4/7 - 383.6ms/batch - loss: 0.51472 - diff: 41.18mlTrain batch 5/7 - 391.8ms/batch - loss: 0.51700 - diff: 41.36mlTrain batch 6/7 - 384.3ms/batch - loss: 0.52897 - diff: 42.32mlTrain batch 7/7 - 118.6ms/batch - loss: 0.62909 - diff: 43.05mlTrain batch 7/7 - 17.7s 118.6ms/batch - loss: 0.62909 - diff: 43.05ml
+Test 1.4s: val_loss: 0.48898 - diff: 33.95ml
+Saving new best model in models/checkpoints/2CH_preproc1_150x150_bySlices_dataset_allViews_Diastole_VGG19_Adam-0.001_MAE_DA3_best
+
+Epoch 52: current best loss = 0.48898, at epoch 51
+Train batch 1/7 - 389.1ms/batch - loss: 0.51582 - diff: 41.27mlTrain batch 2/7 - 389.0ms/batch - loss: 0.51608 - diff: 41.29mlTrain batch 3/7 - 416.1ms/batch - loss: 0.51479 - diff: 41.18mlTrain batch 4/7 - 390.2ms/batch - loss: 0.50338 - diff: 40.27mlTrain batch 5/7 - 402.8ms/batch - loss: 0.54192 - diff: 43.35mlTrain batch 6/7 - 383.3ms/batch - loss: 0.54281 - diff: 43.43mlTrain batch 7/7 - 119.4ms/batch - loss: 0.60146 - diff: 43.30mlTrain batch 7/7 - 17.4s 119.4ms/batch - loss: 0.60146 - diff: 43.30ml
+Test 1.3s: val_loss: 0.59003 - diff: 40.38ml
+
+Epoch 53: current best loss = 0.48898, at epoch 51
+Train batch 1/7 - 403.2ms/batch - loss: 0.56865 - diff: 45.49mlTrain batch 2/7 - 382.7ms/batch - loss: 0.55272 - diff: 44.22mlTrain batch 3/7 - 416.7ms/batch - loss: 0.48876 - diff: 39.10mlTrain batch 4/7 - 383.6ms/batch - loss: 0.49986 - diff: 39.99mlTrain batch 5/7 - 397.1ms/batch - loss: 0.49057 - diff: 39.25mlTrain batch 6/7 - 383.1ms/batch - loss: 0.48359 - diff: 38.69mlTrain batch 7/7 - 126.5ms/batch - loss: 0.53438 - diff: 38.54mlTrain batch 7/7 - 15.6s 126.5ms/batch - loss: 0.53438 - diff: 38.54ml
+Test 1.4s: val_loss: 0.57964 - diff: 37.96ml
+
+Epoch 54: current best loss = 0.48898, at epoch 51
+Train batch 1/7 - 400.0ms/batch - loss: 0.47110 - diff: 37.69mlTrain batch 2/7 - 391.5ms/batch - loss: 0.52176 - diff: 41.74mlTrain batch 3/7 - 389.5ms/batch - loss: 0.49021 - diff: 39.22mlTrain batch 4/7 - 397.1ms/batch - loss: 0.47967 - diff: 38.37mlTrain batch 5/7 - 403.5ms/batch - loss: 0.46686 - diff: 37.35mlTrain batch 6/7 - 382.7ms/batch - loss: 0.45291 - diff: 36.23mlTrain batch 7/7 - 119.0ms/batch - loss: 0.48632 - diff: 35.81mlTrain batch 7/7 - 17.1s 119.0ms/batch - loss: 0.48632 - diff: 35.81ml
+Test 1.3s: val_loss: 0.42136 - diff: 28.37ml
+Saving new best model in models/checkpoints/2CH_preproc1_150x150_bySlices_dataset_allViews_Diastole_VGG19_Adam-0.001_MAE_DA3_best
+
+Epoch 55: current best loss = 0.42136, at epoch 54
+Train batch 1/7 - 408.1ms/batch - loss: 0.38611 - diff: 30.89mlTrain batch 2/7 - 382.3ms/batch - loss: 0.41433 - diff: 33.15mlTrain batch 3/7 - 388.5ms/batch - loss: 0.41346 - diff: 33.08mlTrain batch 4/7 - 382.6ms/batch - loss: 0.40253 - diff: 32.20mlTrain batch 5/7 - 402.3ms/batch - loss: 0.39978 - diff: 31.98mlTrain batch 6/7 - 384.1ms/batch - loss: 0.39431 - diff: 31.54mlTrain batch 7/7 - 123.2ms/batch - loss: 0.44492 - diff: 31.61mlTrain batch 7/7 - 17.6s 123.2ms/batch - loss: 0.44492 - diff: 31.61ml
+Test 1.3s: val_loss: 0.76053 - diff: 49.97ml
+
+Epoch 56: current best loss = 0.42136, at epoch 54
+Train batch 1/7 - 395.6ms/batch - loss: 0.55721 - diff: 44.58mlTrain batch 2/7 - 383.6ms/batch - loss: 0.51121 - diff: 40.90mlTrain batch 3/7 - 409.4ms/batch - loss: 0.52180 - diff: 41.74mlTrain batch 4/7 - 383.1ms/batch - loss: 0.48866 - diff: 39.09mlTrain batch 5/7 - 402.8ms/batch - loss: 0.50138 - diff: 40.11mlTrain batch 6/7 - 383.7ms/batch - loss: 0.48448 - diff: 38.76mlTrain batch 7/7 - 118.7ms/batch - loss: 0.56139 - diff: 39.13mlTrain batch 7/7 - 16.7s 118.7ms/batch - loss: 0.56139 - diff: 39.13ml
+Test 1.2s: val_loss: 0.81974 - diff: 54.24ml
+
+Epoch 57: current best loss = 0.42136, at epoch 54
+Train batch 1/7 - 405.6ms/batch - loss: 0.67334 - diff: 53.87mlTrain batch 2/7 - 389.5ms/batch - loss: 0.58532 - diff: 46.83mlTrain batch 3/7 - 397.8ms/batch - loss: 0.54522 - diff: 43.62mlTrain batch 4/7 - 384.7ms/batch - loss: 0.54904 - diff: 43.92mlTrain batch 5/7 - 395.2ms/batch - loss: 0.52602 - diff: 42.08mlTrain batch 6/7 - 384.4ms/batch - loss: 0.52707 - diff: 42.17mlTrain batch 7/7 - 118.5ms/batch - loss: 0.58181 - diff: 42.00mlTrain batch 7/7 - 16.7s 118.5ms/batch - loss: 0.58181 - diff: 42.00ml
+Test 1.3s: val_loss: 0.42945 - diff: 28.32ml
+
+Epoch 58: current best loss = 0.42136, at epoch 54
+Train batch 1/7 - 403.7ms/batch - loss: 0.36399 - diff: 29.12mlTrain batch 2/7 - 381.6ms/batch - loss: 0.44631 - diff: 35.70mlTrain batch 3/7 - 406.9ms/batch - loss: 0.45275 - diff: 36.22mlTrain batch 4/7 - 383.2ms/batch - loss: 0.43637 - diff: 34.91mlTrain batch 5/7 - 405.0ms/batch - loss: 0.44100 - diff: 35.28mlTrain batch 6/7 - 383.5ms/batch - loss: 0.44169 - diff: 35.34mlTrain batch 7/7 - 119.0ms/batch - loss: 0.47455 - diff: 34.93mlTrain batch 7/7 - 17.6s 119.0ms/batch - loss: 0.47455 - diff: 34.93ml
+Test 1.3s: val_loss: 0.47004 - diff: 31.68ml
+
+Epoch 59: current best loss = 0.42136, at epoch 54
+Train batch 1/7 - 387.8ms/batch - loss: 0.36853 - diff: 29.48mlTrain batch 2/7 - 383.6ms/batch - loss: 0.36951 - diff: 29.56mlTrain batch 3/7 - 406.4ms/batch - loss: 0.38777 - diff: 31.02mlTrain batch 4/7 - 384.2ms/batch - loss: 0.37604 - diff: 30.08mlTrain batch 5/7 - 431.8ms/batch - loss: 0.37760 - diff: 30.21mlTrain batch 6/7 - 393.9ms/batch - loss: 0.38025 - diff: 30.42mlTrain batch 7/7 - 118.6ms/batch - loss: 0.42031 - diff: 30.31mlTrain batch 7/7 - 17.1s 118.6ms/batch - loss: 0.42031 - diff: 30.31ml
+Test 1.4s: val_loss: 0.40542 - diff: 27.09ml
+Saving new best model in models/checkpoints/2CH_preproc1_150x150_bySlices_dataset_allViews_Diastole_VGG19_Adam-0.001_MAE_DA3_best
+
+Epoch 60: current best loss = 0.40542, at epoch 59
+Train batch 1/7 - 393.7ms/batch - loss: 0.37923 - diff: 30.34mlTrain batch 2/7 - 383.1ms/batch - loss: 0.39032 - diff: 31.23mlTrain batch 3/7 - 406.1ms/batch - loss: 0.39082 - diff: 31.27mlTrain batch 4/7 - 383.6ms/batch - loss: 0.40256 - diff: 32.20mlTrain batch 5/7 - 401.3ms/batch - loss: 0.38661 - diff: 30.93mlTrain batch 6/7 - 384.0ms/batch - loss: 0.37224 - diff: 29.78mlTrain batch 7/7 - 119.1ms/batch - loss: 0.42101 - diff: 29.86mlTrain batch 7/7 - 16.4s 119.1ms/batch - loss: 0.42101 - diff: 29.86ml
+Test 1.4s: val_loss: 0.50992 - diff: 34.66ml
+
+Epoch 61: current best loss = 0.40542, at epoch 59
+Train batch 1/7 - 402.9ms/batch - loss: 0.45759 - diff: 36.61mlTrain batch 2/7 - 383.7ms/batch - loss: 0.41723 - diff: 33.38mlTrain batch 3/7 - 407.7ms/batch - loss: 0.41892 - diff: 33.51mlTrain batch 4/7 - 383.7ms/batch - loss: 0.41118 - diff: 32.89mlTrain batch 5/7 - 415.0ms/batch - loss: 0.42192 - diff: 33.75mlTrain batch 6/7 - 383.9ms/batch - loss: 0.40708 - diff: 32.57mlTrain batch 7/7 - 127.5ms/batch - loss: 0.45315 - diff: 32.51mlTrain batch 7/7 - 15.9s 127.5ms/batch - loss: 0.45315 - diff: 32.51ml
+Test 1.2s: val_loss: 0.48618 - diff: 31.80ml
+
+Epoch 62: current best loss = 0.40542, at epoch 59
+Train batch 1/7 - 398.9ms/batch - loss: 0.39287 - diff: 31.43mlTrain batch 2/7 - 391.3ms/batch - loss: 0.37425 - diff: 29.94mlTrain batch 3/7 - 396.7ms/batch - loss: 0.39311 - diff: 31.45mlTrain batch 4/7 - 384.2ms/batch - loss: 0.39067 - diff: 31.25mlTrain batch 5/7 - 402.6ms/batch - loss: 0.44194 - diff: 35.36mlTrain batch 6/7 - 383.7ms/batch - loss: 0.42189 - diff: 33.75mlTrain batch 7/7 - 118.7ms/batch - loss: 0.47895 - diff: 33.88mlTrain batch 7/7 - 19.0s 118.7ms/batch - loss: 0.47895 - diff: 33.88ml
+Test 1.4s: val_loss: 0.57415 - diff: 38.52ml
+
+Epoch 63: current best loss = 0.40542, at epoch 59
+Train batch 1/7 - 398.2ms/batch - loss: 0.48317 - diff: 38.65mlTrain batch 2/7 - 384.5ms/batch - loss: 0.42894 - diff: 34.32mlTrain batch 3/7 - 402.0ms/batch - loss: 0.44572 - diff: 35.66mlTrain batch 4/7 - 383.2ms/batch - loss: 0.41022 - diff: 32.82mlTrain batch 5/7 - 395.6ms/batch - loss: 0.42865 - diff: 34.29mlTrain batch 6/7 - 382.7ms/batch - loss: 0.40698 - diff: 32.56mlTrain batch 7/7 - 118.7ms/batch - loss: 0.46810 - diff: 32.80mlTrain batch 7/7 - 16.0s 118.7ms/batch - loss: 0.46810 - diff: 32.80ml
+Test 1.4s: val_loss: 0.44333 - diff: 30.43ml
+
+Epoch 64: current best loss = 0.40542, at epoch 59
+Train batch 1/7 - 402.3ms/batch - loss: 0.40620 - diff: 32.50mlTrain batch 2/7 - 388.9ms/batch - loss: 0.35684 - diff: 28.55mlTrain batch 3/7 - 407.5ms/batch - loss: 0.37272 - diff: 29.82mlTrain batch 4/7 - 381.9ms/batch - loss: 0.37133 - diff: 29.71mlTrain batch 5/7 - 389.8ms/batch - loss: 0.36821 - diff: 29.46mlTrain batch 6/7 - 383.6ms/batch - loss: 0.38516 - diff: 30.81mlTrain batch 7/7 - 118.7ms/batch - loss: 0.43422 - diff: 30.87mlTrain batch 7/7 - 16.3s 118.7ms/batch - loss: 0.43422 - diff: 30.87ml
+Test 1.3s: val_loss: 0.37668 - diff: 25.56ml
+Saving new best model in models/checkpoints/2CH_preproc1_150x150_bySlices_dataset_allViews_Diastole_VGG19_Adam-0.001_MAE_DA3_best
+
+Epoch 65: current best loss = 0.37668, at epoch 64
+Train batch 1/7 - 398.2ms/batch - loss: 0.31549 - diff: 25.24mlTrain batch 2/7 - 383.1ms/batch - loss: 0.33510 - diff: 26.81mlTrain batch 3/7 - 405.9ms/batch - loss: 0.32271 - diff: 25.82mlTrain batch 4/7 - 383.3ms/batch - loss: 0.32810 - diff: 26.25mlTrain batch 5/7 - 397.7ms/batch - loss: 0.36085 - diff: 28.87mlTrain batch 6/7 - 403.3ms/batch - loss: 0.34499 - diff: 27.60mlTrain batch 7/7 - 119.6ms/batch - loss: 0.38597 - diff: 27.59mlTrain batch 7/7 - 15.3s 119.6ms/batch - loss: 0.38597 - diff: 27.59ml
+Test 1.3s: val_loss: 0.36619 - diff: 24.30ml
+Saving new best model in models/checkpoints/2CH_preproc1_150x150_bySlices_dataset_allViews_Diastole_VGG19_Adam-0.001_MAE_DA3_best
+
+Epoch 66: current best loss = 0.36619, at epoch 65
+Train batch 1/7 - 387.5ms/batch - loss: 0.29460 - diff: 23.57mlTrain batch 2/7 - 383.5ms/batch - loss: 0.28800 - diff: 23.04mlTrain batch 3/7 - 402.2ms/batch - loss: 0.30878 - diff: 24.70mlTrain batch 4/7 - 382.2ms/batch - loss: 0.32187 - diff: 25.75mlTrain batch 5/7 - 388.2ms/batch - loss: 0.32568 - diff: 26.05mlTrain batch 6/7 - 383.9ms/batch - loss: 0.32435 - diff: 25.95mlTrain batch 7/7 - 118.5ms/batch - loss: 0.36338 - diff: 25.95mlTrain batch 7/7 - 17.5s 118.5ms/batch - loss: 0.36338 - diff: 25.95ml
+Test 1.3s: val_loss: 0.41416 - diff: 28.29ml
+
+Epoch 67: current best loss = 0.36619, at epoch 65
+Train batch 1/7 - 420.8ms/batch - loss: 0.38708 - diff: 30.97mlTrain batch 2/7 - 395.9ms/batch - loss: 0.33461 - diff: 26.77mlTrain batch 3/7 - 398.9ms/batch - loss: 0.34719 - diff: 27.78mlTrain batch 4/7 - 391.0ms/batch - loss: 0.35911 - diff: 28.73mlTrain batch 5/7 - 396.1ms/batch - loss: 0.36234 - diff: 28.99mlTrain batch 6/7 - 383.8ms/batch - loss: 0.35822 - diff: 28.66mlTrain batch 7/7 - 119.1ms/batch - loss: 0.39280 - diff: 28.49mlTrain batch 7/7 - 16.6s 119.1ms/batch - loss: 0.39280 - diff: 28.49ml
+Test 1.2s: val_loss: 0.45627 - diff: 29.72ml
+
+Epoch 68: current best loss = 0.36619, at epoch 65
+Train batch 1/7 - 391.7ms/batch - loss: 0.41122 - diff: 32.90mlTrain batch 2/7 - 391.6ms/batch - loss: 0.35322 - diff: 28.26mlTrain batch 3/7 - 389.0ms/batch - loss: 0.36058 - diff: 28.85mlTrain batch 4/7 - 382.7ms/batch - loss: 0.37731 - diff: 30.18mlTrain batch 5/7 - 399.4ms/batch - loss: 0.36762 - diff: 29.41mlTrain batch 6/7 - 384.5ms/batch - loss: 0.38040 - diff: 30.43mlTrain batch 7/7 - 119.1ms/batch - loss: 0.42354 - diff: 30.38mlTrain batch 7/7 - 18.3s 119.1ms/batch - loss: 0.42354 - diff: 30.38ml
+Test 1.4s: val_loss: 0.53381 - diff: 34.20ml
+
+Epoch 69: current best loss = 0.36619, at epoch 65
+Train batch 1/7 - 406.5ms/batch - loss: 0.40796 - diff: 32.64mlTrain batch 2/7 - 383.8ms/batch - loss: 0.38390 - diff: 30.71mlTrain batch 3/7 - 418.3ms/batch - loss: 0.37465 - diff: 29.97mlTrain batch 4/7 - 380.7ms/batch - loss: 0.38287 - diff: 30.63mlTrain batch 5/7 - 401.0ms/batch - loss: 0.37222 - diff: 29.78mlTrain batch 6/7 - 383.4ms/batch - loss: 0.37780 - diff: 30.22mlTrain batch 7/7 - 123.2ms/batch - loss: 0.39432 - diff: 29.65mlTrain batch 7/7 - 18.0s 123.2ms/batch - loss: 0.39432 - diff: 29.65ml
+Test 1.3s: val_loss: 0.37702 - diff: 23.78ml
+
+Epoch 70: current best loss = 0.36619, at epoch 65
+Train batch 1/7 - 389.9ms/batch - loss: 0.37213 - diff: 29.77mlTrain batch 2/7 - 383.6ms/batch - loss: 0.33781 - diff: 27.02mlTrain batch 3/7 - 414.5ms/batch - loss: 0.32016 - diff: 25.61mlTrain batch 4/7 - 383.5ms/batch - loss: 0.31156 - diff: 24.93mlTrain batch 5/7 - 398.4ms/batch - loss: 0.31607 - diff: 25.29mlTrain batch 6/7 - 387.6ms/batch - loss: 0.30643 - diff: 24.51mlTrain batch 7/7 - 124.1ms/batch - loss: 0.34848 - diff: 24.62mlTrain batch 7/7 - 17.2s 124.1ms/batch - loss: 0.34848 - diff: 24.62ml
+Test 1.3s: val_loss: 0.43812 - diff: 29.90ml
+
+Epoch 71: current best loss = 0.36619, at epoch 65
+Train batch 1/7 - 403.5ms/batch - loss: 0.35514 - diff: 28.41mlTrain batch 2/7 - 391.9ms/batch - loss: 0.34827 - diff: 27.86mlTrain batch 3/7 - 398.8ms/batch - loss: 0.36110 - diff: 28.89mlTrain batch 4/7 - 383.6ms/batch - loss: 0.35867 - diff: 28.69mlTrain batch 5/7 - 395.1ms/batch - loss: 0.36193 - diff: 28.95mlTrain batch 6/7 - 383.2ms/batch - loss: 0.36078 - diff: 28.86mlTrain batch 7/7 - 119.1ms/batch - loss: 0.40846 - diff: 28.95mlTrain batch 7/7 - 15.1s 119.1ms/batch - loss: 0.40846 - diff: 28.95ml
+Test 1.4s: val_loss: 0.38162 - diff: 25.33ml
+
+Epoch 72: current best loss = 0.36619, at epoch 65
+Train batch 1/7 - 407.3ms/batch - loss: 0.31099 - diff: 24.88mlTrain batch 2/7 - 384.8ms/batch - loss: 0.30858 - diff: 24.69mlTrain batch 3/7 - 392.1ms/batch - loss: 0.35478 - diff: 28.38mlTrain batch 4/7 - 383.7ms/batch - loss: 0.34746 - diff: 27.80mlTrain batch 5/7 - 389.9ms/batch - loss: 0.33855 - diff: 27.08mlTrain batch 6/7 - 380.6ms/batch - loss: 0.35040 - diff: 28.03mlTrain batch 7/7 - 134.0ms/batch - loss: 0.39260 - diff: 28.04mlTrain batch 7/7 - 17.4s 134.0ms/batch - loss: 0.39260 - diff: 28.04ml
+Test 1.4s: val_loss: 0.36691 - diff: 23.22ml
+
+Epoch 73: current best loss = 0.36619, at epoch 65
+Train batch 1/7 - 393.3ms/batch - loss: 0.34279 - diff: 27.42mlTrain batch 2/7 - 384.0ms/batch - loss: 0.34837 - diff: 27.87mlTrain batch 3/7 - 389.0ms/batch - loss: 0.32825 - diff: 26.26mlTrain batch 4/7 - 392.1ms/batch - loss: 0.33820 - diff: 27.06mlTrain batch 5/7 - 401.7ms/batch - loss: 0.33972 - diff: 27.18mlTrain batch 6/7 - 396.8ms/batch - loss: 0.34937 - diff: 27.95mlTrain batch 7/7 - 119.0ms/batch - loss: 0.39589 - diff: 28.04mlTrain batch 7/7 - 18.9s 119.0ms/batch - loss: 0.39589 - diff: 28.04ml
+Test 1.3s: val_loss: 0.44677 - diff: 29.77ml
+
+Epoch 74: current best loss = 0.36619, at epoch 65
+Train batch 1/7 - 398.1ms/batch - loss: 0.40773 - diff: 32.62mlTrain batch 2/7 - 383.2ms/batch - loss: 0.36653 - diff: 29.32mlTrain batch 3/7 - 394.5ms/batch - loss: 0.39102 - diff: 31.28mlTrain batch 4/7 - 383.6ms/batch - loss: 0.39595 - diff: 31.68mlTrain batch 5/7 - 398.6ms/batch - loss: 0.38022 - diff: 30.42mlTrain batch 6/7 - 403.2ms/batch - loss: 0.37641 - diff: 30.11mlTrain batch 7/7 - 119.4ms/batch - loss: 0.40963 - diff: 29.87mlTrain batch 7/7 - 16.1s 119.4ms/batch - loss: 0.40963 - diff: 29.87ml
+Test 1.4s: val_loss: 0.39881 - diff: 26.85ml
+
+Epoch 75: current best loss = 0.36619, at epoch 65
+Train batch 1/7 - 407.7ms/batch - loss: 0.33198 - diff: 26.56mlTrain batch 2/7 - 381.9ms/batch - loss: 0.33376 - diff: 26.70mlTrain batch 3/7 - 400.8ms/batch - loss: 0.37468 - diff: 29.97mlTrain batch 4/7 - 383.6ms/batch - loss: 0.36057 - diff: 28.85mlTrain batch 5/7 - 389.4ms/batch - loss: 0.36529 - diff: 29.22mlTrain batch 6/7 - 384.5ms/batch - loss: 0.37704 - diff: 30.16mlTrain batch 7/7 - 125.3ms/batch - loss: 0.43357 - diff: 30.39mlTrain batch 7/7 - 16.9s 125.3ms/batch - loss: 0.43357 - diff: 30.39ml
+Test 1.2s: val_loss: 0.49641 - diff: 34.64ml
+
+Epoch 76: current best loss = 0.36619, at epoch 65
+Train batch 1/7 - 394.7ms/batch - loss: 0.45523 - diff: 36.42mlTrain batch 2/7 - 384.0ms/batch - loss: 0.41137 - diff: 32.91mlTrain batch 3/7 - 388.5ms/batch - loss: 0.38647 - diff: 30.92mlTrain batch 4/7 - 384.2ms/batch - loss: 0.37572 - diff: 30.06mlTrain batch 5/7 - 392.3ms/batch - loss: 0.35982 - diff: 28.79mlTrain batch 6/7 - 385.9ms/batch - loss: 0.34603 - diff: 27.68mlTrain batch 7/7 - 119.1ms/batch - loss: 0.40103 - diff: 27.95mlTrain batch 7/7 - 16.5s 119.1ms/batch - loss: 0.40103 - diff: 27.95ml
+Test 1.2s: val_loss: 0.36776 - diff: 24.36ml
+Epoch    77: reducing learning rate of group 0 to 1.2500e-04.
+
+Epoch 77: current best loss = 0.36619, at epoch 65
+Train batch 1/7 - 388.2ms/batch - loss: 0.26277 - diff: 21.02mlTrain batch 2/7 - 387.6ms/batch - loss: 0.29090 - diff: 23.27mlTrain batch 3/7 - 416.3ms/batch - loss: 0.32259 - diff: 25.81mlTrain batch 4/7 - 392.2ms/batch - loss: 0.32306 - diff: 25.85mlTrain batch 5/7 - 403.7ms/batch - loss: 0.31854 - diff: 25.48mlTrain batch 6/7 - 401.7ms/batch - loss: 0.32211 - diff: 25.77mlTrain batch 7/7 - 119.0ms/batch - loss: 0.35322 - diff: 25.62mlTrain batch 7/7 - 16.2s 119.0ms/batch - loss: 0.35322 - diff: 25.62ml
+Test 1.5s: val_loss: 0.37003 - diff: 24.58ml
+
+Epoch 78: current best loss = 0.36619, at epoch 65
+Train batch 1/7 - 394.0ms/batch - loss: 0.29540 - diff: 23.63mlTrain batch 2/7 - 383.8ms/batch - loss: 0.28109 - diff: 22.49mlTrain batch 3/7 - 406.8ms/batch - loss: 0.31017 - diff: 24.81mlTrain batch 4/7 - 383.7ms/batch - loss: 0.32298 - diff: 25.84mlTrain batch 5/7 - 405.7ms/batch - loss: 0.31098 - diff: 24.88mlTrain batch 6/7 - 383.7ms/batch - loss: 0.30793 - diff: 24.63mlTrain batch 7/7 - 119.3ms/batch - loss: 0.34287 - diff: 24.59mlTrain batch 7/7 - 15.5s 119.3ms/batch - loss: 0.34287 - diff: 24.59ml
+Test 1.4s: val_loss: 0.36239 - diff: 24.15ml
+Saving new best model in models/checkpoints/2CH_preproc1_150x150_bySlices_dataset_allViews_Diastole_VGG19_Adam-0.001_MAE_DA3_best
+
+Epoch 79: current best loss = 0.36239, at epoch 78
+Train batch 1/7 - 431.3ms/batch - loss: 0.32554 - diff: 26.04mlTrain batch 2/7 - 383.7ms/batch - loss: 0.32962 - diff: 26.37mlTrain batch 3/7 - 418.6ms/batch - loss: 0.32523 - diff: 26.02mlTrain batch 4/7 - 383.8ms/batch - loss: 0.30925 - diff: 24.74mlTrain batch 5/7 - 391.2ms/batch - loss: 0.31157 - diff: 24.93mlTrain batch 6/7 - 384.0ms/batch - loss: 0.31946 - diff: 25.56mlTrain batch 7/7 - 127.0ms/batch - loss: 0.35381 - diff: 25.48mlTrain batch 7/7 - 16.6s 127.0ms/batch - loss: 0.35381 - diff: 25.48ml
+Test 1.2s: val_loss: 0.34309 - diff: 22.55ml
+Saving new best model in models/checkpoints/2CH_preproc1_150x150_bySlices_dataset_allViews_Diastole_VGG19_Adam-0.001_MAE_DA3_best
+
+Epoch 80: current best loss = 0.34309, at epoch 79
+Train batch 1/7 - 404.5ms/batch - loss: 0.23447 - diff: 18.76mlTrain batch 2/7 - 383.7ms/batch - loss: 0.24141 - diff: 19.31mlTrain batch 3/7 - 391.7ms/batch - loss: 0.26003 - diff: 20.80mlTrain batch 4/7 - 382.3ms/batch - loss: 0.27321 - diff: 21.86mlTrain batch 5/7 - 389.0ms/batch - loss: 0.27429 - diff: 21.94mlTrain batch 6/7 - 383.6ms/batch - loss: 0.28519 - diff: 22.82mlTrain batch 7/7 - 119.6ms/batch - loss: 0.32953 - diff: 23.02mlTrain batch 7/7 - 16.9s 119.6ms/batch - loss: 0.32953 - diff: 23.02ml
+Test 1.3s: val_loss: 0.35234 - diff: 23.31ml
+
+Epoch 81: current best loss = 0.34309, at epoch 79
+Train batch 1/7 - 404.4ms/batch - loss: 0.27998 - diff: 22.40mlTrain batch 2/7 - 383.5ms/batch - loss: 0.29028 - diff: 23.22mlTrain batch 3/7 - 394.8ms/batch - loss: 0.30201 - diff: 24.16mlTrain batch 4/7 - 383.5ms/batch - loss: 0.29171 - diff: 23.34mlTrain batch 5/7 - 416.1ms/batch - loss: 0.30105 - diff: 24.08mlTrain batch 6/7 - 383.9ms/batch - loss: 0.30147 - diff: 24.12mlTrain batch 7/7 - 119.4ms/batch - loss: 0.34508 - diff: 24.27mlTrain batch 7/7 - 16.7s 119.4ms/batch - loss: 0.34508 - diff: 24.27ml
+Test 1.2s: val_loss: 0.39396 - diff: 26.80ml
+
+Epoch 82: current best loss = 0.34309, at epoch 79
+Train batch 1/7 - 394.1ms/batch - loss: 0.30213 - diff: 24.17mlTrain batch 2/7 - 383.3ms/batch - loss: 0.35425 - diff: 28.34mlTrain batch 3/7 - 402.4ms/batch - loss: 0.34941 - diff: 27.95mlTrain batch 4/7 - 383.7ms/batch - loss: 0.33306 - diff: 26.64mlTrain batch 5/7 - 403.0ms/batch - loss: 0.32747 - diff: 26.20mlTrain batch 6/7 - 402.3ms/batch - loss: 0.32166 - diff: 25.73mlTrain batch 7/7 - 119.5ms/batch - loss: 0.33676 - diff: 25.26mlTrain batch 7/7 - 17.3s 119.5ms/batch - loss: 0.33676 - diff: 25.26ml
+Test 1.2s: val_loss: 0.32623 - diff: 22.09ml
+Saving new best model in models/checkpoints/2CH_preproc1_150x150_bySlices_dataset_allViews_Diastole_VGG19_Adam-0.001_MAE_DA3_best
+
+Epoch 83: current best loss = 0.32623, at epoch 82
+Train batch 1/7 - 394.1ms/batch - loss: 0.26491 - diff: 21.19mlTrain batch 2/7 - 384.6ms/batch - loss: 0.29671 - diff: 23.74mlTrain batch 3/7 - 405.7ms/batch - loss: 0.29674 - diff: 23.74mlTrain batch 4/7 - 383.2ms/batch - loss: 0.31416 - diff: 25.13mlTrain batch 5/7 - 388.8ms/batch - loss: 0.32072 - diff: 25.66mlTrain batch 6/7 - 383.7ms/batch - loss: 0.31410 - diff: 25.13mlTrain batch 7/7 - 121.7ms/batch - loss: 0.34312 - diff: 24.95mlTrain batch 7/7 - 16.9s 121.7ms/batch - loss: 0.34312 - diff: 24.95ml
+Test 1.3s: val_loss: 0.36916 - diff: 24.02ml
+
+Epoch 84: current best loss = 0.32623, at epoch 82
+Train batch 1/7 - 392.9ms/batch - loss: 0.26128 - diff: 20.90mlTrain batch 2/7 - 384.3ms/batch - loss: 0.30082 - diff: 24.07mlTrain batch 3/7 - 389.1ms/batch - loss: 0.30949 - diff: 24.76mlTrain batch 4/7 - 384.2ms/batch - loss: 0.30685 - diff: 24.55mlTrain batch 5/7 - 395.2ms/batch - loss: 0.30999 - diff: 24.80mlTrain batch 6/7 - 384.4ms/batch - loss: 0.30997 - diff: 24.80mlTrain batch 7/7 - 119.0ms/batch - loss: 0.33367 - diff: 24.53mlTrain batch 7/7 - 16.8s 119.0ms/batch - loss: 0.33367 - diff: 24.53ml
+Test 1.4s: val_loss: 0.35108 - diff: 23.86ml
+
+Epoch 85: current best loss = 0.32623, at epoch 82
+Train batch 1/7 - 402.4ms/batch - loss: 0.25223 - diff: 20.18mlTrain batch 2/7 - 383.7ms/batch - loss: 0.25099 - diff: 20.08mlTrain batch 3/7 - 390.7ms/batch - loss: 0.27737 - diff: 22.19mlTrain batch 4/7 - 383.9ms/batch - loss: 0.28143 - diff: 22.51mlTrain batch 5/7 - 407.8ms/batch - loss: 0.27288 - diff: 21.83mlTrain batch 6/7 - 383.5ms/batch - loss: 0.27522 - diff: 22.02mlTrain batch 7/7 - 118.7ms/batch - loss: 0.32061 - diff: 22.26mlTrain batch 7/7 - 16.9s 118.7ms/batch - loss: 0.32061 - diff: 22.26ml
+Test 1.4s: val_loss: 0.33971 - diff: 23.11ml
+
+Epoch 86: current best loss = 0.32623, at epoch 82
+Train batch 1/7 - 396.2ms/batch - loss: 0.27097 - diff: 21.68mlTrain batch 2/7 - 383.1ms/batch - loss: 0.27420 - diff: 21.94mlTrain batch 3/7 - 404.3ms/batch - loss: 0.27042 - diff: 21.63mlTrain batch 4/7 - 383.7ms/batch - loss: 0.28722 - diff: 22.98mlTrain batch 5/7 - 405.1ms/batch - loss: 0.27736 - diff: 22.19mlTrain batch 6/7 - 384.0ms/batch - loss: 0.27264 - diff: 21.81mlTrain batch 7/7 - 119.0ms/batch - loss: 0.29155 - diff: 21.54mlTrain batch 7/7 - 16.2s 119.0ms/batch - loss: 0.29155 - diff: 21.54ml
+Test 1.2s: val_loss: 0.35487 - diff: 23.42ml
+
+Epoch 87: current best loss = 0.32623, at epoch 82
+Train batch 1/7 - 396.6ms/batch - loss: 0.27016 - diff: 21.61mlTrain batch 2/7 - 383.4ms/batch - loss: 0.26779 - diff: 21.42mlTrain batch 3/7 - 397.2ms/batch - loss: 0.26207 - diff: 20.97mlTrain batch 4/7 - 383.9ms/batch - loss: 0.26194 - diff: 20.96mlTrain batch 5/7 - 407.6ms/batch - loss: 0.26897 - diff: 21.52mlTrain batch 6/7 - 383.7ms/batch - loss: 0.26958 - diff: 21.57mlTrain batch 7/7 - 119.6ms/batch - loss: 0.29948 - diff: 21.52mlTrain batch 7/7 - 16.1s 119.6ms/batch - loss: 0.29948 - diff: 21.52ml
+Test 1.2s: val_loss: 0.41627 - diff: 27.78ml
+
+Epoch 88: current best loss = 0.32623, at epoch 82
+Train batch 1/7 - 406.7ms/batch - loss: 0.32056 - diff: 25.64mlTrain batch 2/7 - 383.7ms/batch - loss: 0.29015 - diff: 23.21mlTrain batch 3/7 - 399.5ms/batch - loss: 0.28774 - diff: 23.02mlTrain batch 4/7 - 383.5ms/batch - loss: 0.29096 - diff: 23.28mlTrain batch 5/7 - 408.4ms/batch - loss: 0.29192 - diff: 23.35mlTrain batch 6/7 - 390.1ms/batch - loss: 0.28764 - diff: 23.01mlTrain batch 7/7 - 118.9ms/batch - loss: 0.33782 - diff: 23.32mlTrain batch 7/7 - 17.4s 118.9ms/batch - loss: 0.33782 - diff: 23.32ml
+Test 1.5s: val_loss: 0.38894 - diff: 26.96ml
+
+Epoch 89: current best loss = 0.32623, at epoch 82
+Train batch 1/7 - 393.6ms/batch - loss: 0.28372 - diff: 22.70mlTrain batch 2/7 - 383.2ms/batch - loss: 0.27157 - diff: 21.73mlTrain batch 3/7 - 392.2ms/batch - loss: 0.27943 - diff: 22.35mlTrain batch 4/7 - 383.4ms/batch - loss: 0.28079 - diff: 22.46mlTrain batch 5/7 - 391.4ms/batch - loss: 0.27725 - diff: 22.18mlTrain batch 6/7 - 383.7ms/batch - loss: 0.28391 - diff: 22.71mlTrain batch 7/7 - 119.3ms/batch - loss: 0.30954 - diff: 22.54mlTrain batch 7/7 - 17.3s 119.3ms/batch - loss: 0.30954 - diff: 22.54ml
+Test 1.2s: val_loss: 0.37888 - diff: 25.94ml
+
+Epoch 90: current best loss = 0.32623, at epoch 82
+Train batch 1/7 - 417.2ms/batch - loss: 0.35636 - diff: 28.51mlTrain batch 2/7 - 383.3ms/batch - loss: 0.33765 - diff: 27.01mlTrain batch 3/7 - 414.7ms/batch - loss: 0.30435 - diff: 24.35mlTrain batch 4/7 - 383.3ms/batch - loss: 0.30446 - diff: 24.36mlTrain batch 5/7 - 390.0ms/batch - loss: 0.29859 - diff: 23.89mlTrain batch 6/7 - 389.2ms/batch - loss: 0.28687 - diff: 22.95mlTrain batch 7/7 - 119.1ms/batch - loss: 0.30259 - diff: 22.58mlTrain batch 7/7 - 16.4s 119.1ms/batch - loss: 0.30259 - diff: 22.58ml
+Test 1.5s: val_loss: 0.44946 - diff: 29.89ml
+
+Epoch 91: current best loss = 0.32623, at epoch 82
+Train batch 1/7 - 404.4ms/batch - loss: 0.35090 - diff: 28.07mlTrain batch 2/7 - 395.9ms/batch - loss: 0.29781 - diff: 23.82mlTrain batch 3/7 - 404.9ms/batch - loss: 0.29321 - diff: 23.46mlTrain batch 4/7 - 384.1ms/batch - loss: 0.29285 - diff: 23.43mlTrain batch 5/7 - 396.7ms/batch - loss: 0.29161 - diff: 23.33mlTrain batch 6/7 - 386.7ms/batch - loss: 0.30281 - diff: 24.22mlTrain batch 7/7 - 123.4ms/batch - loss: 0.33111 - diff: 24.06mlTrain batch 7/7 - 16.8s 123.4ms/batch - loss: 0.33111 - diff: 24.06ml
+Test 1.4s: val_loss: 0.32307 - diff: 21.52ml
+Saving new best model in models/checkpoints/2CH_preproc1_150x150_bySlices_dataset_allViews_Diastole_VGG19_Adam-0.001_MAE_DA3_best
+
+Epoch 92: current best loss = 0.32307, at epoch 91
+Train batch 1/7 - 404.4ms/batch - loss: 0.28370 - diff: 22.70mlTrain batch 2/7 - 383.7ms/batch - loss: 0.26573 - diff: 21.26mlTrain batch 3/7 - 399.1ms/batch - loss: 0.25960 - diff: 20.77mlTrain batch 4/7 - 390.0ms/batch - loss: 0.25845 - diff: 20.68mlTrain batch 5/7 - 400.1ms/batch - loss: 0.26648 - diff: 21.32mlTrain batch 6/7 - 381.3ms/batch - loss: 0.27469 - diff: 21.98mlTrain batch 7/7 - 119.0ms/batch - loss: 0.31089 - diff: 22.04mlTrain batch 7/7 - 16.6s 119.0ms/batch - loss: 0.31089 - diff: 22.04ml
+Test 1.3s: val_loss: 0.42992 - diff: 28.36ml
+
+Epoch 93: current best loss = 0.32307, at epoch 91
+Train batch 1/7 - 406.5ms/batch - loss: 0.38584 - diff: 30.87mlTrain batch 2/7 - 383.7ms/batch - loss: 0.40474 - diff: 32.38mlTrain batch 3/7 - 403.0ms/batch - loss: 0.38485 - diff: 30.79mlTrain batch 4/7 - 391.8ms/batch - loss: 0.36019 - diff: 28.82mlTrain batch 5/7 - 395.9ms/batch - loss: 0.36517 - diff: 29.21mlTrain batch 6/7 - 384.1ms/batch - loss: 0.35886 - diff: 28.71mlTrain batch 7/7 - 119.0ms/batch - loss: 0.37673 - diff: 28.21mlTrain batch 7/7 - 17.0s 119.0ms/batch - loss: 0.37673 - diff: 28.21ml
+Test 1.3s: val_loss: 0.43690 - diff: 28.54ml
+
+Epoch 94: current best loss = 0.32307, at epoch 91
+Train batch 1/7 - 402.7ms/batch - loss: 0.36774 - diff: 29.42mlTrain batch 2/7 - 383.7ms/batch - loss: 0.36078 - diff: 28.86mlTrain batch 3/7 - 395.1ms/batch - loss: 0.33145 - diff: 26.52mlTrain batch 4/7 - 383.7ms/batch - loss: 0.33073 - diff: 26.46mlTrain batch 5/7 - 400.0ms/batch - loss: 0.32044 - diff: 25.63mlTrain batch 6/7 - 383.8ms/batch - loss: 0.31093 - diff: 24.87mlTrain batch 7/7 - 118.6ms/batch - loss: 0.33073 - diff: 24.52mlTrain batch 7/7 - 16.8s 118.6ms/batch - loss: 0.33073 - diff: 24.52ml
+Test 1.4s: val_loss: 0.35385 - diff: 23.21ml
+
+Epoch 95: current best loss = 0.32307, at epoch 91
+Train batch 1/7 - 407.2ms/batch - loss: 0.26173 - diff: 20.94mlTrain batch 2/7 - 384.2ms/batch - loss: 0.25755 - diff: 20.60mlTrain batch 3/7 - 394.1ms/batch - loss: 0.24562 - diff: 19.65mlTrain batch 4/7 - 381.1ms/batch - loss: 0.24370 - diff: 19.50mlTrain batch 5/7 - 389.2ms/batch - loss: 0.24847 - diff: 19.88mlTrain batch 6/7 - 384.5ms/batch - loss: 0.25797 - diff: 20.64mlTrain batch 7/7 - 119.1ms/batch - loss: 0.29485 - diff: 20.76mlTrain batch 7/7 - 18.0s 119.1ms/batch - loss: 0.29485 - diff: 20.76ml
+Test 1.3s: val_loss: 0.35687 - diff: 23.36ml
+
+Epoch 96: current best loss = 0.32307, at epoch 91
+Train batch 1/7 - 391.3ms/batch - loss: 0.25741 - diff: 20.59mlTrain batch 2/7 - 393.0ms/batch - loss: 0.26733 - diff: 21.39mlTrain batch 3/7 - 395.7ms/batch - loss: 0.27143 - diff: 21.71mlTrain batch 4/7 - 383.3ms/batch - loss: 0.27202 - diff: 21.76mlTrain batch 5/7 - 395.6ms/batch - loss: 0.26886 - diff: 21.51mlTrain batch 6/7 - 383.4ms/batch - loss: 0.27161 - diff: 21.73mlTrain batch 7/7 - 119.2ms/batch - loss: 0.30076 - diff: 21.66mlTrain batch 7/7 - 14.4s 119.2ms/batch - loss: 0.30076 - diff: 21.66ml
+Test 1.4s: val_loss: 0.37016 - diff: 23.82ml
+
+Epoch 97: current best loss = 0.32307, at epoch 91
+Train batch 1/7 - 401.9ms/batch - loss: 0.24274 - diff: 19.42mlTrain batch 2/7 - 398.8ms/batch - loss: 0.23626 - diff: 18.90mlTrain batch 3/7 - 397.6ms/batch - loss: 0.24418 - diff: 19.53mlTrain batch 4/7 - 383.5ms/batch - loss: 0.25618 - diff: 20.49mlTrain batch 5/7 - 405.1ms/batch - loss: 0.26894 - diff: 21.52mlTrain batch 6/7 - 383.2ms/batch - loss: 0.26764 - diff: 21.41mlTrain batch 7/7 - 119.0ms/batch - loss: 0.29228 - diff: 21.26mlTrain batch 7/7 - 17.8s 119.0ms/batch - loss: 0.29228 - diff: 21.26ml
+Test 1.4s: val_loss: 0.37606 - diff: 25.14ml
+
+Epoch 98: current best loss = 0.32307, at epoch 91
+Train batch 1/7 - 403.9ms/batch - loss: 0.35877 - diff: 28.70mlTrain batch 2/7 - 383.6ms/batch - loss: 0.33271 - diff: 26.62mlTrain batch 3/7 - 401.9ms/batch - loss: 0.30622 - diff: 24.50mlTrain batch 4/7 - 383.4ms/batch - loss: 0.29797 - diff: 23.84mlTrain batch 5/7 - 407.4ms/batch - loss: 0.28379 - diff: 22.70mlTrain batch 6/7 - 383.7ms/batch - loss: 0.27889 - diff: 22.31mlTrain batch 7/7 - 119.2ms/batch - loss: 0.30771 - diff: 22.22mlTrain batch 7/7 - 17.3s 119.2ms/batch - loss: 0.30771 - diff: 22.22ml
+Test 1.3s: val_loss: 0.33257 - diff: 22.62ml
+
+Epoch 99: current best loss = 0.32307, at epoch 91
+Train batch 1/7 - 394.6ms/batch - loss: 0.22451 - diff: 17.96mlTrain batch 2/7 - 384.6ms/batch - loss: 0.24067 - diff: 19.25mlTrain batch 3/7 - 392.2ms/batch - loss: 0.25070 - diff: 20.06mlTrain batch 4/7 - 388.2ms/batch - loss: 0.25138 - diff: 20.11mlTrain batch 5/7 - 403.4ms/batch - loss: 0.25246 - diff: 20.20mlTrain batch 6/7 - 385.4ms/batch - loss: 0.25418 - diff: 20.33mlTrain batch 7/7 - 118.8ms/batch - loss: 0.30031 - diff: 20.65mlTrain batch 7/7 - 16.8s 118.8ms/batch - loss: 0.30031 - diff: 20.65ml
+Test 1.3s: val_loss: 0.37746 - diff: 25.04ml
+
+Epoch 100: current best loss = 0.32307, at epoch 91
+Train batch 1/7 - 401.2ms/batch - loss: 0.31739 - diff: 25.39mlTrain batch 2/7 - 383.3ms/batch - loss: 0.31554 - diff: 25.24mlTrain batch 3/7 - 404.9ms/batch - loss: 0.29774 - diff: 23.82mlTrain batch 4/7 - 383.3ms/batch - loss: 0.30778 - diff: 24.62mlTrain batch 5/7 - 418.9ms/batch - loss: 0.29388 - diff: 23.51mlTrain batch 6/7 - 383.8ms/batch - loss: 0.28474 - diff: 22.78mlTrain batch 7/7 - 118.7ms/batch - loss: 0.31187 - diff: 22.64mlTrain batch 7/7 - 16.8s 118.7ms/batch - loss: 0.31187 - diff: 22.64ml
+Test 1.4s: val_loss: 0.36627 - diff: 24.93ml
+
+Epoch 101: current best loss = 0.32307, at epoch 91
+Train batch 1/7 - 393.9ms/batch - loss: 0.34999 - diff: 28.00mlTrain batch 2/7 - 395.9ms/batch - loss: 0.31896 - diff: 25.52mlTrain batch 3/7 - 401.6ms/batch - loss: 0.28248 - diff: 22.60mlTrain batch 4/7 - 383.7ms/batch - loss: 0.30797 - diff: 24.64mlTrain batch 5/7 - 405.8ms/batch - loss: 0.30119 - diff: 24.10mlTrain batch 6/7 - 383.4ms/batch - loss: 0.29692 - diff: 23.75mlTrain batch 7/7 - 119.1ms/batch - loss: 0.33481 - diff: 23.80mlTrain batch 7/7 - 18.4s 119.1ms/batch - loss: 0.33481 - diff: 23.80ml
+Test 1.5s: val_loss: 0.33532 - diff: 22.06ml
+
+Epoch 102: current best loss = 0.32307, at epoch 91
+Train batch 1/7 - 390.2ms/batch - loss: 0.25730 - diff: 20.58mlTrain batch 2/7 - 393.1ms/batch - loss: 0.24736 - diff: 19.79mlTrain batch 3/7 - 406.7ms/batch - loss: 0.26147 - diff: 20.92mlTrain batch 4/7 - 383.2ms/batch - loss: 0.25276 - diff: 20.22mlTrain batch 5/7 - 405.1ms/batch - loss: 0.25199 - diff: 20.16mlTrain batch 6/7 - 404.8ms/batch - loss: 0.25428 - diff: 20.34mlTrain batch 7/7 - 119.2ms/batch - loss: 0.29381 - diff: 20.52mlTrain batch 7/7 - 16.6s 119.2ms/batch - loss: 0.29381 - diff: 20.52ml
+Test 1.6s: val_loss: 0.35083 - diff: 23.07ml
+Epoch   103: reducing learning rate of group 0 to 6.2500e-05.
+
+Epoch 103: current best loss = 0.32307, at epoch 91
+Train batch 1/7 - 407.1ms/batch - loss: 0.22739 - diff: 18.19mlTrain batch 2/7 - 384.1ms/batch - loss: 0.23788 - diff: 19.03mlTrain batch 3/7 - 405.8ms/batch - loss: 0.24256 - diff: 19.40mlTrain batch 4/7 - 383.6ms/batch - loss: 0.24730 - diff: 19.78mlTrain batch 5/7 - 403.0ms/batch - loss: 0.25282 - diff: 20.23mlTrain batch 6/7 - 383.6ms/batch - loss: 0.25800 - diff: 20.64mlTrain batch 7/7 - 119.1ms/batch - loss: 0.28219 - diff: 20.50mlTrain batch 7/7 - 16.8s 119.1ms/batch - loss: 0.28219 - diff: 20.50ml
+Test 1.2s: val_loss: 0.34381 - diff: 23.82ml
+
+Epoch 104: current best loss = 0.32307, at epoch 91
+Train batch 1/7 - 403.3ms/batch - loss: 0.21438 - diff: 17.15mlTrain batch 2/7 - 383.5ms/batch - loss: 0.23435 - diff: 18.75mlTrain batch 3/7 - 401.2ms/batch - loss: 0.25619 - diff: 20.49mlTrain batch 4/7 - 383.5ms/batch - loss: 0.24978 - diff: 19.98mlTrain batch 5/7 - 410.3ms/batch - loss: 0.25433 - diff: 20.35mlTrain batch 6/7 - 383.3ms/batch - loss: 0.25792 - diff: 20.63mlTrain batch 7/7 - 119.1ms/batch - loss: 0.28312 - diff: 20.52mlTrain batch 7/7 - 16.5s 119.1ms/batch - loss: 0.28312 - diff: 20.52ml
+Test 1.4s: val_loss: 0.32316 - diff: 21.93ml
+
+Epoch 105: current best loss = 0.32307, at epoch 91
+Train batch 1/7 - 390.8ms/batch - loss: 0.29507 - diff: 23.61mlTrain batch 2/7 - 384.8ms/batch - loss: 0.27377 - diff: 21.90mlTrain batch 3/7 - 407.6ms/batch - loss: 0.26592 - diff: 21.27mlTrain batch 4/7 - 383.2ms/batch - loss: 0.24973 - diff: 19.98mlTrain batch 5/7 - 396.7ms/batch - loss: 0.24025 - diff: 19.22mlTrain batch 6/7 - 383.3ms/batch - loss: 0.24521 - diff: 19.62mlTrain batch 7/7 - 119.3ms/batch - loss: 0.26720 - diff: 19.47mlTrain batch 7/7 - 16.3s 119.3ms/batch - loss: 0.26720 - diff: 19.47ml
+Test 1.4s: val_loss: 0.37655 - diff: 25.82ml
+
+Epoch 106: current best loss = 0.32307, at epoch 91
+Train batch 1/7 - 391.6ms/batch - loss: 0.31266 - diff: 25.01mlTrain batch 2/7 - 381.3ms/batch - loss: 0.30380 - diff: 24.30mlTrain batch 3/7 - 394.1ms/batch - loss: 0.28020 - diff: 22.42mlTrain batch 4/7 - 390.5ms/batch - loss: 0.28847 - diff: 23.08mlTrain batch 5/7 - 406.7ms/batch - loss: 0.28935 - diff: 23.15mlTrain batch 6/7 - 383.8ms/batch - loss: 0.28358 - diff: 22.69mlTrain batch 7/7 - 119.0ms/batch - loss: 0.30708 - diff: 22.48mlTrain batch 7/7 - 16.7s 119.0ms/batch - loss: 0.30708 - diff: 22.48ml
+Test 1.3s: val_loss: 0.33254 - diff: 21.33ml
+
+Epoch 107: current best loss = 0.32307, at epoch 91
+Train batch 1/7 - 402.8ms/batch - loss: 0.24284 - diff: 19.43mlTrain batch 2/7 - 382.0ms/batch - loss: 0.26272 - diff: 21.02mlTrain batch 3/7 - 396.9ms/batch - loss: 0.26834 - diff: 21.47mlTrain batch 4/7 - 391.3ms/batch - loss: 0.26369 - diff: 21.10mlTrain batch 5/7 - 406.8ms/batch - loss: 0.26279 - diff: 21.02mlTrain batch 6/7 - 384.0ms/batch - loss: 0.25844 - diff: 20.68mlTrain batch 7/7 - 119.0ms/batch - loss: 0.29585 - diff: 20.80mlTrain batch 7/7 - 16.9s 119.0ms/batch - loss: 0.29585 - diff: 20.80ml
+Test 1.2s: val_loss: 0.33202 - diff: 21.33ml
+
+Epoch 108: current best loss = 0.32307, at epoch 91
+Train batch 1/7 - 401.6ms/batch - loss: 0.23413 - diff: 18.73mlTrain batch 2/7 - 391.9ms/batch - loss: 0.22442 - diff: 17.95mlTrain batch 3/7 - 399.2ms/batch - loss: 0.23411 - diff: 18.73mlTrain batch 4/7 - 384.0ms/batch - loss: 0.24655 - diff: 19.72mlTrain batch 5/7 - 406.7ms/batch - loss: 0.24025 - diff: 19.22mlTrain batch 6/7 - 387.8ms/batch - loss: 0.24691 - diff: 19.75mlTrain batch 7/7 - 124.8ms/batch - loss: 0.27530 - diff: 19.73mlTrain batch 7/7 - 16.3s 124.8ms/batch - loss: 0.27530 - diff: 19.73ml
+Test 1.3s: val_loss: 0.33887 - diff: 21.75ml
+
+Epoch 109: current best loss = 0.32307, at epoch 91
+Train batch 1/7 - 388.9ms/batch - loss: 0.21554 - diff: 17.24mlTrain batch 2/7 - 383.7ms/batch - loss: 0.22818 - diff: 18.25mlTrain batch 3/7 - 406.6ms/batch - loss: 0.24311 - diff: 19.45mlTrain batch 4/7 - 396.8ms/batch - loss: 0.23720 - diff: 18.98mlTrain batch 5/7 - 393.6ms/batch - loss: 0.23759 - diff: 19.01mlTrain batch 6/7 - 383.7ms/batch - loss: 0.23805 - diff: 19.04mlTrain batch 7/7 - 119.1ms/batch - loss: 0.27408 - diff: 19.19mlTrain batch 7/7 - 16.5s 119.1ms/batch - loss: 0.27408 - diff: 19.19ml
+Test 1.3s: val_loss: 0.33388 - diff: 21.80ml
+
+Epoch 110: current best loss = 0.32307, at epoch 91
+Train batch 1/7 - 405.5ms/batch - loss: 0.26448 - diff: 21.16mlTrain batch 2/7 - 384.1ms/batch - loss: 0.25067 - diff: 20.05mlTrain batch 3/7 - 395.8ms/batch - loss: 0.25194 - diff: 20.15mlTrain batch 4/7 - 390.0ms/batch - loss: 0.24203 - diff: 19.36mlTrain batch 5/7 - 399.7ms/batch - loss: 0.23723 - diff: 18.98mlTrain batch 6/7 - 398.3ms/batch - loss: 0.23397 - diff: 18.72mlTrain batch 7/7 - 118.9ms/batch - loss: 0.27132 - diff: 18.90mlTrain batch 7/7 - 17.5s 118.9ms/batch - loss: 0.27132 - diff: 18.90ml
+Test 1.4s: val_loss: 0.34659 - diff: 23.23ml
+
+Epoch 111: current best loss = 0.32307, at epoch 91
+Train batch 1/7 - 404.6ms/batch - loss: 0.23660 - diff: 18.93mlTrain batch 2/7 - 383.9ms/batch - loss: 0.23264 - diff: 18.61mlTrain batch 3/7 - 403.3ms/batch - loss: 0.23822 - diff: 19.06mlTrain batch 4/7 - 383.6ms/batch - loss: 0.23419 - diff: 18.74mlTrain batch 5/7 - 403.0ms/batch - loss: 0.24480 - diff: 19.58mlTrain batch 6/7 - 387.5ms/batch - loss: 0.24972 - diff: 19.98mlTrain batch 7/7 - 119.4ms/batch - loss: 0.27912 - diff: 19.97mlTrain batch 7/7 - 16.2s 119.4ms/batch - loss: 0.27912 - diff: 19.97ml
+Test 1.1s: val_loss: 0.37927 - diff: 25.04ml
+
+Epoch 112: current best loss = 0.32307, at epoch 91
+Train batch 1/7 - 406.7ms/batch - loss: 0.25105 - diff: 20.08mlTrain batch 2/7 - 383.9ms/batch - loss: 0.26732 - diff: 21.39mlTrain batch 3/7 - 392.1ms/batch - loss: 0.25560 - diff: 20.45mlTrain batch 4/7 - 383.4ms/batch - loss: 0.24271 - diff: 19.42mlTrain batch 5/7 - 389.1ms/batch - loss: 0.24795 - diff: 19.84mlTrain batch 6/7 - 382.7ms/batch - loss: 0.24800 - diff: 19.84mlTrain batch 7/7 - 118.7ms/batch - loss: 0.28723 - diff: 20.03mlTrain batch 7/7 - 16.5s 118.7ms/batch - loss: 0.28723 - diff: 20.03ml
+Test 1.4s: val_loss: 0.37309 - diff: 24.47ml
+
+Epoch 113: current best loss = 0.32307, at epoch 91
+Train batch 1/7 - 390.1ms/batch - loss: 0.26600 - diff: 21.28mlTrain batch 2/7 - 382.7ms/batch - loss: 0.28879 - diff: 23.10mlTrain batch 3/7 - 408.3ms/batch - loss: 0.26423 - diff: 21.14mlTrain batch 4/7 - 383.8ms/batch - loss: 0.25932 - diff: 20.75mlTrain batch 5/7 - 401.4ms/batch - loss: 0.26014 - diff: 20.81mlTrain batch 6/7 - 383.4ms/batch - loss: 0.25072 - diff: 20.06mlTrain batch 7/7 - 126.4ms/batch - loss: 0.27237 - diff: 19.89mlTrain batch 7/7 - 17.2s 126.4ms/batch - loss: 0.27237 - diff: 19.89ml
+Test 1.4s: val_loss: 0.37518 - diff: 24.66ml
+Epoch   114: reducing learning rate of group 0 to 3.1250e-05.
+
+Epoch 114: current best loss = 0.32307, at epoch 91
+Train batch 1/7 - 398.9ms/batch - loss: 0.23676 - diff: 18.94mlTrain batch 2/7 - 384.5ms/batch - loss: 0.25057 - diff: 20.05mlTrain batch 3/7 - 417.0ms/batch - loss: 0.24683 - diff: 19.75mlTrain batch 4/7 - 387.7ms/batch - loss: 0.23840 - diff: 19.07mlTrain batch 5/7 - 394.6ms/batch - loss: 0.24599 - diff: 19.68mlTrain batch 6/7 - 383.1ms/batch - loss: 0.23980 - diff: 19.18mlTrain batch 7/7 - 119.5ms/batch - loss: 0.25986 - diff: 19.01mlTrain batch 7/7 - 16.9s 119.5ms/batch - loss: 0.25986 - diff: 19.01ml
+Test 1.3s: val_loss: 0.33315 - diff: 22.21ml
+
+Epoch 115: current best loss = 0.32307, at epoch 91
+Train batch 1/7 - 395.6ms/batch - loss: 0.24634 - diff: 19.71mlTrain batch 2/7 - 393.8ms/batch - loss: 0.21236 - diff: 16.99mlTrain batch 3/7 - 398.4ms/batch - loss: 0.21272 - diff: 17.02mlTrain batch 4/7 - 383.9ms/batch - loss: 0.21098 - diff: 16.88mlTrain batch 5/7 - 406.3ms/batch - loss: 0.22683 - diff: 18.15mlTrain batch 6/7 - 383.6ms/batch - loss: 0.22850 - diff: 18.28mlTrain batch 7/7 - 119.0ms/batch - loss: 0.24805 - diff: 18.12mlTrain batch 7/7 - 16.8s 119.0ms/batch - loss: 0.24805 - diff: 18.12ml
+Test 1.2s: val_loss: 0.33005 - diff: 21.91ml
+
+Epoch 116: current best loss = 0.32307, at epoch 91
+Train batch 1/7 - 404.9ms/batch - loss: 0.29687 - diff: 23.75mlTrain batch 2/7 - 390.1ms/batch - loss: 0.26035 - diff: 20.83mlTrain batch 3/7 - 404.0ms/batch - loss: 0.23797 - diff: 19.04mlTrain batch 4/7 - 384.2ms/batch - loss: 0.24345 - diff: 19.48mlTrain batch 5/7 - 407.8ms/batch - loss: 0.24040 - diff: 19.23mlTrain batch 6/7 - 382.1ms/batch - loss: 0.24274 - diff: 19.42mlTrain batch 7/7 - 119.0ms/batch - loss: 0.27611 - diff: 19.50mlTrain batch 7/7 - 16.8s 119.0ms/batch - loss: 0.27611 - diff: 19.50ml
+Test 1.3s: val_loss: 0.34467 - diff: 23.08ml
+
+Epoch 117: current best loss = 0.32307, at epoch 91
+Train batch 1/7 - 405.0ms/batch - loss: 0.25889 - diff: 20.71mlTrain batch 2/7 - 383.5ms/batch - loss: 0.25504 - diff: 20.40mlTrain batch 3/7 - 403.8ms/batch - loss: 0.25456 - diff: 20.36mlTrain batch 4/7 - 390.3ms/batch - loss: 0.24331 - diff: 19.47mlTrain batch 5/7 - 397.9ms/batch - loss: 0.24358 - diff: 19.49mlTrain batch 6/7 - 383.7ms/batch - loss: 0.24480 - diff: 19.58mlTrain batch 7/7 - 119.3ms/batch - loss: 0.26948 - diff: 19.49mlTrain batch 7/7 - 15.1s 119.3ms/batch - loss: 0.26948 - diff: 19.49ml
+Test 1.0s: val_loss: 0.30670 - diff: 20.99ml
+Saving new best model in models/checkpoints/2CH_preproc1_150x150_bySlices_dataset_allViews_Diastole_VGG19_Adam-0.001_MAE_DA3_best
+
+Epoch 118: current best loss = 0.30670, at epoch 117
+Train batch 1/7 - 401.5ms/batch - loss: 0.19910 - diff: 15.93mlTrain batch 2/7 - 382.7ms/batch - loss: 0.21562 - diff: 17.25mlTrain batch 3/7 - 403.7ms/batch - loss: 0.22372 - diff: 17.90mlTrain batch 4/7 - 383.5ms/batch - loss: 0.21811 - diff: 17.45mlTrain batch 5/7 - 394.8ms/batch - loss: 0.22325 - diff: 17.86mlTrain batch 6/7 - 392.3ms/batch - loss: 0.22008 - diff: 17.61mlTrain batch 7/7 - 118.8ms/batch - loss: 0.24275 - diff: 17.53mlTrain batch 7/7 - 16.8s 118.8ms/batch - loss: 0.24275 - diff: 17.53ml
+Test 1.3s: val_loss: 0.30530 - diff: 21.24ml
+Saving new best model in models/checkpoints/2CH_preproc1_150x150_bySlices_dataset_allViews_Diastole_VGG19_Adam-0.001_MAE_DA3_best
+
+Epoch 119: current best loss = 0.30530, at epoch 118
+Train batch 1/7 - 402.5ms/batch - loss: 0.24155 - diff: 19.32mlTrain batch 2/7 - 384.2ms/batch - loss: 0.23382 - diff: 18.71mlTrain batch 3/7 - 400.5ms/batch - loss: 0.22218 - diff: 17.77mlTrain batch 4/7 - 383.9ms/batch - loss: 0.23135 - diff: 18.51mlTrain batch 5/7 - 401.9ms/batch - loss: 0.23035 - diff: 18.43mlTrain batch 6/7 - 386.7ms/batch - loss: 0.23023 - diff: 18.42mlTrain batch 7/7 - 121.2ms/batch - loss: 0.26476 - diff: 18.56mlTrain batch 7/7 - 16.9s 121.2ms/batch - loss: 0.26476 - diff: 18.56ml
+Test 1.3s: val_loss: 0.32220 - diff: 21.52ml
+
+Epoch 120: current best loss = 0.30530, at epoch 118
+Train batch 1/7 - 414.0ms/batch - loss: 0.20958 - diff: 16.77mlTrain batch 2/7 - 383.5ms/batch - loss: 0.22731 - diff: 18.18mlTrain batch 3/7 - 404.8ms/batch - loss: 0.21431 - diff: 17.15mlTrain batch 4/7 - 394.0ms/batch - loss: 0.22237 - diff: 17.79mlTrain batch 5/7 - 399.7ms/batch - loss: 0.22132 - diff: 17.71mlTrain batch 6/7 - 384.5ms/batch - loss: 0.22987 - diff: 18.39mlTrain batch 7/7 - 118.9ms/batch - loss: 0.24749 - diff: 18.19mlTrain batch 7/7 - 16.0s 118.9ms/batch - loss: 0.24749 - diff: 18.19ml
+Test 1.4s: val_loss: 0.31158 - diff: 21.18ml
+
+Epoch 121: current best loss = 0.30530, at epoch 118
+Train batch 1/7 - 404.5ms/batch - loss: 0.21626 - diff: 17.30mlTrain batch 2/7 - 384.2ms/batch - loss: 0.23932 - diff: 19.15mlTrain batch 3/7 - 408.7ms/batch - loss: 0.23265 - diff: 18.61mlTrain batch 4/7 - 383.5ms/batch - loss: 0.23318 - diff: 18.65mlTrain batch 5/7 - 391.4ms/batch - loss: 0.22709 - diff: 18.17mlTrain batch 6/7 - 385.5ms/batch - loss: 0.22622 - diff: 18.10mlTrain batch 7/7 - 118.6ms/batch - loss: 0.26676 - diff: 18.37mlTrain batch 7/7 - 17.3s 118.6ms/batch - loss: 0.26676 - diff: 18.37ml
+Test 1.3s: val_loss: 0.33681 - diff: 22.53ml
+
+Epoch 122: current best loss = 0.30530, at epoch 118
+Train batch 1/7 - 392.2ms/batch - loss: 0.25632 - diff: 20.51mlTrain batch 2/7 - 384.4ms/batch - loss: 0.24269 - diff: 19.42mlTrain batch 3/7 - 405.0ms/batch - loss: 0.24142 - diff: 19.31mlTrain batch 4/7 - 381.1ms/batch - loss: 0.23599 - diff: 18.88mlTrain batch 5/7 - 397.4ms/batch - loss: 0.23370 - diff: 18.70mlTrain batch 6/7 - 384.1ms/batch - loss: 0.23086 - diff: 18.47mlTrain batch 7/7 - 119.5ms/batch - loss: 0.25692 - diff: 18.44mlTrain batch 7/7 - 17.2s 119.5ms/batch - loss: 0.25692 - diff: 18.44ml
+Test 1.4s: val_loss: 0.33477 - diff: 22.42ml
+
+Epoch 123: current best loss = 0.30530, at epoch 118
+Train batch 1/7 - 401.8ms/batch - loss: 0.23483 - diff: 18.79mlTrain batch 2/7 - 383.9ms/batch - loss: 0.24298 - diff: 19.44mlTrain batch 3/7 - 395.9ms/batch - loss: 0.23028 - diff: 18.42mlTrain batch 4/7 - 389.1ms/batch - loss: 0.23120 - diff: 18.50mlTrain batch 5/7 - 396.4ms/batch - loss: 0.23136 - diff: 18.51mlTrain batch 6/7 - 390.9ms/batch - loss: 0.23417 - diff: 18.73mlTrain batch 7/7 - 126.8ms/batch - loss: 0.26358 - diff: 18.76mlTrain batch 7/7 - 16.9s 126.8ms/batch - loss: 0.26358 - diff: 18.76ml
+Test 1.3s: val_loss: 0.36355 - diff: 23.33ml
+
+Epoch 124: current best loss = 0.30530, at epoch 118
+Train batch 1/7 - 422.9ms/batch - loss: 0.19689 - diff: 15.75mlTrain batch 2/7 - 391.6ms/batch - loss: 0.22816 - diff: 18.25mlTrain batch 3/7 - 412.2ms/batch - loss: 0.23811 - diff: 19.05mlTrain batch 4/7 - 384.3ms/batch - loss: 0.23324 - diff: 18.66mlTrain batch 5/7 - 391.9ms/batch - loss: 0.23495 - diff: 18.80mlTrain batch 6/7 - 383.4ms/batch - loss: 0.23571 - diff: 18.86mlTrain batch 7/7 - 119.7ms/batch - loss: 0.27115 - diff: 19.00mlTrain batch 7/7 - 15.3s 119.7ms/batch - loss: 0.27115 - diff: 19.00ml
+Test 1.3s: val_loss: 0.34226 - diff: 22.75ml
+
+Epoch 125: current best loss = 0.30530, at epoch 118
+Train batch 1/7 - 401.8ms/batch - loss: 0.23618 - diff: 18.89mlTrain batch 2/7 - 390.8ms/batch - loss: 0.22702 - diff: 18.16mlTrain batch 3/7 - 395.8ms/batch - loss: 0.23258 - diff: 18.61mlTrain batch 4/7 - 383.5ms/batch - loss: 0.22720 - diff: 18.18mlTrain batch 5/7 - 414.6ms/batch - loss: 0.22971 - diff: 18.38mlTrain batch 6/7 - 388.3ms/batch - loss: 0.23144 - diff: 18.52mlTrain batch 7/7 - 119.4ms/batch - loss: 0.25794 - diff: 18.49mlTrain batch 7/7 - 16.2s 119.4ms/batch - loss: 0.25794 - diff: 18.49ml
+Test 1.3s: val_loss: 0.32575 - diff: 21.68ml
+
+Epoch 126: current best loss = 0.30530, at epoch 118
+Train batch 1/7 - 409.9ms/batch - loss: 0.24836 - diff: 19.87mlTrain batch 2/7 - 383.7ms/batch - loss: 0.22454 - diff: 17.96mlTrain batch 3/7 - 387.9ms/batch - loss: 0.23140 - diff: 18.51mlTrain batch 4/7 - 390.6ms/batch - loss: 0.23494 - diff: 18.80mlTrain batch 5/7 - 409.4ms/batch - loss: 0.22319 - diff: 17.86mlTrain batch 6/7 - 404.2ms/batch - loss: 0.21913 - diff: 17.53mlTrain batch 7/7 - 119.4ms/batch - loss: 0.24592 - diff: 17.54mlTrain batch 7/7 - 17.7s 119.4ms/batch - loss: 0.24592 - diff: 17.54ml
+Test 1.3s: val_loss: 0.35402 - diff: 23.56ml
+
+Epoch 127: current best loss = 0.30530, at epoch 118
+Train batch 1/7 - 389.0ms/batch - loss: 0.24606 - diff: 19.68mlTrain batch 2/7 - 383.1ms/batch - loss: 0.27065 - diff: 21.65mlTrain batch 3/7 - 403.2ms/batch - loss: 0.25801 - diff: 20.64mlTrain batch 4/7 - 391.9ms/batch - loss: 0.25130 - diff: 20.10mlTrain batch 5/7 - 391.3ms/batch - loss: 0.24502 - diff: 19.60mlTrain batch 6/7 - 386.2ms/batch - loss: 0.24660 - diff: 19.73mlTrain batch 7/7 - 119.5ms/batch - loss: 0.28123 - diff: 19.83mlTrain batch 7/7 - 17.3s 119.5ms/batch - loss: 0.28123 - diff: 19.83ml
+Test 1.9s: val_loss: 0.33019 - diff: 21.99ml
+
+Epoch 128: current best loss = 0.30530, at epoch 118
+Train batch 1/7 - 396.5ms/batch - loss: 0.24217 - diff: 19.37mlTrain batch 2/7 - 383.3ms/batch - loss: 0.25242 - diff: 20.19mlTrain batch 3/7 - 406.0ms/batch - loss: 0.26274 - diff: 21.02mlTrain batch 4/7 - 384.4ms/batch - loss: 0.25780 - diff: 20.62mlTrain batch 5/7 - 400.9ms/batch - loss: 0.25180 - diff: 20.14mlTrain batch 6/7 - 383.0ms/batch - loss: 0.24825 - diff: 19.86mlTrain batch 7/7 - 119.2ms/batch - loss: 0.28543 - diff: 20.01mlTrain batch 7/7 - 17.5s 119.2ms/batch - loss: 0.28543 - diff: 20.01ml
+Test 1.5s: val_loss: 0.33776 - diff: 21.74ml
+
+Epoch 129: current best loss = 0.30530, at epoch 118
+Train batch 1/7 - 407.5ms/batch - loss: 0.21070 - diff: 16.86mlTrain batch 2/7 - 382.9ms/batch - loss: 0.23379 - diff: 18.70mlTrain batch 3/7 - 399.4ms/batch - loss: 0.23354 - diff: 18.68mlTrain batch 4/7 - 384.0ms/batch - loss: 0.23345 - diff: 18.68mlTrain batch 5/7 - 397.7ms/batch - loss: 0.23023 - diff: 18.42mlTrain batch 6/7 - 383.8ms/batch - loss: 0.22634 - diff: 18.11mlTrain batch 7/7 - 118.8ms/batch - loss: 0.24785 - diff: 17.99mlTrain batch 7/7 - 16.5s 118.8ms/batch - loss: 0.24785 - diff: 17.99ml
+Test 1.3s: val_loss: 0.33434 - diff: 22.13ml
+Epoch   130: reducing learning rate of group 0 to 1.5625e-05.
+
+Epoch 130: current best loss = 0.30530, at epoch 118
+Train batch 1/7 - 402.2ms/batch - loss: 0.21701 - diff: 17.36mlTrain batch 2/7 - 383.8ms/batch - loss: 0.21762 - diff: 17.41mlTrain batch 3/7 - 396.5ms/batch - loss: 0.21677 - diff: 17.34mlTrain batch 4/7 - 383.9ms/batch - loss: 0.21861 - diff: 17.49mlTrain batch 5/7 - 390.5ms/batch - loss: 0.21738 - diff: 17.39mlTrain batch 6/7 - 383.5ms/batch - loss: 0.21763 - diff: 17.41mlTrain batch 7/7 - 119.2ms/batch - loss: 0.23052 - diff: 17.15mlTrain batch 7/7 - 16.3s 119.2ms/batch - loss: 0.23052 - diff: 17.15ml
+Test 1.5s: val_loss: 0.32976 - diff: 21.50ml
+
+Epoch 131: current best loss = 0.30530, at epoch 118
+Train batch 1/7 - 408.7ms/batch - loss: 0.25172 - diff: 20.14mlTrain batch 2/7 - 383.8ms/batch - loss: 0.24489 - diff: 19.59mlTrain batch 3/7 - 395.6ms/batch - loss: 0.23188 - diff: 18.55mlTrain batch 4/7 - 395.8ms/batch - loss: 0.23388 - diff: 18.71mlTrain batch 5/7 - 404.1ms/batch - loss: 0.23652 - diff: 18.92mlTrain batch 6/7 - 384.3ms/batch - loss: 0.22949 - diff: 18.36mlTrain batch 7/7 - 119.4ms/batch - loss: 0.25345 - diff: 18.29mlTrain batch 7/7 - 17.0s 119.4ms/batch - loss: 0.25345 - diff: 18.29ml
+Test 1.5s: val_loss: 0.30517 - diff: 21.13ml
+Saving new best model in models/checkpoints/2CH_preproc1_150x150_bySlices_dataset_allViews_Diastole_VGG19_Adam-0.001_MAE_DA3_best
+
+Epoch 132: current best loss = 0.30517, at epoch 131
+Train batch 1/7 - 402.1ms/batch - loss: 0.20120 - diff: 16.10mlTrain batch 2/7 - 384.4ms/batch - loss: 0.21060 - diff: 16.85mlTrain batch 3/7 - 420.6ms/batch - loss: 0.21006 - diff: 16.80mlTrain batch 4/7 - 384.4ms/batch - loss: 0.21375 - diff: 17.10mlTrain batch 5/7 - 395.4ms/batch - loss: 0.22848 - diff: 18.28mlTrain batch 6/7 - 405.6ms/batch - loss: 0.22529 - diff: 18.02mlTrain batch 7/7 - 119.4ms/batch - loss: 0.23625 - diff: 17.70mlTrain batch 7/7 - 16.4s 119.4ms/batch - loss: 0.23625 - diff: 17.70ml
+Test 1.3s: val_loss: 0.33893 - diff: 21.67ml
+
+Epoch 133: current best loss = 0.30517, at epoch 131
+Train batch 1/7 - 408.1ms/batch - loss: 0.21603 - diff: 17.28mlTrain batch 2/7 - 388.0ms/batch - loss: 0.21748 - diff: 17.40mlTrain batch 3/7 - 409.7ms/batch - loss: 0.23263 - diff: 18.61mlTrain batch 4/7 - 383.9ms/batch - loss: 0.22234 - diff: 17.79mlTrain batch 5/7 - 391.3ms/batch - loss: 0.21755 - diff: 17.40mlTrain batch 6/7 - 383.5ms/batch - loss: 0.21877 - diff: 17.50mlTrain batch 7/7 - 126.6ms/batch - loss: 0.26396 - diff: 17.88mlTrain batch 7/7 - 17.6s 126.6ms/batch - loss: 0.26396 - diff: 17.88ml
+Test 1.4s: val_loss: 0.33130 - diff: 22.06ml
+
+Epoch 134: current best loss = 0.30517, at epoch 131
+Train batch 1/7 - 414.3ms/batch - loss: 0.17784 - diff: 14.23mlTrain batch 2/7 - 383.6ms/batch - loss: 0.20692 - diff: 16.55mlTrain batch 3/7 - 404.6ms/batch - loss: 0.21784 - diff: 17.43mlTrain batch 4/7 - 383.6ms/batch - loss: 0.22376 - diff: 17.90mlTrain batch 5/7 - 407.7ms/batch - loss: 0.22785 - diff: 18.23mlTrain batch 6/7 - 384.1ms/batch - loss: 0.23738 - diff: 18.99mlTrain batch 7/7 - 127.0ms/batch - loss: 0.26687 - diff: 19.01mlTrain batch 7/7 - 16.5s 127.0ms/batch - loss: 0.26687 - diff: 19.01ml
+Test 1.3s: val_loss: 0.33908 - diff: 21.77ml
+
+Epoch 135: current best loss = 0.30517, at epoch 131
+Train batch 1/7 - 405.4ms/batch - loss: 0.23972 - diff: 19.18mlTrain batch 2/7 - 391.7ms/batch - loss: 0.21676 - diff: 17.34mlTrain batch 3/7 - 408.3ms/batch - loss: 0.20697 - diff: 16.56mlTrain batch 4/7 - 383.8ms/batch - loss: 0.21270 - diff: 17.02mlTrain batch 5/7 - 394.0ms/batch - loss: 0.22618 - diff: 18.09mlTrain batch 6/7 - 385.4ms/batch - loss: 0.22530 - diff: 18.02mlTrain batch 7/7 - 119.1ms/batch - loss: 0.24368 - diff: 17.85mlTrain batch 7/7 - 17.3s 119.1ms/batch - loss: 0.24368 - diff: 17.85ml
+Test 1.4s: val_loss: 0.32777 - diff: 21.62ml
+
+Epoch 136: current best loss = 0.30517, at epoch 131
+Train batch 1/7 - 393.3ms/batch - loss: 0.23842 - diff: 19.07mlTrain batch 2/7 - 394.1ms/batch - loss: 0.23597 - diff: 18.88mlTrain batch 3/7 - 392.5ms/batch - loss: 0.22197 - diff: 17.76mlTrain batch 4/7 - 384.3ms/batch - loss: 0.21452 - diff: 17.16mlTrain batch 5/7 - 426.2ms/batch - loss: 0.22031 - diff: 17.62mlTrain batch 6/7 - 383.8ms/batch - loss: 0.21379 - diff: 17.10mlTrain batch 7/7 - 118.7ms/batch - loss: 0.25749 - diff: 17.46mlTrain batch 7/7 - 17.5s 118.7ms/batch - loss: 0.25749 - diff: 17.46ml
+Test 1.3s: val_loss: 0.33049 - diff: 21.77ml
+
+Epoch 137: current best loss = 0.30517, at epoch 131
+Train batch 1/7 - 400.0ms/batch - loss: 0.17651 - diff: 14.12mlTrain batch 2/7 - 394.5ms/batch - loss: 0.19702 - diff: 15.76mlTrain batch 3/7 - 400.1ms/batch - loss: 0.20998 - diff: 16.80mlTrain batch 4/7 - 389.9ms/batch - loss: 0.20875 - diff: 16.70mlTrain batch 5/7 - 395.7ms/batch - loss: 0.20806 - diff: 16.64mlTrain batch 6/7 - 384.1ms/batch - loss: 0.20551 - diff: 16.44mlTrain batch 7/7 - 119.3ms/batch - loss: 0.23067 - diff: 16.45mlTrain batch 7/7 - 16.1s 119.3ms/batch - loss: 0.23067 - diff: 16.45ml
+Test 1.3s: val_loss: 0.32330 - diff: 21.83ml
+
+Epoch 138: current best loss = 0.30517, at epoch 131
+Train batch 1/7 - 400.0ms/batch - loss: 0.20564 - diff: 16.45mlTrain batch 2/7 - 385.0ms/batch - loss: 0.21145 - diff: 16.92mlTrain batch 3/7 - 400.2ms/batch - loss: 0.22337 - diff: 17.87mlTrain batch 4/7 - 397.6ms/batch - loss: 0.22484 - diff: 17.99mlTrain batch 5/7 - 390.9ms/batch - loss: 0.22044 - diff: 17.64mlTrain batch 6/7 - 381.6ms/batch - loss: 0.21468 - diff: 17.17mlTrain batch 7/7 - 127.4ms/batch - loss: 0.24007 - diff: 17.17mlTrain batch 7/7 - 17.8s 127.4ms/batch - loss: 0.24007 - diff: 17.17ml
+Test 1.5s: val_loss: 0.32929 - diff: 21.56ml
+
+Epoch 139: current best loss = 0.30517, at epoch 131
+Train batch 1/7 - 397.1ms/batch - loss: 0.21229 - diff: 16.98mlTrain batch 2/7 - 383.7ms/batch - loss: 0.21353 - diff: 17.08mlTrain batch 3/7 - 395.3ms/batch - loss: 0.21992 - diff: 17.59mlTrain batch 4/7 - 384.0ms/batch - loss: 0.23109 - diff: 18.49mlTrain batch 5/7 - 397.2ms/batch - loss: 0.22311 - diff: 17.85mlTrain batch 6/7 - 383.9ms/batch - loss: 0.21672 - diff: 17.34mlTrain batch 7/7 - 118.8ms/batch - loss: 0.22897 - diff: 17.06mlTrain batch 7/7 - 16.2s 118.8ms/batch - loss: 0.22897 - diff: 17.06ml
+Test 1.4s: val_loss: 0.31986 - diff: 21.71ml
+
+Epoch 140: current best loss = 0.30517, at epoch 131
+Train batch 1/7 - 407.7ms/batch - loss: 0.19933 - diff: 15.95mlTrain batch 2/7 - 382.1ms/batch - loss: 0.20574 - diff: 16.46mlTrain batch 3/7 - 401.2ms/batch - loss: 0.21450 - diff: 17.16mlTrain batch 4/7 - 390.6ms/batch - loss: 0.21709 - diff: 17.37mlTrain batch 5/7 - 411.0ms/batch - loss: 0.22225 - diff: 17.78mlTrain batch 6/7 - 384.3ms/batch - loss: 0.21891 - diff: 17.51mlTrain batch 7/7 - 119.6ms/batch - loss: 0.23195 - diff: 17.25mlTrain batch 7/7 - 15.5s 119.6ms/batch - loss: 0.23195 - diff: 17.25ml
+Test 1.1s: val_loss: 0.33160 - diff: 21.71ml
+
+Epoch 141: current best loss = 0.30517, at epoch 131
+Train batch 1/7 - 391.6ms/batch - loss: 0.22300 - diff: 17.84mlTrain batch 2/7 - 382.8ms/batch - loss: 0.20738 - diff: 16.59mlTrain batch 3/7 - 390.7ms/batch - loss: 0.21523 - diff: 17.22mlTrain batch 4/7 - 383.6ms/batch - loss: 0.21202 - diff: 16.96mlTrain batch 5/7 - 407.6ms/batch - loss: 0.20903 - diff: 16.72mlTrain batch 6/7 - 390.5ms/batch - loss: 0.20679 - diff: 16.54mlTrain batch 7/7 - 129.1ms/batch - loss: 0.24696 - diff: 16.85mlTrain batch 7/7 - 16.9s 129.1ms/batch - loss: 0.24696 - diff: 16.85ml
+Test 1.4s: val_loss: 0.32302 - diff: 21.60ml
+
+Epoch 142: current best loss = 0.30517, at epoch 131
+Train batch 1/7 - 412.0ms/batch - loss: 0.21427 - diff: 17.14mlTrain batch 2/7 - 383.8ms/batch - loss: 0.21289 - diff: 17.03mlTrain batch 3/7 - 400.0ms/batch - loss: 0.21198 - diff: 16.96mlTrain batch 4/7 - 384.3ms/batch - loss: 0.21108 - diff: 16.89mlTrain batch 5/7 - 413.4ms/batch - loss: 0.21020 - diff: 16.82mlTrain batch 6/7 - 383.1ms/batch - loss: 0.21401 - diff: 17.12mlTrain batch 7/7 - 118.9ms/batch - loss: 0.23727 - diff: 17.07mlTrain batch 7/7 - 17.8s 118.9ms/batch - loss: 0.23727 - diff: 17.07ml
+Test 1.3s: val_loss: 0.32936 - diff: 21.81ml
+Epoch   143: reducing learning rate of group 0 to 7.8125e-06.
+
+Epoch 143: current best loss = 0.30517, at epoch 131
+Train batch 1/7 - 397.6ms/batch - loss: 0.20575 - diff: 16.46mlTrain batch 2/7 - 385.7ms/batch - loss: 0.21729 - diff: 17.38mlTrain batch 3/7 - 399.5ms/batch - loss: 0.21425 - diff: 17.14mlTrain batch 4/7 - 383.8ms/batch - loss: 0.20179 - diff: 16.14mlTrain batch 5/7 - 394.4ms/batch - loss: 0.20302 - diff: 16.24mlTrain batch 6/7 - 383.4ms/batch - loss: 0.20389 - diff: 16.31mlTrain batch 7/7 - 119.0ms/batch - loss: 0.23382 - diff: 16.42mlTrain batch 7/7 - 16.7s 119.0ms/batch - loss: 0.23382 - diff: 16.42ml
+Test 1.2s: val_loss: 0.31347 - diff: 21.31ml
+
+Epoch 144: current best loss = 0.30517, at epoch 131
+Train batch 1/7 - 389.9ms/batch - loss: 0.19588 - diff: 15.67mlTrain batch 2/7 - 383.2ms/batch - loss: 0.20662 - diff: 16.53mlTrain batch 3/7 - 407.2ms/batch - loss: 0.21372 - diff: 17.10mlTrain batch 4/7 - 384.2ms/batch - loss: 0.21407 - diff: 17.13mlTrain batch 5/7 - 398.1ms/batch - loss: 0.22063 - diff: 17.65mlTrain batch 6/7 - 386.6ms/batch - loss: 0.21619 - diff: 17.29mlTrain batch 7/7 - 126.8ms/batch - loss: 0.23791 - diff: 17.21mlTrain batch 7/7 - 18.4s 126.8ms/batch - loss: 0.23791 - diff: 17.21ml
+Test 1.2s: val_loss: 0.32187 - diff: 21.15ml
+
+Epoch 145: current best loss = 0.30517, at epoch 131
+Train batch 1/7 - 408.1ms/batch - loss: 0.24492 - diff: 19.59mlTrain batch 2/7 - 388.8ms/batch - loss: 0.22471 - diff: 17.98mlTrain batch 3/7 - 401.7ms/batch - loss: 0.22069 - diff: 17.66mlTrain batch 4/7 - 385.8ms/batch - loss: 0.21305 - diff: 17.04mlTrain batch 5/7 - 403.4ms/batch - loss: 0.21443 - diff: 17.15mlTrain batch 6/7 - 385.1ms/batch - loss: 0.21324 - diff: 17.06mlTrain batch 7/7 - 121.2ms/batch - loss: 0.24142 - diff: 17.11mlTrain batch 7/7 - 17.3s 121.2ms/batch - loss: 0.24142 - diff: 17.11ml
+Test 1.4s: val_loss: 0.32892 - diff: 21.25ml
+
+Epoch 146: current best loss = 0.30517, at epoch 131
+Train batch 1/7 - 403.5ms/batch - loss: 0.17740 - diff: 14.19mlTrain batch 2/7 - 383.6ms/batch - loss: 0.19936 - diff: 15.95mlTrain batch 3/7 - 402.5ms/batch - loss: 0.20951 - diff: 16.76mlTrain batch 4/7 - 382.9ms/batch - loss: 0.21544 - diff: 17.24mlTrain batch 5/7 - 405.8ms/batch - loss: 0.21126 - diff: 16.90mlTrain batch 6/7 - 384.4ms/batch - loss: 0.21424 - diff: 17.14mlTrain batch 7/7 - 118.8ms/batch - loss: 0.23796 - diff: 17.10mlTrain batch 7/7 - 17.0s 118.8ms/batch - loss: 0.23796 - diff: 17.10ml
+Test 1.2s: val_loss: 0.31297 - diff: 21.45ml
+
+Epoch 147: current best loss = 0.30517, at epoch 131
+Train batch 1/7 - 390.2ms/batch - loss: 0.20528 - diff: 16.42mlTrain batch 2/7 - 384.0ms/batch - loss: 0.22511 - diff: 18.01mlTrain batch 3/7 - 397.4ms/batch - loss: 0.21010 - diff: 16.81mlTrain batch 4/7 - 387.2ms/batch - loss: 0.20685 - diff: 16.55mlTrain batch 5/7 - 408.3ms/batch - loss: 0.21652 - diff: 17.32mlTrain batch 6/7 - 384.1ms/batch - loss: 0.22208 - diff: 17.77mlTrain batch 7/7 - 119.1ms/batch - loss: 0.24459 - diff: 17.68mlTrain batch 7/7 - 16.9s 119.1ms/batch - loss: 0.24459 - diff: 17.68ml
+Test 1.2s: val_loss: 0.31096 - diff: 21.47ml
+
+Epoch 148: current best loss = 0.30517, at epoch 131
+Train batch 1/7 - 393.8ms/batch - loss: 0.20775 - diff: 16.62mlTrain batch 2/7 - 384.0ms/batch - loss: 0.20623 - diff: 16.50mlTrain batch 3/7 - 394.6ms/batch - loss: 0.20481 - diff: 16.38mlTrain batch 4/7 - 384.1ms/batch - loss: 0.20413 - diff: 16.33mlTrain batch 5/7 - 402.3ms/batch - loss: 0.20755 - diff: 16.60mlTrain batch 6/7 - 384.4ms/batch - loss: 0.21458 - diff: 17.17mlTrain batch 7/7 - 119.0ms/batch - loss: 0.23780 - diff: 17.12mlTrain batch 7/7 - 16.9s 119.0ms/batch - loss: 0.23780 - diff: 17.12ml
+Test 1.4s: val_loss: 0.32556 - diff: 21.85ml
+
+Epoch 149: current best loss = 0.30517, at epoch 131
+Train batch 1/7 - 392.5ms/batch - loss: 0.22733 - diff: 18.19mlTrain batch 2/7 - 384.0ms/batch - loss: 0.20805 - diff: 16.64mlTrain batch 3/7 - 389.3ms/batch - loss: 0.22325 - diff: 17.86mlTrain batch 4/7 - 385.0ms/batch - loss: 0.22663 - diff: 18.13mlTrain batch 5/7 - 403.4ms/batch - loss: 0.21672 - diff: 17.34mlTrain batch 6/7 - 383.4ms/batch - loss: 0.21112 - diff: 16.89mlTrain batch 7/7 - 127.0ms/batch - loss: 0.24953 - diff: 17.15mlTrain batch 7/7 - 16.4s 127.0ms/batch - loss: 0.24953 - diff: 17.15ml
+Test 1.2s: val_loss: 0.33003 - diff: 22.08ml
+
