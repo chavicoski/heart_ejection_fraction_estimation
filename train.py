@@ -37,6 +37,7 @@ arg_parser.add_argument("-m", "--model", help="Select the model to train", type=
                 "DenseNet121_0"], default="TimeAsDepth_0")
 arg_parser.add_argument("-opt", "--optimizer", help="Select the training optimizer", type=str, choices=["Adam", "AdamW", "SGD"], default="Adam")
 arg_parser.add_argument("-lr", "--learning_rate", help="Starting learning rate for the optimizer", type=float, default=0.001)
+arg_parser.add_argument("-w_decay", "--weight_decay", help="Weight decay to apply to the optimizer (L2 penalty)", type=float, default=0)
 arg_parser.add_argument("-loss", "--loss_function", help="Loss function to optimize during training", type=str, choices=["MSE", "MAE"], default="MSE")
 arg_parser.add_argument("-da", "--data_augmentation", help="Enable data augmentation", choices=[0, 1, 2, 3], type=int, default=0)
 arg_parser.add_argument("-dp", "--data_path", help="Path to the preprocessed dataset folder", type=str, default="../preproc1_150x150_bySlices_dataset_allViews/")
@@ -61,6 +62,7 @@ model_name = args.model
 loss_function = args.loss_function
 opt_name = args.optimizer
 learning_rate = args.learning_rate
+w_decay = args.weight_decay
 data_augmentation = args.data_augmentation
 use_pretrained = bool(args.use_pretrained)
 use_lr_scheduler = bool(args.lr_scheduler)
@@ -73,6 +75,10 @@ if data_augmentation > 0:
 
 if not use_pretrained:
     exp_name += "_no-pretrained"
+
+if w_decay > 0:
+    exp_name += f"_w-decay-{w_decay}"
+
 print(f"Running experiment {exp_name}")
 
 # Check computing device
@@ -159,11 +165,11 @@ else:
 
 # Get optimizer 
 if opt_name == "Adam":
-    optimizer = optim.Adam(model.parameters(), lr=learning_rate)
+    optimizer = optim.Adam(model.parameters(), lr=learning_rate, weight_decay=w_decay)
 elif opt_name == "AdamW":
     optimizer = optim.AdamW(model.parameters(), lr=learning_rate)
 elif opt_name == "SGD":
-    optimizer = optim.SGD(model.parameters(), lr=learning_rate, momentum=0.9)
+    optimizer = optim.SGD(model.parameters(), lr=learning_rate, momentum=0.9, weight_decay=w_decay)
 else:
     print(f"Optimizer {opt_name} not recognized!")
     sys.exit()
